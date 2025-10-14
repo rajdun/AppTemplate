@@ -18,13 +18,12 @@ public static class DependencyInjection
     public static WebApplicationBuilder AddTelemetry(this WebApplicationBuilder builder)
     {
         Log.Logger = new LoggerConfiguration()
-            .ReadFrom.Configuration(builder.Configuration)
             .Enrich.FromLogContext()
             .WriteTo.Console()
             .WriteTo.OpenTelemetry(options =>
             {
                 options.Endpoint = builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"] ?? "http://localhost:4317";
-                options.Protocol = Serilog.Sinks.OpenTelemetry.OtlpProtocol.Grpc;
+                options.Protocol = Serilog.Sinks.OpenTelemetry.OtlpProtocol.HttpProtobuf;
                 options.ResourceAttributes = new Dictionary<string, object>
                 {
                     ["service.name"] = builder.Configuration["OTEL_SERVICE_NAME"] ?? "unknown-service"
@@ -35,25 +34,27 @@ public static class DependencyInjection
         builder.Host.UseSerilog();
         
         var serviceName = builder.Configuration["OTEL_SERVICE_NAME"] ?? "my-api-service";
-        var serviceVersion = "1.0.0";
+        var serviceVersion = builder.Configuration["OTEL_SERVICE_VERSION"] ?? "1.0.0";
         
         builder.Services.AddOpenTelemetry()
             .ConfigureResource(resource => resource
                 .AddService(serviceName: serviceName, serviceVersion: serviceVersion))
-    
-            // Configure Tracing
+
             .WithTracing(tracing => tracing
-                .AddSource(serviceName)
                 .AddAspNetCoreInstrumentation()
                 .AddHttpClientInstrumentation()
-                .AddNpgsql() // Instrument the PostgreSQL driver
-                .AddOtlpExporter())
-        
-            // Configure Metrics
+                .AddOtlpExporter(opt => 
+                {
+                    opt.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.HttpProtobuf;
+                }))
+
             .WithMetrics(metrics => metrics
                 .AddAspNetCoreInstrumentation()
                 .AddHttpClientInstrumentation()
-                .AddOtlpExporter());
+                .AddOtlpExporter(opt => 
+                {
+                    opt.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.HttpProtobuf;
+                }));
         
         builder.Logging.AddOpenTelemetry(logging =>
         {
