@@ -24,6 +24,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InfrastructureTests", "Infr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DomainTests", "DomainTests\DomainTests.csproj", "{1B1C94A2-B3A8-4F90-9622-AF022EE2F5BE}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "config", "config", "{640B9FE7-900A-407A-9547-1EB8A6EB2FBE}"
+	ProjectSection(SolutionItems) = preProject
+		config\grafana-datasources.yml = config\grafana-datasources.yml
+		config\loki-config.yaml = config\loki-config.yaml
+		config\otel-collector-config.yaml = config\otel-collector-config.yaml
+		config\prometheus.yml = config\prometheus.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -66,5 +74,6 @@ Global
 		{7A929DDB-F20D-487F-8317-DC1512D162D4} = {67505113-1EBC-4F67-8FB7-1FA41EB81A3A}
 		{CCB230DD-C744-45B9-AC60-EE001C4EE78F} = {67505113-1EBC-4F67-8FB7-1FA41EB81A3A}
 		{1B1C94A2-B3A8-4F90-9622-AF022EE2F5BE} = {67505113-1EBC-4F67-8FB7-1FA41EB81A3A}
+		{640B9FE7-900A-407A-9547-1EB8A6EB2FBE} = {99120E20-916C-407D-A59C-1C9E5A5E02A8}
 	EndGlobalSection
 EndGlobal
