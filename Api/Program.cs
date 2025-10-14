@@ -32,7 +32,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.MapGet("/", () => "Hello World!");
+app.MapControllers();
 
 try
 {

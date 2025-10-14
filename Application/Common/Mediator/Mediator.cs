@@ -13,11 +13,11 @@ public class Mediator : IMediator
         _serviceProvider = serviceProvider;
     }
 
-    public async Task<Result<TResponse>> SendAsync<TRequest, TResponse>(TRequest request) 
+    public async Task<Result<TResponse>> SendAsync<TRequest, TResponse>(TRequest request, CancellationToken cancellationToken = new())
         where TRequest : IRequest<TResponse>
     {
         var handler = _serviceProvider.GetRequiredService<IRequestHandler<TRequest, TResponse>>();
         
-        return await handler.Handle(request);
+        return await handler.Handle(request, cancellationToken);
     }
 }
