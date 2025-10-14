@@ -24,4 +24,8 @@
       <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.10" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Common\" />
+    </ItemGroup>
+
 </Project>
