@@ -25,6 +25,7 @@ services:
       - ConnectionStrings__Cache=${CACHE_CONNECTION_STRING:-cache:6379}
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4317
       - OTEL_SERVICE_NAME=my-api-service
+      - Urls=http://+:80
     restart: unless-stopped
     networks:
       - monitoring
