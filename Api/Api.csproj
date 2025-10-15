@@ -5,6 +5,8 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <OpenApiSpecPath>$(MSBuildProjectDirectory)\Api_internal.json</OpenApiSpecPath>
+        <HttpFilesOutputDirectory>$(MSBuildProjectDirectory)\Http</HttpFilesOutputDirectory>
         <UserSecretsId>6bba0d5d-a6fa-40e0-92e5-8113499445a4</UserSecretsId>
     </PropertyGroup>
 
@@ -53,5 +55,10 @@
       <ProjectReference Include="..\Domain\Domain.csproj" />
       <ProjectReference Include="..\Infrastructure\Infrastructure.csproj" />
     </ItemGroup>
+
+    <Target Name="GenerateHttpFiles" AfterTargets="Build">
+        <Exec Command="dotnet httpgenerator $(OpenApiSpecPath) --output-type OneRequestPerFile --output $(HttpFilesOutputDirectory)"
+              Condition="Exists('$(OpenApiSpecPath)')" />
+    </Target>
 
 </Project>

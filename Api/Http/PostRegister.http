@@ -1,0 +1,20 @@
+@baseUrl = 
+@contentType = application/json
+
+######################################################################################################################################################################################################################################################################################
+### Request: POST /api/users/register
+### Summary: Rejestracja użytkownika. Wymaga username, email, password, repeatPassword. Token JWT oraz refresh token w odpowiedzi.
+### Description: Rejestruje nowego użytkownika na podstawie podanych danych: username, email, password, repeatPassword. Zwraca token JWT oraz refresh token przy poprawnej rejestracji. W przypadku błędnych danych (np. niezgodność haseł, istniejący użytkownik) zwraca kod błędu.
+######################################################################################################################################################################################################################################################################################
+
+
+POST {{baseUrl}}/api/users/register
+Content-Type: {{contentType}}
+
+{
+  "username": "username",
+  "password": "password",
+  "repeatPassword": "repeatPassword",
+  "email": "email"
+}
+
