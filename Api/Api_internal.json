@@ -10,8 +10,8 @@
         "tags": [
           "Users"
         ],
-        "summary": "User Login Endpoint",
-        "description": "Authenticates a user with the provided username and password.",
+        "summary": "Uwierzytelnianie użytkownika. Wymaga loginu i hasła. Token JWT oraz refresh token w odpowiedzi.",
+        "description": "Autoryzuje użytkownika na podstawie loginu i hasła. Zwraca token JWT oraz refresh token przy poprawnych danych. W przypadku błędnych danych zwraca odpowiedni kod błędu.",
         "operationId": "Login",
         "requestBody": {
           "content": {
@@ -33,6 +33,26 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
@@ -42,8 +62,8 @@
         "tags": [
           "Users"
         ],
-        "summary": "User Registration Endpoint",
-        "description": "Registers a new user with the provided username, email, and password.",
+        "summary": "Rejestracja użytkownika. Wymaga username, email, password, repeatPassword. Token JWT oraz refresh token w odpowiedzi.",
+        "description": "Rejestruje nowego użytkownika na podstawie podanych danych: username, email, password, repeatPassword. Zwraca token JWT oraz refresh token przy poprawnej rejestracji. W przypadku błędnych danych (np. niezgodność haseł, istniejący użytkownik) zwraca kod błędu.",
         "operationId": "Register",
         "requestBody": {
           "content": {
@@ -62,6 +82,16 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/TokenResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
             }
@@ -84,6 +114,32 @@
           },
           "password": {
             "type": "string"
+          }
+        }
+      },
+      "ProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "detail": {
+            "type": "string",
+            "nullable": true
+          },
+          "instance": {
+            "type": "string",
+            "nullable": true
           }
         }
       },
