@@ -57,7 +57,7 @@
     </ItemGroup>
 
     <Target Name="GenerateHttpFiles" AfterTargets="Build">
-        <Exec Command="dotnet httpgenerator $(OpenApiSpecPath) --output-type OneRequestPerFile --output $(HttpFilesOutputDirectory)"
+        <Exec Command="dotnet httpgenerator $(OpenApiSpecPath) --output-type OneRequestPerFile --output $(HttpFilesOutputDirectory) --base-url http://localhost:8080 --authorization-header-variable-name authToken"
               Condition="Exists('$(OpenApiSpecPath)')" />
     </Target>
 
