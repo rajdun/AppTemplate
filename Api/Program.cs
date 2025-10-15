@@ -1,5 +1,6 @@
 using Api;
 using Application;
+using Carter;
 using Domain;
 using Infrastructure;
 using Infrastructure.Data;
@@ -8,11 +9,13 @@ using Serilog;
 
 
 var builder = WebApplication.CreateBuilder(args);
+
 builder.AddTelemetry();
 builder.Services.AddDomain();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
 builder.Services.AddPresentation(builder.Configuration);
+
 var app = builder.Build();
 
 if (args.Contains("migrate"))
@@ -32,7 +35,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.MapControllers();
+app.MapCarter();
 
 try
 {
