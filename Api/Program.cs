@@ -32,9 +32,21 @@ if (args.Contains("migrate"))
 
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.MapOpenApi("/openapi/{documentName}/openapi.json");
 }
 
+app.UseExceptionHandler();
+
+var supportedCultures = new[] { "en-US", "pl-PL" };
+var localizationOptions = new RequestLocalizationOptions()
+    .SetDefaultCulture(supportedCultures[0])
+    .AddSupportedCultures(supportedCultures)
+    .AddSupportedUICultures(supportedCultures);
+
+app.UseRequestLocalization(localizationOptions);
+
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapCarter();
 
 try

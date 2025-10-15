@@ -1,9 +1,18 @@
-﻿using Infrastructure.Data;
+﻿using System.Text;
+using Application.Common.Interfaces;
+using Application.Users.Interfaces;
+using Domain.Entities.Users;
+using Infrastructure.Data;
+using Infrastructure.Implementation;
+using Infrastructure.Implementation.Dto;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Npgsql;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
@@ -17,6 +26,8 @@ public static class DependencyInjection
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddDatabase(configuration);
+        services.AddIdentity(configuration);
+        services.AddImplementation(configuration);
         
         return services;
     }
@@ -70,6 +81,52 @@ public static class DependencyInjection
         });
         
         return builder;
+    }
+    
+    private static IServiceCollection AddImplementation(this IServiceCollection services, IConfiguration configuration)
+    {
+        var jwtSettings = new JwtSettings();
+        configuration.Bind(JwtSettings.SectionName, jwtSettings);
+        services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
+        services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
+
+        services.AddScoped<IUserService, UserService>();
+        
+        return services;
+    }
+    
+    private static IServiceCollection AddIdentity(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.AddIdentity<ApplicationUser, ApplicationRole>()
+            .AddEntityFrameworkStores<ApplicationDbContext>();
+        services.AddAuthorization();
+        services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                var key = configuration["JwtSettings:Secret"];
+
+                if (string.IsNullOrWhiteSpace(key))
+                {
+                    throw new ArgumentNullException("JWTSettings:Secret", "JWT Secret is not configured.");
+                }
+                
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = configuration["JwtSettings:Issuer"],
+                    ValidAudience = configuration["JwtSettings:Audience"],
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
+                };
+            });
+        
+        return services;
     }
     
     private static IServiceCollection AddDatabase(this IServiceCollection services, IConfiguration configuration)

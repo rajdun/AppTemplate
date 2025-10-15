@@ -1,4 +1,5 @@
-﻿using Carter;
+﻿using Api.Common;
+using Carter;
 using Npgsql;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
@@ -12,7 +13,12 @@ public static class DependencyInjection
     public static IServiceCollection AddPresentation(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddCarter();
-        services.AddOpenApi();
+        services.AddOpenApi("internal");
+        services.AddEndpointsApiExplorer();
+        services.AddLocalization();
+        
+        services.AddExceptionHandler<GlobalExceptionHandler>();
+        services.AddProblemDetails();
         
         return services;
     }

@@ -1,0 +1,32 @@
+﻿using Api.Common;
+using Application.Common.Mediator;
+using Application.Users.Commands;
+using Application.Users.Dto;
+using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Identity.Data;
+using Microsoft.AspNetCore.Mvc;
+using LoginRequest = Api.Modules.Users.Requests.LoginRequest;
+using RegisterRequest = Api.Modules.Users.Requests.RegisterRequest;
+
+namespace Api.Modules.Users;
+
+public partial class UsersModule
+{
+    private static async Task<IResult> Login([FromServices] IMediator mediator, [FromBody] LoginRequest request)
+    {
+        var command = new LoginCommand(request.Login, request.Password);
+        
+        var response = await mediator.SendAsync<LoginCommand, TokenResult>(command);
+
+        return response.ToHttpResult();
+    }
+    
+    private static async Task<IResult> Register([FromServices] IMediator mediator, [FromBody] RegisterRequest request)
+    {
+        var command = new RegisterCommand(request.Username, request.Email, request.Password, request.RepeatPassword);
+        
+        var response = await mediator.SendAsync<RegisterCommand, TokenResult>(command); 
+        
+        return response.ToHttpResult();
+    }
+}

@@ -1,4 +1,7 @@
-﻿FROM mcr.microsoft.com/dotnet/aspnet:9.0-alpine AS base
+﻿FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
+USER root
+RUN apt-get update && apt-get install -y libicu-dev && rm -rf /var/lib/apt/lists/*
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
@@ -19,6 +22,5 @@ RUN dotnet publish "./Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:Use
 
 FROM base AS final
 WORKDIR /app
-RUN apk add --no-cache curl
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "Api.dll"]
