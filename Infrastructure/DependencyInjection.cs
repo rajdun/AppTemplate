@@ -88,6 +88,7 @@ public static class DependencyInjection
         configuration.Bind(JwtSettings.SectionName, jwtSettings);
         services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
         services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
+        services.AddScoped<IUser, CurrentUser>();
         
         return services;
     }
