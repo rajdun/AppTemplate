@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace Infrastructure.Implementation;
 
-public class CurrentUser : IUser
+internal class CurrentUser : IUser
 {
     public Guid UserId { get; }
     public string UserName { get; }
