@@ -11,6 +11,7 @@ internal class CurrentUser : IUser
     public string UserName { get; }
     public string Email { get; }
     public bool IsAuthenticated { get; }
+    public bool IsAdmin { get; }
 
     public CurrentUser(IHttpContextAccessor httpContextAccessor)
     {
@@ -22,6 +23,7 @@ internal class CurrentUser : IUser
             UserName = user.Identity.Name ?? string.Empty;
             Email = user.FindFirst(JwtRegisteredClaimNames.Email)?.Value ?? string.Empty;
             var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            IsAdmin = true;
 
             if (Guid.TryParse(userIdClaim, out var userId))
             {

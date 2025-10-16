@@ -12,6 +12,7 @@ namespace Application.Users.Commands;
 
 public record RefreshTokenCommand(string RefreshToken) : IRequest<TokenResult>;
 
+[Authorize(AuthorizePolicy.Any)]
 public class RefreshTokenCommandValidator : AbstractValidator<RefreshTokenCommand>
 {
     public RefreshTokenCommandValidator()

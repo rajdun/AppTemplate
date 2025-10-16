@@ -38,3 +38,12 @@ public class ForbiddenError : Error
 {
     public ForbiddenError(string message) : base(message) { }
 }
+
+/// <summary>
+/// Błąd uwierzytelniania wskazujący, że użytkownik nie jest zalogowany lub token jest nieprawidłowy.
+/// Tłumaczony na status HTTP 401 Unauthorized.
+/// </summary>
+public class UnauthorizedError : Error
+{
+    public UnauthorizedError(string message) : base(message) { }
+}

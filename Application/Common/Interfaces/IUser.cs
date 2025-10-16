@@ -6,4 +6,5 @@ public interface IUser
     string UserName { get; }
     string Email { get; }
     bool IsAuthenticated { get; }
+    bool IsAdmin { get; }
 }

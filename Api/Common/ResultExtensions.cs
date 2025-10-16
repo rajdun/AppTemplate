@@ -1,5 +1,6 @@
 ﻿using Application.Common.Errors;
 using FluentResults;
+using Grpc.Core;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Common;
@@ -59,6 +60,11 @@ public static class ResultExtensions
                  return CreateProblemResult(
                     StatusCodes.Status403Forbidden, 
                     "Forbidden", 
+                    firstError.Message);
+            case UnauthorizedError:
+                return CreateProblemResult(
+                    StatusCodes.Status401Unauthorized,
+                    "Unauthorized",
                     firstError.Message);
             case ValidationError:
                 var validationProblem = new ValidationProblemDetails(errorsDict)
