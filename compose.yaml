@@ -23,7 +23,7 @@ services:
     environment:
       # Connection strings
       - ConnectionStrings__DefaultConnection=${DB_CONNECTION_STRING:-Server=database;Port=5432;Database=dev_db;User Id=dev_user;Password=dev_password;}
-      - ConnectionStrings__Cache=${CACHE_CONNECTION_STRING:-cache:6379}
+      - ConnectionStrings__Redis=${CACHE_CONNECTION_STRING:-cache:6379}
       
       # OpenTelemetry configuration
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318
@@ -58,6 +58,8 @@ services:
   cache:
     image: valkey/valkey:8.1.4-alpine3.22
     restart: unless-stopped
+    ports:
+      - "6379:6379"
     networks:
       - monitoring
 

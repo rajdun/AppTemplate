@@ -1,4 +1,5 @@
 ﻿using Api.Common;
+using Api.Modules.Users.Requests;
 using Application.Common.Mediator;
 using Application.Users.Commands;
 using Application.Users.Dto;
@@ -26,6 +27,15 @@ public partial class UsersModule
         var command = new RegisterCommand(request.Username, request.Email, request.Password, request.RepeatPassword);
         
         var response = await mediator.SendAsync<RegisterCommand, TokenResult>(command); 
+        
+        return response.ToHttpResult();
+    }
+    
+    private static async Task<IResult> RefreshToken([FromServices] IMediator mediator, [FromBody] RefreshTokenRequest request)
+    {
+        var command = new RefreshTokenCommand(request.RefreshToken);
+        
+        var response = await mediator.SendAsync<RefreshTokenCommand, TokenResult>(command); 
         
         return response.ToHttpResult();
     }

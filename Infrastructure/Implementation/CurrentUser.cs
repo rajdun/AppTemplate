@@ -1,4 +1,5 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using Application.Common.Interfaces;
 using Microsoft.AspNetCore.Http;
 
@@ -20,7 +21,7 @@ internal class CurrentUser : IUser
             IsAuthenticated = true;
             UserName = user.Identity.Name ?? string.Empty;
             Email = user.FindFirst(JwtRegisteredClaimNames.Email)?.Value ?? string.Empty;
-            var userIdClaim = user.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
+            var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             if (Guid.TryParse(userIdClaim, out var userId))
             {

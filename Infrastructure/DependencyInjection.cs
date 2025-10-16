@@ -13,10 +13,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Npgsql;
+using NRedisStack.RedisStackCommands;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using Serilog;
+using StackExchange.Redis;
 
 namespace Infrastructure;
 
@@ -27,6 +29,7 @@ public static class DependencyInjection
         services.AddDatabase(configuration);
         services.AddIdentity(configuration);
         services.AddImplementation(configuration);
+        services.AddCache(configuration);
         
         return services;
     }
@@ -80,6 +83,20 @@ public static class DependencyInjection
         });
         
         return builder;
+    }
+    
+    private static IServiceCollection AddCache(this IServiceCollection services, IConfiguration configuration)
+    {
+        var redisConnectionString = configuration.GetConnectionString("Redis");
+        if (string.IsNullOrWhiteSpace(redisConnectionString))
+        {
+            return services;
+        }
+        
+        services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnectionString));
+        services.AddSingleton<ICacheService, RedisCacheService>();
+        
+        return services;
     }
     
     private static IServiceCollection AddImplementation(this IServiceCollection services, IConfiguration configuration)

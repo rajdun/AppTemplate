@@ -6,6 +6,7 @@ using Domain.Entities.Users;
 using FluentResults;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Localization;
 
 namespace Application.Users.Commands;
@@ -32,7 +33,11 @@ public class RegisterCommandValidator : AbstractValidator<RegisterCommand>
     }
 }
 
-public class RegisterCommandHandler(UserManager<ApplicationUser> userManager, IJwtTokenGenerator jwtTokenGenerator, IStringLocalizer<UserTranslations> localizer)
+public class RegisterCommandHandler(
+    UserManager<ApplicationUser> userManager,
+    IJwtTokenGenerator jwtTokenGenerator,
+    IStringLocalizer<UserTranslations> localizer,
+    ICacheService cacheService)
     : IRequestHandler<RegisterCommand, TokenResult>
 {
     public async Task<Result<TokenResult>> Handle(RegisterCommand request, CancellationToken cancellationToken = new())
@@ -40,25 +45,28 @@ public class RegisterCommandHandler(UserManager<ApplicationUser> userManager, IJ
         var existingUser = await userManager.FindByNameAsync(request.Username);
         if (existingUser != null)
         {
-            return Result.Fail(localizer["UsernameAlreadyExists"]);
+            return Result.Fail<TokenResult>(localizer["UsernameAlreadyExists"]);
         }
-        
+
         var newUser = new ApplicationUser
         {
             UserName = request.Username,
-            Email = request.Email
+            Email = request.Email,
         };
-        
+
         var createResult = await userManager.CreateAsync(newUser, request.Password);
         if (!createResult.Succeeded)
         {
-            var errors = string.Join(", ", createResult.Errors.Select(e => e.Description));
-            return Result.Fail(errors);
+            var errors = createResult.Errors.Select(e => e.Description).ToList();
+            return Result.Fail<TokenResult>(errors);
         }
-        
+
         var token = await jwtTokenGenerator.GenerateToken(newUser);
         var refreshToken = jwtTokenGenerator.GenerateRefreshToken();
         
+        var refreshTokenKey = CacheKeys.GetRefreshTokenCacheKey(newUser.Id.ToString());
+        await cacheService.SetAsync(refreshTokenKey, refreshToken, TimeSpan.FromDays(7), cancellationToken);
+
         return Result.Ok(new TokenResult(token, refreshToken));
     }
 }

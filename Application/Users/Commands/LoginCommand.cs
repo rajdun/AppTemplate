@@ -24,26 +24,29 @@ public class LoginCommandValidator : AbstractValidator<LoginCommand>
     }
 }
 
-internal sealed class LoginCommandHandler(UserManager<ApplicationUser> userManager, IJwtTokenGenerator jwtTokenGenerator, IStringLocalizer<UserTranslations> localizer) 
+internal sealed class LoginCommandHandler(
+    UserManager<ApplicationUser> userManager,
+    IJwtTokenGenerator jwtTokenGenerator,
+    IStringLocalizer<UserTranslations> localizer,
+    ICacheService cacheService)
     : IRequestHandler<LoginCommand, TokenResult>
 {
     public async Task<Result<TokenResult>> Handle(LoginCommand request, CancellationToken cancellationToken = new())
     {
         var user = await userManager.FindByNameAsync(request.Username);
-        if (user == null)
-        {
-            return Result.Fail(localizer["UserNotFound"]);
-        }
         
-        var isPasswordValid = await userManager.CheckPasswordAsync(user, request.Password);
-        if (!isPasswordValid)
+        if (user == null || !await userManager.CheckPasswordAsync(user, request.Password))
         {
-            return Result.Fail(localizer["InvalidPassword"]);
+            return Result.Fail<TokenResult>(localizer["InvalidUsernameOrPassword"]);
         }
-        
+
         var token = await jwtTokenGenerator.GenerateToken(user);
         var refreshToken = jwtTokenGenerator.GenerateRefreshToken();
         
+        var refreshTokenKey = CacheKeys.GetRefreshTokenCacheKey(user.Id.ToString());
+        
+        await cacheService.SetAsync(refreshTokenKey, refreshToken, TimeSpan.FromDays(7), cancellationToken);
+
         return Result.Ok(new TokenResult(token, refreshToken));
     }
 }
