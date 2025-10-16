@@ -1,8 +1,12 @@
-﻿using Application.Common.Mediator;
+﻿using Application.Common.Interfaces;
+using Application.Common.Mediator;
+using Application.Resources;
 using Application.Users.Dto;
-using Application.Users.Interfaces;
+using Domain.Entities.Users;
 using FluentResults;
 using FluentValidation;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Localization;
 
 namespace Application.Users.Commands;
 
@@ -20,12 +24,27 @@ public class LoginCommandValidator : AbstractValidator<LoginCommand>
     }
 }
 
-internal sealed class LoginCommandHandler(IUserService userService) 
+internal sealed class LoginCommandHandler(UserManager<ApplicationUser> userManager, IJwtTokenGenerator jwtTokenGenerator, IStringLocalizer<UserTranslations> localizer) 
     : IRequestHandler<LoginCommand, TokenResult>
 {
     public async Task<Result<TokenResult>> Handle(LoginCommand request, CancellationToken cancellationToken = new())
     {
-        return await userService.LoginAsync(request.Username, request.Password, cancellationToken);
+        var user = await userManager.FindByNameAsync(request.Username);
+        if (user == null)
+        {
+            return Result.Fail(localizer["UserNotFound"]);
+        }
+        
+        var isPasswordValid = await userManager.CheckPasswordAsync(user, request.Password);
+        if (!isPasswordValid)
+        {
+            return Result.Fail(localizer["InvalidPassword"]);
+        }
+        
+        var token = await jwtTokenGenerator.GenerateToken(user);
+        var refreshToken = jwtTokenGenerator.GenerateRefreshToken();
+        
+        return Result.Ok(new TokenResult(token, refreshToken));
     }
 }
 

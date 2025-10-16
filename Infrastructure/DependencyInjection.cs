@@ -1,6 +1,5 @@
 ﻿using System.Text;
 using Application.Common.Interfaces;
-using Application.Users.Interfaces;
 using Domain.Entities.Users;
 using Infrastructure.Data;
 using Infrastructure.Implementation;
@@ -89,8 +88,6 @@ public static class DependencyInjection
         configuration.Bind(JwtSettings.SectionName, jwtSettings);
         services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
         services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
-
-        services.AddScoped<IUserService, UserService>();
         
         return services;
     }
