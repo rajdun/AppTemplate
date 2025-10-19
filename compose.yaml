@@ -37,6 +37,10 @@ services:
       - JwtSettings__Secret=${JWT_SECRET:-SUPER_SECRET_AND_SECURE_AND_VERY_LONG_KEY_USED_FOR_ENCRYPTION}
       - JwtSettings__Issuer=${JWT_ISSUER:-Api}
       - JwtSettings__Audience=${JWT_AUDIENCE:-ApiUsers}
+      
+      # Cors settings
+      - Cors__AllowedOrigins=${CORS_ALLOWED_ORIGINS:-http://localhost:80}
+      - Cors__PolicyName=${CORS_POLICY_NAME:-DefaultCorsPolicy}
     restart: unless-stopped
     networks:
       - monitoring

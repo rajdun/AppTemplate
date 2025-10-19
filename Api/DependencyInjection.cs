@@ -19,7 +19,32 @@ public static class DependencyInjection
         
         services.AddExceptionHandler<GlobalExceptionHandler>();
         services.AddProblemDetails();
+        services.AddCors(configuration);
         
         return services;
+    }
+
+    public static IServiceCollection AddCors(this IServiceCollection services, IConfiguration configuration)
+    {
+        var corsSettings = configuration.GetSection("Cors").Get<CorsSettings>() ?? new CorsSettings();
+        
+        services.AddCors(options =>
+        {
+            options.AddPolicy(corsSettings.PolicyName, policy =>
+            {
+                policy.WithOrigins(corsSettings.AllowedOrigins)
+                    .AllowAnyHeader()
+                    .AllowAnyMethod()
+                    .AllowCredentials();
+            });
+        });
+        
+        return services;
+    }
+    
+    private class CorsSettings
+    {
+        public string[] AllowedOrigins { get; set; } = Array.Empty<string>();
+        public string PolicyName { get; set; } = "DefaultCorsPolicy";
     }
 }

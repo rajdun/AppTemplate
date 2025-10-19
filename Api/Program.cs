@@ -35,6 +35,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi("/openapi/{documentName}/openapi.json");
 }
 
+app.UseCors(app.Configuration.GetValue<string>("Cors:PolicyName") ?? "DefaultCorsPolicy");
 app.UseExceptionHandler();
 
 var supportedCultures = new[] { "en-US", "pl-PL" };
