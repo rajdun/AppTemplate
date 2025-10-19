@@ -30,6 +30,7 @@ public static class DependencyInjection
         services.AddIdentity(configuration);
         services.AddImplementation(configuration);
         services.AddCache(configuration);
+        services.AddHealthChecks(configuration);
         
         return services;
     }
@@ -150,6 +151,18 @@ public static class DependencyInjection
 
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseNpgsql(connectionString));
+
+        return services;
+    }
+    
+    private static IServiceCollection AddHealthChecks(this IServiceCollection services, IConfiguration configuration)
+    {
+        var redisConnectionString = configuration.GetConnectionString("Redis") ?? "";
+
+        var healthChecks = services.AddHealthChecks()
+            .AddDbContextCheck<ApplicationDbContext>();
+        
+        healthChecks.AddRedis(redisConnectionString, name: "Redis");
 
         return services;
     }

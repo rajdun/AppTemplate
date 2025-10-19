@@ -47,6 +47,7 @@ app.UseRequestLocalization(localizationOptions);
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.MapHealthChecks("/health");
 app.MapCarter();
 
 try
