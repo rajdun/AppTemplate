@@ -1,6 +1,8 @@
 ﻿using System.Text;
 using Application.Common.Interfaces;
 using Domain.Entities.Users;
+using Hangfire;
+using Hangfire.Redis.StackExchange;
 using Infrastructure.Data;
 using Infrastructure.Implementation;
 using Infrastructure.Implementation.Dto;
@@ -24,6 +26,8 @@ namespace Infrastructure;
 
 public static class DependencyInjection
 {
+    private const string RedisConnectionStringName = "Redis";
+    
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddDatabase(configuration);
@@ -31,6 +35,7 @@ public static class DependencyInjection
         services.AddImplementation(configuration);
         services.AddCache(configuration);
         services.AddHealthChecks(configuration);
+        services.AddHangfire(configuration);
         
         return services;
     }
@@ -86,9 +91,22 @@ public static class DependencyInjection
         return builder;
     }
     
+    private static IServiceCollection AddHangfire(this IServiceCollection services, IConfiguration configuration)
+    {
+        var connectionString = configuration.GetConnectionString(RedisConnectionStringName) ?? "localhost:6379";
+
+        services.AddHangfire(config => config
+            .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+            .UseSimpleAssemblyNameTypeSerializer()
+            .UseRecommendedSerializerSettings()
+            .UseRedisStorage(connectionString));
+
+        return services;
+    }
+    
     private static IServiceCollection AddCache(this IServiceCollection services, IConfiguration configuration)
     {
-        var redisConnectionString = configuration.GetConnectionString("Redis");
+        var redisConnectionString = configuration.GetConnectionString(RedisConnectionStringName);
         if (string.IsNullOrWhiteSpace(redisConnectionString))
         {
             return services;
@@ -157,12 +175,12 @@ public static class DependencyInjection
     
     private static IServiceCollection AddHealthChecks(this IServiceCollection services, IConfiguration configuration)
     {
-        var redisConnectionString = configuration.GetConnectionString("Redis") ?? "";
+        var redisConnectionString = configuration.GetConnectionString(RedisConnectionStringName) ?? "";
 
         var healthChecks = services.AddHealthChecks()
             .AddDbContextCheck<ApplicationDbContext>();
         
-        healthChecks.AddRedis(redisConnectionString, name: "Redis");
+        healthChecks.AddRedis(redisConnectionString, name: RedisConnectionStringName);
 
         return services;
     }

@@ -11,13 +11,14 @@ public static class DependencyInjection
     {
         services.AddMediator(typeof(DependencyInjection).Assembly);
         services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
+        
         return services;
     }
     
     private static IServiceCollection AddMediator(this IServiceCollection services, Assembly assembly)
     {
         services.AddScoped<IMediator, Mediator>();
-
+        
         var handlerTypes = assembly.GetTypes()
             .Where(t => t.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IRequestHandler<,>)))
             .ToList();

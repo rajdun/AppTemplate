@@ -32,6 +32,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "config", "config", "{640B9F
 		config\prometheus.yml = config\prometheus.yml
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WorkerService", "WorkerService\WorkerService.csproj", "{F8BBC265-F7CF-4A46-8D99-1BFB256A9634}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -66,6 +68,10 @@ Global
 		{1B1C94A2-B3A8-4F90-9622-AF022EE2F5BE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1B1C94A2-B3A8-4F90-9622-AF022EE2F5BE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1B1C94A2-B3A8-4F90-9622-AF022EE2F5BE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F8BBC265-F7CF-4A46-8D99-1BFB256A9634}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8BBC265-F7CF-4A46-8D99-1BFB256A9634}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8BBC265-F7CF-4A46-8D99-1BFB256A9634}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8BBC265-F7CF-4A46-8D99-1BFB256A9634}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{E2383C59-8414-424F-B723-A70411562975} = {36C2EE9D-EFF3-4FDD-B5DE-4DC55A15075A}

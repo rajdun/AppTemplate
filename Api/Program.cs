@@ -1,7 +1,9 @@
 using Api;
+using Api.Common;
 using Application;
 using Carter;
 using Domain;
+using Hangfire;
 using Infrastructure;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -49,6 +51,10 @@ app.UseRequestLocalization(localizationOptions);
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapHealthChecks("/health");
+app.UseHangfireDashboard("/hangfire", new DashboardOptions()
+{
+    Authorization = new[] { new HangfireAuthorizationFilter() },
+});
 app.MapCarter();
 
 try

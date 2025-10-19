@@ -1,5 +1,6 @@
 ﻿using Api.Common;
 using Carter;
+using Hangfire;
 using Npgsql;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
@@ -24,7 +25,7 @@ public static class DependencyInjection
         return services;
     }
 
-    public static IServiceCollection AddCors(this IServiceCollection services, IConfiguration configuration)
+    private static IServiceCollection AddCors(this IServiceCollection services, IConfiguration configuration)
     {
         var corsSettings = configuration.GetSection("Cors").Get<CorsSettings>() ?? new CorsSettings();
         
@@ -42,7 +43,7 @@ public static class DependencyInjection
         return services;
     }
     
-    private class CorsSettings
+    private sealed class CorsSettings
     {
         public string[] AllowedOrigins { get; set; } = Array.Empty<string>();
         public string PolicyName { get; set; } = "DefaultCorsPolicy";

@@ -41,9 +41,30 @@ services:
       # Cors settings
       - Cors__AllowedOrigins=${CORS_ALLOWED_ORIGINS:-http://localhost:80}
       - Cors__PolicyName=${CORS_POLICY_NAME:-DefaultCorsPolicy}
+        
+      # Hangfire settings
+      - HangfireSettings__Url=${HANGFIRE_URL:-http://background_service:8080}
     restart: unless-stopped
     networks:
       - monitoring
+        
+  background_service:
+    image: background_service:latest
+    build:
+      context: .
+      dockerfile: WorkerService/Dockerfile
+    ports:
+      - "8081:8080"
+    depends_on:
+      - database
+      - cache
+    environment:
+      # Connection strings
+      - ConnectionStrings__DefaultConnection=${DB_CONNECTION_STRING:-Server=database;Port=5432;Database=dev_db;User Id=dev_user;Password=dev_password;}
+      - ConnectionStrings__Redis=${CACHE_CONNECTION_STRING:-cache:6379}    
+    restart: unless-stopped
+    networks:
+      - monitoring 
 
   database:
     image: postgres:18.0-alpine3.22
