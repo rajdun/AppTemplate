@@ -1,4 +1,5 @@
-﻿using Hangfire;
+﻿using Application.Common.Messaging;
+using Hangfire;
 using Hangfire.Redis.StackExchange;
 
 namespace WorkerService;

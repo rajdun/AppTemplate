@@ -2,6 +2,7 @@
 using Application.Common.Mediator;
 using Application.Resources;
 using Application.Users.Dto;
+using Domain.Common;
 using Domain.Entities.Users;
 using FluentResults;
 using FluentValidation;

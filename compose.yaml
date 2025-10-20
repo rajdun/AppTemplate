@@ -44,6 +44,14 @@ services:
         
       # Hangfire settings
       - HangfireSettings__Url=${HANGFIRE_URL:-http://background_service:8080}
+        
+      # SMTP settings
+      - SmtpSettings__Host=${SMTP_HOST:-mailhog}
+      - SmtpSettings__Port=${SMTP_PORT:-1025}
+      - SmtpSettings__Username=${SMTP_USERNAME:-}
+      - SmtpSettings__Password=${SMTP_PASSWORD:-}
+      - SmtpSettings__From=${SMTP_FROM:-noreply@api.local}
+      - SmtpSettings__UseSsl=${SMTP_USE_SSL:-false}
     restart: unless-stopped
     networks:
       - monitoring
@@ -149,6 +157,16 @@ services:
       - prometheus
       - loki
       - jaeger
+    restart: unless-stopped
+    networks:
+      - monitoring
+  
+  # Development services  
+  mailhog:
+    image: mailhog/mailhog:v1.0.1
+    ports:
+      - "8025:8025"
+      - "1025:1025"
     restart: unless-stopped
     networks:
       - monitoring

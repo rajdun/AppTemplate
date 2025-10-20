@@ -1,7 +1,10 @@
-﻿using Application.Common.Interfaces;
+﻿using Application.Common;
+using Application.Common.Interfaces;
 using Application.Common.Mediator;
 using Application.Resources;
 using Application.Users.Dto;
+using Domain.Common;
+using Domain.DomainEvents.User;
 using Domain.Entities.Users;
 using FluentResults;
 using FluentValidation;
@@ -48,11 +51,7 @@ public class RegisterCommandHandler(
             return Result.Fail<TokenResult>(localizer["UsernameAlreadyExists"]);
         }
 
-        var newUser = new ApplicationUser
-        {
-            UserName = request.Username,
-            Email = request.Email,
-        };
+        var newUser = ApplicationUser.Create(request.Username, request.Email);
 
         var createResult = await userManager.CreateAsync(newUser, request.Password);
         if (!createResult.Succeeded)
@@ -66,7 +65,7 @@ public class RegisterCommandHandler(
         
         var refreshTokenKey = CacheKeys.GetRefreshTokenCacheKey(newUser.Id.ToString());
         await cacheService.SetAsync(refreshTokenKey, refreshToken, TimeSpan.FromDays(7), cancellationToken);
-
+        
         return Result.Ok(new TokenResult(token, refreshToken));
     }
 }

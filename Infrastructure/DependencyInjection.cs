@@ -1,11 +1,14 @@
 ﻿using System.Text;
+using Application.Common;
 using Application.Common.Interfaces;
+using Application.Common.Messaging;
 using Domain.Entities.Users;
 using Hangfire;
 using Hangfire.Redis.StackExchange;
 using Infrastructure.Data;
 using Infrastructure.Implementation;
 using Infrastructure.Implementation.Dto;
+using Infrastructure.Messaging;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
@@ -125,6 +128,7 @@ public static class DependencyInjection
         services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
         services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
         services.AddScoped<IUser, CurrentUser>();
+        services.AddScoped<IHangfireJobExecutor, HangfireJobExecutor>();
         
         return services;
     }
@@ -167,8 +171,16 @@ public static class DependencyInjection
     {
         var connectionString = configuration.GetConnectionString("DefaultConnection");
 
-        services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseNpgsql(connectionString));
+        services.AddSingleton<DomainEventToOutboxInterceptor>();
+        
+        services.AddDbContext<ApplicationDbContext>((sp, options) =>
+        {
+            var interceptor = sp.GetRequiredService<DomainEventToOutboxInterceptor>();
+            options.UseNpgsql(connectionString)
+                .AddInterceptors(interceptor);
+        });
+
+        services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());
 
         return services;
     }

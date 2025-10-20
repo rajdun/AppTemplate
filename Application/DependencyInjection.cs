@@ -1,5 +1,7 @@
 ﻿using System.Reflection;
 using Application.Common.Mediator;
+using Application.Common.Messaging;
+using Domain.Common;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -11,6 +13,7 @@ public static class DependencyInjection
     {
         services.AddMediator(typeof(DependencyInjection).Assembly);
         services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
+        services.AddScoped<IOutboxProcessor, OutboxProcessor>();
         
         return services;
     }
@@ -19,14 +22,27 @@ public static class DependencyInjection
     {
         services.AddScoped<IMediator, Mediator>();
         
-        var handlerTypes = assembly.GetTypes()
+        var handlerTypesWithTypeResults = assembly.GetTypes()
             .Where(t => t.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IRequestHandler<,>)))
             .ToList();
 
-        foreach (var type in handlerTypes)
+        foreach (var type in handlerTypesWithTypeResults)
         {
             var interfaceType = type.GetInterfaces()
                 .Single(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IRequestHandler<,>));
+            
+            services.AddScoped(interfaceType, type);
+        }
+        
+        
+        var handlerTypesWithGenericResults = assembly.GetTypes()
+            .Where(t => t.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IRequestHandler<>)))
+            .ToList();
+
+        foreach (var type in handlerTypesWithGenericResults)
+        {
+            var interfaceType = type.GetInterfaces()
+                .Single(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IRequestHandler<>));
             
             services.AddScoped(interfaceType, type);
         }
