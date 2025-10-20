@@ -23,30 +23,31 @@ public class RefreshTokenCommandValidator : AbstractValidator<RefreshTokenComman
     }
 }
 
-internal class RefreshTokenCommandHandler(ICacheService cacheService, IJwtTokenGenerator jwtTokenGenerator, UserManager<ApplicationUser> userManager, IUser currentUser, IStringLocalizer<UserTranslations> localizer)
+internal class RefreshTokenCommandHandler(
+    ICacheService cacheService,
+    IJwtTokenGenerator jwtTokenGenerator,
+    UserManager<ApplicationUser> userManager,
+    IUser currentUser,
+    IStringLocalizer<UserTranslations> localizer)
     : IRequestHandler<RefreshTokenCommand, TokenResult>
 {
-    public async Task<Result<TokenResult>> Handle(RefreshTokenCommand request, CancellationToken cancellationToken = new CancellationToken())
+    public async Task<Result<TokenResult>> Handle(RefreshTokenCommand request,
+        CancellationToken cancellationToken = new())
     {
         var refreshToken = CacheKeys.GetRefreshTokenCacheKey(currentUser.UserId.ToString());
-        
+
         var cachedToken = await cacheService.GetAsync<string>(refreshToken, cancellationToken);
         if (cachedToken == null || cachedToken != request.RefreshToken)
-        {
             return Result.Fail(localizer["InvalidRefreshToken"]);
-        }
-        
+
         var user = await userManager.FindByIdAsync(currentUser.UserId.ToString());
-        if (user == null)
-        {
-            return Result.Fail(localizer["InvalidRefreshToken"]);
-        }
-        
+        if (user == null) return Result.Fail(localizer["InvalidRefreshToken"]);
+
         var newJwtToken = await jwtTokenGenerator.GenerateToken(user);
         var newRefreshToken = jwtTokenGenerator.GenerateRefreshToken();
-        
+
         await cacheService.SetAsync(refreshToken, newRefreshToken, TimeSpan.FromDays(7), cancellationToken);
-        
+
         return Result.Ok(new TokenResult(newJwtToken, newRefreshToken));
     }
 }

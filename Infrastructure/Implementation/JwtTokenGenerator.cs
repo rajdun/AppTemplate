@@ -5,7 +5,6 @@ using System.Text;
 using Application.Common.Interfaces;
 using Domain.Entities.Users;
 using Infrastructure.Implementation.Dto;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 
@@ -19,7 +18,7 @@ internal class JwtTokenGenerator : IJwtTokenGenerator
     {
         _jwtSettings = jwtSettings;
     }
-    
+
     public async Task<string> GenerateToken(ApplicationUser user)
     {
         await Task.CompletedTask;
@@ -30,15 +29,15 @@ internal class JwtTokenGenerator : IJwtTokenGenerator
             new(JwtRegisteredClaimNames.Email, user.Email!),
             new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
         };
-        
-        
+
+
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Value.Secret));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
-        
+
         var token = new JwtSecurityToken(
-            issuer: _jwtSettings.Value.Issuer,
-            audience: _jwtSettings.Value.Audience,
-            claims: claims,
+            _jwtSettings.Value.Issuer,
+            _jwtSettings.Value.Audience,
+            claims,
             expires: DateTime.UtcNow.AddMinutes(_jwtSettings.Value.ExpiryMinutes),
             signingCredentials: credentials);
 

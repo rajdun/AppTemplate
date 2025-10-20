@@ -1,5 +1,4 @@
 ﻿using Application.Common.Interfaces;
-using Application.Common.Mediator;
 using Application.Resources;
 using Application.Users.Dto;
 using Domain.Common;
@@ -35,20 +34,17 @@ internal sealed class LoginCommandHandler(
     public async Task<Result<TokenResult>> Handle(LoginCommand request, CancellationToken cancellationToken = new())
     {
         var user = await userManager.FindByNameAsync(request.Username);
-        
+
         if (user == null || !await userManager.CheckPasswordAsync(user, request.Password))
-        {
             return Result.Fail<TokenResult>(localizer["InvalidUsernameOrPassword"]);
-        }
 
         var token = await jwtTokenGenerator.GenerateToken(user);
         var refreshToken = jwtTokenGenerator.GenerateRefreshToken();
-        
+
         var refreshTokenKey = CacheKeys.GetRefreshTokenCacheKey(user.Id.ToString());
-        
+
         await cacheService.SetAsync(refreshTokenKey, refreshToken, TimeSpan.FromDays(7), cancellationToken);
 
         return Result.Ok(new TokenResult(token, refreshToken));
     }
 }
-

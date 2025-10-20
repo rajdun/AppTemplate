@@ -1,11 +1,5 @@
 ﻿using Api.Common;
 using Carter;
-using Hangfire;
-using Npgsql;
-using OpenTelemetry.Metrics;
-using OpenTelemetry.Resources;
-using OpenTelemetry.Trace;
-using Serilog;
 
 namespace Api;
 
@@ -17,18 +11,18 @@ public static class DependencyInjection
         services.AddOpenApi("internal");
         services.AddEndpointsApiExplorer();
         services.AddLocalization();
-        
+
         services.AddExceptionHandler<GlobalExceptionHandler>();
         services.AddProblemDetails();
         services.AddCors(configuration);
-        
+
         return services;
     }
 
     private static IServiceCollection AddCors(this IServiceCollection services, IConfiguration configuration)
     {
         var corsSettings = configuration.GetSection("Cors").Get<CorsSettings>() ?? new CorsSettings();
-        
+
         services.AddCors(options =>
         {
             options.AddPolicy(corsSettings.PolicyName, policy =>
@@ -39,10 +33,10 @@ public static class DependencyInjection
                     .AllowCredentials();
             });
         });
-        
+
         return services;
     }
-    
+
     private sealed class CorsSettings
     {
         public string[] AllowedOrigins { get; set; } = Array.Empty<string>();

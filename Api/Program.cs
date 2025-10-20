@@ -9,7 +9,6 @@ using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddTelemetry();
@@ -28,14 +27,12 @@ if (args.Contains("migrate"))
         var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         await dbContext.Database.MigrateAsync();
     }
+
     Console.WriteLine("Migrations applied successfully. Exiting.");
     return;
 }
 
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi("/openapi/{documentName}/openapi.json");
-}
+if (app.Environment.IsDevelopment()) app.MapOpenApi("/openapi/{documentName}/openapi.json");
 
 app.UseCors(app.Configuration.GetValue<string>("Cors:PolicyName") ?? "DefaultCorsPolicy");
 app.UseExceptionHandler();
@@ -51,9 +48,9 @@ app.UseRequestLocalization(localizationOptions);
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapHealthChecks("/health");
-app.UseHangfireDashboard("/hangfire", new DashboardOptions()
+app.UseHangfireDashboard("/hangfire", new DashboardOptions
 {
-    Authorization = new[] { new HangfireAuthorizationFilter() },
+    Authorization = new[] { new HangfireAuthorizationFilter() }
 });
 app.MapCarter();
 

@@ -1,6 +1,5 @@
 ﻿using Application.Common.Errors;
 using FluentResults;
-using Grpc.Core;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Common;
@@ -11,26 +10,20 @@ public static class ResultExtensions
     {
         if (result.IsSuccess)
         {
-            if (typeof(TValue) == typeof(bool) || typeof(TValue) == typeof(ValueTask))
-            {
-                return TypedResults.NoContent();
-            }
+            if (typeof(TValue) == typeof(bool) || typeof(TValue) == typeof(ValueTask)) return TypedResults.NoContent();
             return TypedResults.Ok(result.Value);
         }
 
         return MapToProblemDetails(result.ToResult());
     }
-    
+
     public static IResult ToHttpResult(this Result result)
     {
-        if (result.IsSuccess)
-        {
-            return TypedResults.NoContent();
-        }
+        if (result.IsSuccess) return TypedResults.NoContent();
 
         return MapToProblemDetails(result);
     }
-    
+
     private static IResult MapToProblemDetails(ResultBase result)
     {
         var firstError = result.Errors.FirstOrDefault();
@@ -38,7 +31,7 @@ public static class ResultExtensions
         var errorsDict = result.Errors
             .GroupBy(e => (string?)e.Metadata.GetValueOrDefault("PropertyName", "GeneralErrors"))
             .ToDictionary(
-                g => g.Key ?? "GeneralErrors", 
+                g => g.Key ?? "GeneralErrors",
                 g => g.Select(e => e.Message).ToArray()
             );
 
@@ -46,20 +39,20 @@ public static class ResultExtensions
         {
             case NotFoundError:
                 return CreateProblemResult(
-                    StatusCodes.Status404NotFound, 
-                    "Not Found", 
+                    StatusCodes.Status404NotFound,
+                    "Not Found",
                     firstError.Message);
 
             case ConflictError:
                 return CreateProblemResult(
-                    StatusCodes.Status409Conflict, 
-                    "Conflict", 
+                    StatusCodes.Status409Conflict,
+                    "Conflict",
                     firstError.Message);
-            
+
             case ForbiddenError:
-                 return CreateProblemResult(
-                    StatusCodes.Status403Forbidden, 
-                    "Forbidden", 
+                return CreateProblemResult(
+                    StatusCodes.Status403Forbidden,
+                    "Forbidden",
                     firstError.Message);
             case UnauthorizedError:
                 return CreateProblemResult(
@@ -74,18 +67,18 @@ public static class ResultExtensions
                     Detail = "See the errors property for details."
                 };
                 return Results.ValidationProblem(
-                    validationProblem.Errors, 
+                    validationProblem.Errors,
                     statusCode: validationProblem.Status,
                     title: validationProblem.Title
                 );
             default:
                 return CreateProblemResult(
-                    StatusCodes.Status400BadRequest, 
-                    "An error occurred", 
+                    StatusCodes.Status400BadRequest,
+                    "An error occurred",
                     firstError?.Message ?? "An unknown error occurred.");
         }
     }
-    
+
     private static IResult CreateProblemResult(int statusCode, string title, string detail)
     {
         return Results.Problem(

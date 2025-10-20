@@ -5,24 +5,24 @@ namespace Application.Common.Mediator;
 [AttributeUsage(AttributeTargets.Class)]
 public class AuthorizeAttribute : Attribute
 {
-    public AuthorizePolicy AuthorizeUserBehaviour { get; }
-
     public AuthorizeAttribute(AuthorizePolicy policy)
     {
         AuthorizeUserBehaviour = policy;
     }
-    
+
+    public AuthorizePolicy AuthorizeUserBehaviour { get; }
+
     public bool Authorize(IUser user)
     {
-        if(!user.IsAuthenticated)
+        if (!user.IsAuthenticated)
             return false;
-        
-        if(AuthorizeUserBehaviour.HasFlag(AuthorizePolicy.None))
+
+        if (AuthorizeUserBehaviour.HasFlag(AuthorizePolicy.None))
             return true;
-        
-        if(AuthorizeUserBehaviour.HasFlag(AuthorizePolicy.Admin) && user.IsAdmin)
+
+        if (AuthorizeUserBehaviour.HasFlag(AuthorizePolicy.Admin) && user.IsAdmin)
             return true;
-        
+
         return false;
     }
 }

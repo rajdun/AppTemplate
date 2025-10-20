@@ -6,7 +6,6 @@ namespace Domain.Common;
 
 public interface IDomainEvent : IRequest
 {
-    
 }
 
 public interface IDomainEventDeserializer
@@ -16,13 +15,13 @@ public interface IDomainEventDeserializer
 
 public class DomainEventDeserializer : IDomainEventDeserializer
 {
-    private readonly Dictionary<string, Type> _eventTypes;
-    private readonly ILogger<DomainEventDeserializer> _logger;
-    
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
         PropertyNameCaseInsensitive = true
     };
+
+    private readonly Dictionary<string, Type> _eventTypes;
+    private readonly ILogger<DomainEventDeserializer> _logger;
 
     public DomainEventDeserializer(IEnumerable<Type> domainEventTypes, ILogger<DomainEventDeserializer> logger)
     {
@@ -32,18 +31,12 @@ public class DomainEventDeserializer : IDomainEventDeserializer
             .ToDictionary(t => t.AssemblyQualifiedName!, t => t);
     }
 
-    public static IEnumerable<Type> ScanDomainEventTypes(Assembly assembly)
-    {
-        return assembly.GetTypes()
-            .Where(t => t.IsClass && !t.IsAbstract && typeof(IDomainEvent).IsAssignableFrom(t));
-    }
-
     public dynamic? Deserialize(string eventType, string eventPayload)
     {
         if (!_eventTypes.TryGetValue(eventType, out var type))
         {
             Console.WriteLine($"Error: Event type '{eventType}' not found.");
-            return null; 
+            return null;
         }
 
         try
@@ -55,5 +48,11 @@ public class DomainEventDeserializer : IDomainEventDeserializer
             _logger.LogError(ex, "JSON deserialization error for event type {EventType}", eventType);
             return null;
         }
+    }
+
+    public static IEnumerable<Type> ScanDomainEventTypes(Assembly assembly)
+    {
+        return assembly.GetTypes()
+            .Where(t => t.IsClass && !t.IsAbstract && typeof(IDomainEvent).IsAssignableFrom(t));
     }
 }

@@ -13,17 +13,18 @@ public class DomainEventToOutboxInterceptor : SaveChangesInterceptor
         return base.SavingChanges(eventData, result);
     }
 
-    public override ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData, InterceptionResult<int> result,
-        CancellationToken cancellationToken = new CancellationToken())
+    public override ValueTask<InterceptionResult<int>> SavingChangesAsync(DbContextEventData eventData,
+        InterceptionResult<int> result,
+        CancellationToken cancellationToken = new())
     {
         ConvertDomainEventsToOutboxMessages(eventData.Context);
         return base.SavingChangesAsync(eventData, result, cancellationToken);
     }
-    
+
     private void ConvertDomainEventsToOutboxMessages(DbContext? context)
     {
         if (context is null) return;
-        
+
         var entitiesWithDomainEvents = context.ChangeTracker
             .Entries<IEntity>()
             .Where(e => e.Entity.DomainEvents.Count > 0)
@@ -31,13 +32,13 @@ public class DomainEventToOutboxInterceptor : SaveChangesInterceptor
             .ToList();
 
         if (entitiesWithDomainEvents.Count == 0) return;
-        
+
         var domainEvents = entitiesWithDomainEvents
             .SelectMany(e => e.DomainEvents)
             .ToList();
-        
+
         entitiesWithDomainEvents.ForEach(e => e.ClearDomainEvents());
-        
+
         var outboxMessages = domainEvents.Select(domainEvent =>
             new OutboxMessage
             {
@@ -47,7 +48,7 @@ public class DomainEventToOutboxInterceptor : SaveChangesInterceptor
                 ProcessedAt = null,
                 RetryCount = 0
             });
-        
+
         context.Set<OutboxMessage>().AddRange(outboxMessages);
     }
 }

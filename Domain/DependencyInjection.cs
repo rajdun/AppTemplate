@@ -10,13 +10,13 @@ public static class DependencyInjection
         services.AddDomainEvents();
         return services;
     }
-    
+
     private static IServiceCollection AddDomainEvents(this IServiceCollection services)
     {
         var domainEventTypes = DomainEventDeserializer.ScanDomainEventTypes(typeof(IDomainEvent).Assembly);
-        services.AddSingleton(domainEventTypes); 
+        services.AddSingleton(domainEventTypes);
         services.AddSingleton<IDomainEventDeserializer, DomainEventDeserializer>();
-        
+
         return services;
     }
 }

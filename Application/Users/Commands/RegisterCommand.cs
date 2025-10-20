@@ -1,20 +1,17 @@
-﻿using Application.Common;
-using Application.Common.Interfaces;
-using Application.Common.Mediator;
+﻿using Application.Common.Interfaces;
 using Application.Resources;
 using Application.Users.Dto;
 using Domain.Common;
-using Domain.DomainEvents.User;
 using Domain.Entities.Users;
 using FluentResults;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Localization;
 
 namespace Application.Users.Commands;
 
-public record RegisterCommand(string Username, string? Email, string Password, string RepeatPassword) : IRequest<TokenResult>;
+public record RegisterCommand(string Username, string? Email, string Password, string RepeatPassword)
+    : IRequest<TokenResult>;
 
 public class RegisterCommandValidator : AbstractValidator<RegisterCommand>
 {
@@ -46,10 +43,7 @@ public class RegisterCommandHandler(
     public async Task<Result<TokenResult>> Handle(RegisterCommand request, CancellationToken cancellationToken = new())
     {
         var existingUser = await userManager.FindByNameAsync(request.Username);
-        if (existingUser != null)
-        {
-            return Result.Fail<TokenResult>(localizer["UsernameAlreadyExists"]);
-        }
+        if (existingUser != null) return Result.Fail<TokenResult>(localizer["UsernameAlreadyExists"]);
 
         var newUser = ApplicationUser.Create(request.Username, request.Email);
 
@@ -62,10 +56,10 @@ public class RegisterCommandHandler(
 
         var token = await jwtTokenGenerator.GenerateToken(newUser);
         var refreshToken = jwtTokenGenerator.GenerateRefreshToken();
-        
+
         var refreshTokenKey = CacheKeys.GetRefreshTokenCacheKey(newUser.Id.ToString());
         await cacheService.SetAsync(refreshTokenKey, refreshToken, TimeSpan.FromDays(7), cancellationToken);
-        
+
         return Result.Ok(new TokenResult(token, refreshToken));
     }
 }

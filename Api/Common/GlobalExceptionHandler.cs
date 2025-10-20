@@ -4,12 +4,12 @@ using Microsoft.AspNetCore.Mvc;
 namespace Api.Common;
 
 /// <summary>
-/// Handles unhandled exceptions globally and returns a standardized ProblemDetails response.
+///     Handles unhandled exceptions globally and returns a standardized ProblemDetails response.
 /// </summary>
 public class GlobalExceptionHandler : IExceptionHandler
 {
-    private readonly ILogger<GlobalExceptionHandler> _logger;
     private readonly IHostEnvironment _environment;
+    private readonly ILogger<GlobalExceptionHandler> _logger;
 
     public GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger, IHostEnvironment environment)
     {
@@ -36,7 +36,7 @@ public class GlobalExceptionHandler : IExceptionHandler
         httpContext.Response.StatusCode = problemDetails.Status.Value;
 
         await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
-        
+
         // Return true to indicate the exception has been handled.
         return true;
     }

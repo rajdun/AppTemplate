@@ -7,12 +7,6 @@ namespace Infrastructure.Implementation;
 
 internal class CurrentUser : IUser
 {
-    public Guid UserId { get; }
-    public string UserName { get; }
-    public string Email { get; }
-    public bool IsAuthenticated { get; }
-    public bool IsAdmin { get; }
-
     public CurrentUser(IHttpContextAccessor httpContextAccessor)
     {
         var user = httpContextAccessor.HttpContext?.User;
@@ -26,13 +20,9 @@ internal class CurrentUser : IUser
             IsAdmin = true;
 
             if (Guid.TryParse(userIdClaim, out var userId))
-            {
                 UserId = userId;
-            }
             else
-            {
                 UserId = Guid.Empty;
-            }
         }
         else
         {
@@ -42,4 +32,10 @@ internal class CurrentUser : IUser
             Email = string.Empty;
         }
     }
+
+    public Guid UserId { get; }
+    public string UserName { get; }
+    public string Email { get; }
+    public bool IsAuthenticated { get; }
+    public bool IsAdmin { get; }
 }

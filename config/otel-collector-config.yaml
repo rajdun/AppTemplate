@@ -27,14 +27,14 @@ exporters:
 service:
   pipelines:
     traces:
-      receivers: [otlp]
-      processors: [batch]
-      exporters: [otlp/jaeger, logging]
+      receivers: [ otlp ]
+      processors: [ batch ]
+      exporters: [ otlp/jaeger, logging ]
     metrics:
-      receivers: [otlp]
-      processors: [batch]
-      exporters: [prometheus, logging]
+      receivers: [ otlp ]
+      processors: [ batch ]
+      exporters: [ prometheus, logging ]
     logs:
-      receivers: [otlp]
-      processors: [batch]
-      exporters: [loki, logging]
+      receivers: [ otlp ]
+      processors: [ batch ]
+      exporters: [ loki, logging ]

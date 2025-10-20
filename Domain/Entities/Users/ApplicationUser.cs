@@ -9,7 +9,7 @@ namespace Domain.Entities.Users;
 public class ApplicationUser : IdentityUser<Guid>, IEntity
 {
     private readonly List<IDomainEvent> _domainEvents = new();
-    
+
     public void AddDomainEvent(IDomainEvent domainEvent)
     {
         _domainEvents.Add(domainEvent);
@@ -21,19 +21,16 @@ public class ApplicationUser : IdentityUser<Guid>, IEntity
     }
 
     public IReadOnlyCollection<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
-    
+
     public static ApplicationUser Create(string userName, string? email)
     {
-        var user = new ApplicationUser()
+        var user = new ApplicationUser
         {
             Email = email,
-            UserName = userName,
+            UserName = userName
         };
 
-        if (!string.IsNullOrWhiteSpace(email))
-        {
-            user.AddDomainEvent(new UserRegistered(userName, email));
-        }
+        if (!string.IsNullOrWhiteSpace(email)) user.AddDomainEvent(new UserRegistered(userName, email));
 
         return user;
     }

@@ -7,41 +7,41 @@
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-      <WarningLevel>4</WarningLevel>
-      <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <WarningLevel>4</WarningLevel>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-      <WarningLevel>4</WarningLevel>
-      <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <WarningLevel>4</WarningLevel>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Domain\Domain.csproj" />
+        <ProjectReference Include="..\Domain\Domain.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="FluentResults" Version="4.0.0" />
-      <PackageReference Include="FluentValidation" Version="11.11.0" />
-      <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.11.0" />
-      <PackageReference Include="Hangfire.AspNetCore" Version="1.8.21" />
-      <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.10" />
-      <PackageReference Include="Microsoft.Extensions.Localization.Abstractions" Version="9.0.10" />
+        <PackageReference Include="FluentResults" Version="4.0.0"/>
+        <PackageReference Include="FluentValidation" Version="11.11.0"/>
+        <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="11.11.0"/>
+        <PackageReference Include="Hangfire.AspNetCore" Version="1.8.21"/>
+        <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.10"/>
+        <PackageReference Include="Microsoft.Extensions.Localization.Abstractions" Version="9.0.10"/>
     </ItemGroup>
 
     <ItemGroup>
-      <EmbeddedResource Update="Resources\UserTranslations.resx">
-        <Generator>PublicResXFileCodeGenerator</Generator>
-        <LastGenOutput>UserTranslations.Designer.cs</LastGenOutput>
-      </EmbeddedResource>
+        <EmbeddedResource Update="Resources\UserTranslations.resx">
+            <Generator>PublicResXFileCodeGenerator</Generator>
+            <LastGenOutput>UserTranslations.Designer.cs</LastGenOutput>
+        </EmbeddedResource>
     </ItemGroup>
 
     <ItemGroup>
-      <Compile Update="Resources\UserTranslations.Designer.cs">
-        <DesignTime>True</DesignTime>
-        <AutoGen>True</AutoGen>
-        <DependentUpon>UserTranslations.resx</DependentUpon>
-      </Compile>
+        <Compile Update="Resources\UserTranslations.Designer.cs">
+            <DesignTime>True</DesignTime>
+            <AutoGen>True</AutoGen>
+            <DependentUpon>UserTranslations.resx</DependentUpon>
+        </Compile>
     </ItemGroup>
 
 </Project>
