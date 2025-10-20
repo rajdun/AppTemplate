@@ -6,10 +6,7 @@ public class HangfireAuthorizationFilter : IDashboardAuthorizationFilter
 {
     public bool Authorize(DashboardContext context)
     {
-#if DEBUG
+        // TODO: Implement proper authorization logic here. For now, allow all access.
         return true;
-#else
-        return context.GetHttpContext().User.Identity?.IsAuthenticated ?? false;
-#endif
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System.Text;
 using Application.Common;
 using Application.Common.Interfaces;
+using Application.Common.Mailing;
 using Application.Common.Messaging;
 using Domain.Entities.Users;
 using Hangfire;
@@ -8,6 +9,8 @@ using Hangfire.Redis.StackExchange;
 using Infrastructure.Data;
 using Infrastructure.Implementation;
 using Infrastructure.Implementation.Dto;
+using Infrastructure.Mailing;
+using Infrastructure.Mailing.Dto;
 using Infrastructure.Messaging;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -86,6 +89,15 @@ public static class DependencyInjection
         return builder;
     }
 
+    private static IServiceCollection AddMailing(this IServiceCollection services, IConfiguration configuration)
+    {
+        var smtpSettings = new SmtpSettings("", 0, "", "", "", false);
+        configuration.Bind(SmtpSettings.SectionName, smtpSettings);
+        services.Configure<SmtpSettings>(configuration.GetSection(SmtpSettings.SectionName));
+        services.AddSingleton<IEmailService, SmtpEmailService>();
+
+        return services;
+    }
     private static IServiceCollection AddHangfire(this IServiceCollection services, IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString(RedisConnectionStringName) ?? "localhost:6379";
