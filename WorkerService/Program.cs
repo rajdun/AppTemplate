@@ -5,8 +5,8 @@ using Hangfire;
 using Infrastructure;
 using WorkerService;
 
-var builder = Host.CreateApplicationBuilder(args);
 
+var builder = Host.CreateApplicationBuilder(args);
 builder.Services.AddDomain();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();

@@ -70,6 +70,14 @@ services:
       # Connection strings
       - ConnectionStrings__DefaultConnection=${DB_CONNECTION_STRING:-Server=database;Port=5432;Database=dev_db;User Id=dev_user;Password=dev_password;}
       - ConnectionStrings__Redis=${CACHE_CONNECTION_STRING:-cache:6379}
+      
+      # SMTP settings
+      - SmtpSettings__Host=${SMTP_HOST:-mailhog}
+      - SmtpSettings__Port=${SMTP_PORT:-1025}
+      - SmtpSettings__Username=${SMTP_USERNAME:-}
+      - SmtpSettings__Password=${SMTP_PASSWORD:-}
+      - SmtpSettings__From=${SMTP_FROM:-noreply@api.local}
+      - SmtpSettings__UseSsl=${SMTP_USE_SSL:-false}
     restart: unless-stopped
     networks:
       - monitoring

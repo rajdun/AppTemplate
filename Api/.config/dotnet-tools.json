@@ -4,7 +4,17 @@
   "tools": {
     "httpgenerator": {
       "version": "1.0.0",
-      "commands": ["httpgenerator"]
+      "commands": [
+        "httpgenerator"
+      ],
+      "rollForward": false
+    },
+    "microsoft.dotnet-openapi": {
+      "version": "9.0.10",
+      "commands": [
+        "dotnet-openapi"
+      ],
+      "rollForward": false
     }
   }
 }

@@ -1,3 +1,4 @@
+using System.Reflection;
 using Api;
 using Api.Common;
 using Application;
@@ -11,11 +12,23 @@ using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var isRuntime = Assembly.GetEntryAssembly()?.GetName().Name != "GetDocument.Insider";
+
 builder.AddTelemetry();
 builder.Services.AddDomain();
-builder.Services.AddInfrastructure(builder.Configuration);
-builder.Services.AddApplication();
+if (isRuntime)
+{
+    builder.Services.AddInfrastructure(builder.Configuration);
+    builder.Services.AddApplication();
+}
+
 builder.Services.AddPresentation(builder.Configuration);
+
+builder.Host.UseDefaultServiceProvider((context, options) =>
+{
+    options.ValidateOnBuild = !isRuntime;
+    options.ValidateScopes = !isRuntime;
+});
 
 var app = builder.Build();
 
@@ -45,13 +58,18 @@ var localizationOptions = new RequestLocalizationOptions()
 
 app.UseRequestLocalization(localizationOptions);
 
-app.UseAuthentication();
-app.UseAuthorization();
-app.MapHealthChecks("/health");
-app.UseHangfireDashboard("/hangfire", new DashboardOptions
+if (isRuntime)
 {
-    Authorization = new[] { new HangfireAuthorizationFilter() }
-});
+    app.UseAuthentication();
+    app.UseAuthorization();
+    app.MapHealthChecks("/health");
+    
+    app.UseHangfireDashboard("/hangfire", new DashboardOptions
+    {
+        Authorization = new[] { new HangfireAuthorizationFilter() }
+    });
+}
+
 app.MapCarter();
 
 try

@@ -17,7 +17,9 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Npgsql;
 using OpenTelemetry.Exporter;
@@ -42,11 +44,12 @@ public static class DependencyInjection
         services.AddCache(configuration);
         services.AddHealthChecks(configuration);
         services.AddHangfire(configuration);
+        services.AddMailing(configuration);
 
         return services;
     }
 
-    public static WebApplicationBuilder AddTelemetry(this WebApplicationBuilder builder)
+    public static IHostApplicationBuilder AddTelemetry(this WebApplicationBuilder builder)
     {
         Log.Logger = new LoggerConfiguration()
             .Enrich.FromLogContext()
@@ -88,16 +91,15 @@ public static class DependencyInjection
 
         return builder;
     }
-
+    
     private static IServiceCollection AddMailing(this IServiceCollection services, IConfiguration configuration)
     {
-        var smtpSettings = new SmtpSettings("", 0, "", "", "", false);
-        configuration.Bind(SmtpSettings.SectionName, smtpSettings);
         services.Configure<SmtpSettings>(configuration.GetSection(SmtpSettings.SectionName));
-        services.AddSingleton<IEmailService, SmtpEmailService>();
+        services.AddScoped<IEmailService, SmtpEmailService>();
 
         return services;
     }
+    
     private static IServiceCollection AddHangfire(this IServiceCollection services, IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString(RedisConnectionStringName) ?? "localhost:6379";

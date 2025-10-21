@@ -31,7 +31,8 @@ public class HangfireJobExecutor(
         {
             logger.LogWarning("Processing of event type {EventType} failed. See logs for details. Hangfire will retry.",
                 eventType);
-            throw new InvalidOperationException($"Processing failed for event type {eventType}. See logs for details.");
+            throw new InvalidOperationException(
+                $"Processing of event type '{eventType}' failed: {string.Join(", ", result.Errors.Select(e => e.Message))}");
         }
 
         logger.LogInformation("Hangfire job successfully completed for event type {EventType}", eventType);
