@@ -1,7 +1,11 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Application.Common.ExtensionMethods;
 using Application.Common.Interfaces;
+using Application.Common.Mailing;
+using Application.Common.ValueObjects;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Localization;
 
 namespace Infrastructure.Implementation;
 
@@ -11,6 +15,11 @@ internal class CurrentUser : IUser
     {
         var user = httpContextAccessor.HttpContext?.User;
 
+        var cultureFeature = httpContextAccessor.HttpContext?.Features.Get<IRequestCultureFeature>();
+        var languageCode = cultureFeature?.RequestCulture.UICulture.TwoLetterISOLanguageName ?? "pl";
+
+        Language = AppLanguageHelpers.FromString(languageCode);
+        
         if (user?.Identity?.IsAuthenticated ?? false)
         {
             IsAuthenticated = true;
@@ -38,4 +47,5 @@ internal class CurrentUser : IUser
     public string Email { get; }
     public bool IsAuthenticated { get; }
     public bool IsAdmin { get; }
+    public AppLanguage Language { get; }
 }

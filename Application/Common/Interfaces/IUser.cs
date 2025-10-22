@@ -1,4 +1,7 @@
-﻿namespace Application.Common.Interfaces;
+﻿using Application.Common.Mailing;
+using Application.Common.ValueObjects;
+
+namespace Application.Common.Interfaces;
 
 public interface IUser
 {
@@ -7,4 +10,5 @@ public interface IUser
     string Email { get; }
     bool IsAuthenticated { get; }
     bool IsAdmin { get; }
+    AppLanguage Language { get; }
 }

@@ -37,7 +37,8 @@ public class RegisterCommandHandler(
     UserManager<ApplicationUser> userManager,
     IJwtTokenGenerator jwtTokenGenerator,
     IStringLocalizer<UserTranslations> localizer,
-    ICacheService cacheService)
+    ICacheService cacheService,
+    IUser user)
     : IRequestHandler<RegisterCommand, TokenResult>
 {
     public async Task<Result<TokenResult>> Handle(RegisterCommand request, CancellationToken cancellationToken = new())
@@ -45,7 +46,7 @@ public class RegisterCommandHandler(
         var existingUser = await userManager.FindByNameAsync(request.Username);
         if (existingUser != null) return Result.Fail<TokenResult>(localizer["UsernameAlreadyExists"]);
 
-        var newUser = ApplicationUser.Create(request.Username, request.Email);
+        var newUser = ApplicationUser.Create(request.Username, request.Email, user.Language.ToString());
 
         var createResult = await userManager.CreateAsync(newUser, request.Password);
         if (!createResult.Succeeded)

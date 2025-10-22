@@ -58,9 +58,4 @@
         <ProjectReference Include="..\Infrastructure\Infrastructure.csproj"/>
     </ItemGroup>
 
-    <Target Name="GenerateHttpFiles" AfterTargets="Build">
-        <Exec Command="dotnet httpgenerator $(OpenApiSpecPath) --output-type OneRequestPerFile --output $(HttpFilesOutputDirectory) --base-url http://localhost:8080 --authorization-header-variable-name authToken"
-              Condition="Exists('$(OpenApiSpecPath)') AND '$(DOTNET_RUNNING_IN_CONTAINER)' != 'true'"/>
-    </Target>
-
 </Project>

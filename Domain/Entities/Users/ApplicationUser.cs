@@ -22,7 +22,7 @@ public class ApplicationUser : IdentityUser<Guid>, IEntity
 
     public IReadOnlyCollection<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
 
-    public static ApplicationUser Create(string userName, string? email)
+    public static ApplicationUser Create(string userName, string? email, string language = "pl")
     {
         var user = new ApplicationUser
         {
@@ -30,7 +30,7 @@ public class ApplicationUser : IdentityUser<Guid>, IEntity
             UserName = userName
         };
 
-        if (!string.IsNullOrWhiteSpace(email)) user.AddDomainEvent(new UserRegistered(userName, email));
+        if (!string.IsNullOrWhiteSpace(email)) user.AddDomainEvent(new UserRegistered(userName, email, language));
 
         return user;
     }

@@ -1,5 +1,7 @@
-﻿using Application.Common.Mailing;
+﻿using Application.Common.ExtensionMethods;
+using Application.Common.Mailing;
 using Application.Common.Mailing.Templates;
+using Application.Common.ValueObjects;
 using Domain.Common;
 using Domain.DomainEvents.User;
 using FluentResults;
@@ -14,8 +16,10 @@ public class UserRegisteredEventHandler(ILogger<UserRegisteredEventHandler> logg
     {
         try
         {
+            var emailLanguage = AppLanguageHelpers.FromString(request.Language);
+            
             await emailService.SendTemplatedEmailAsync(request.Email,
-                new UserRegisteredEmailTemplate(request.Name, "Api"),
+                new UserRegisteredEmailTemplate(request.Name, "Api", emailLanguage),
                 cancellationToken);
         }
         catch (Exception ex)

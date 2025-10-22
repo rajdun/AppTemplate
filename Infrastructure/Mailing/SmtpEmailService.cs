@@ -36,7 +36,7 @@ internal class SmtpEmailService(IOptions<SmtpSettings> settings)
             AppContext.BaseDirectory, 
             "Mailing", 
             "Templates", 
-            template.Language, 
+            template.Language.ToString(), 
             $"{template.TemplateName}.html"
         );
 
