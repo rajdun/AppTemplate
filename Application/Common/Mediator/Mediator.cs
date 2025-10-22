@@ -28,12 +28,11 @@ public class Mediator : IMediator
         var validators = _serviceProvider.GetServices<IValidator<TRequest>>();
         var logger = _serviceProvider.GetRequiredService<ILogger<Mediator>>();
         var user = _serviceProvider.GetRequiredService<IUser>();
-        var stringLocalizer = _serviceProvider.GetRequiredService<IStringLocalizer<UserTranslations>>();
 
         logger.LogInformation("Handling {RequestType} with {HandlerType}", typeof(TRequest).Name,
             handler.GetType().Name);
         if (!Authorize<TRequest>(user))
-            return new UnauthorizedError(stringLocalizer["Unauthorized"]);
+            return new UnauthorizedError(UserTranslations.Unauthorized);
 
         if (RunValidations<TRequest, TResponse>(request, validators, logger, out var fail))
             return fail;

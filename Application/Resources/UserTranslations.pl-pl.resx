@@ -19,9 +19,18 @@
         <value>Nie znaleziono użytkownika</value>
     </data>
     <data name="InvalidPassword" xml:space="preserve">
-        <value>Błędne hasło</value>
+        <value>Bledna nazwa uzytkownika lub haslo</value>
     </data>
     <data name="UsernameAlreadyExists" xml:space="preserve">
         <value>Nazwa użytkownika jest już zajęta</value>
+    </data>
+    <data name="InvalidRefreshToken" xml:space="preserve">
+        <value>Problem z sesja.</value>
+    </data>
+    <data name="Unauthorized" xml:space="preserve">
+        <value>Niezalogowano.</value>
+    </data>
+    <data name="InvalidPasswordOrUsername" xml:space="preserve">
+        <value>Bledna nazwa uzytkownika lub haslo</value>
     </data>
 </root>

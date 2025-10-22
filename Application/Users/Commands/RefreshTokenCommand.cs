@@ -27,8 +27,7 @@ internal class RefreshTokenCommandHandler(
     ICacheService cacheService,
     IJwtTokenGenerator jwtTokenGenerator,
     UserManager<ApplicationUser> userManager,
-    IUser currentUser,
-    IStringLocalizer<UserTranslations> localizer)
+    IUser currentUser)
     : IRequestHandler<RefreshTokenCommand, TokenResult>
 {
     public async Task<Result<TokenResult>> Handle(RefreshTokenCommand request,
@@ -38,10 +37,10 @@ internal class RefreshTokenCommandHandler(
 
         var cachedToken = await cacheService.GetAsync<string>(refreshToken, cancellationToken);
         if (cachedToken == null || cachedToken != request.RefreshToken)
-            return Result.Fail(localizer["InvalidRefreshToken"]);
+            return Result.Fail(UserTranslations.InvalidRefreshToken);
 
         var user = await userManager.FindByIdAsync(currentUser.UserId.ToString());
-        if (user == null) return Result.Fail(localizer["InvalidRefreshToken"]);
+        if (user == null) return Result.Fail(UserTranslations.InvalidRefreshToken);
 
         var newJwtToken = await jwtTokenGenerator.GenerateToken(user);
         var newRefreshToken = jwtTokenGenerator.GenerateRefreshToken();

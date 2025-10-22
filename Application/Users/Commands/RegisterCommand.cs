@@ -36,7 +36,6 @@ public class RegisterCommandValidator : AbstractValidator<RegisterCommand>
 public class RegisterCommandHandler(
     UserManager<ApplicationUser> userManager,
     IJwtTokenGenerator jwtTokenGenerator,
-    IStringLocalizer<UserTranslations> localizer,
     ICacheService cacheService,
     IUser user)
     : IRequestHandler<RegisterCommand, TokenResult>
@@ -44,7 +43,7 @@ public class RegisterCommandHandler(
     public async Task<Result<TokenResult>> Handle(RegisterCommand request, CancellationToken cancellationToken = new())
     {
         var existingUser = await userManager.FindByNameAsync(request.Username);
-        if (existingUser != null) return Result.Fail<TokenResult>(localizer["UsernameAlreadyExists"]);
+        if (existingUser != null) return Result.Fail<TokenResult>(UserTranslations.UsernameAlreadyExists);
 
         var newUser = ApplicationUser.Create(request.Username, request.Email, user.Language.ToString());
 

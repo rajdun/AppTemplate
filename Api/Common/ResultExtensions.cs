@@ -1,6 +1,7 @@
 ﻿using Application.Common.Errors;
 using FluentResults;
 using Microsoft.AspNetCore.Mvc;
+using System.Collections.Generic;
 
 namespace Api.Common;
 
@@ -41,24 +42,28 @@ public static class ResultExtensions
                 return CreateProblemResult(
                     StatusCodes.Status404NotFound,
                     "Not Found",
-                    firstError.Message);
+                    firstError.Message,
+                    errorsDict);
 
             case ConflictError:
                 return CreateProblemResult(
                     StatusCodes.Status409Conflict,
                     "Conflict",
-                    firstError.Message);
+                    firstError.Message,
+                    errorsDict);
 
             case ForbiddenError:
                 return CreateProblemResult(
                     StatusCodes.Status403Forbidden,
                     "Forbidden",
-                    firstError.Message);
+                    firstError.Message,
+                    errorsDict);
             case UnauthorizedError:
                 return CreateProblemResult(
                     StatusCodes.Status401Unauthorized,
                     "Unauthorized",
-                    firstError.Message);
+                    firstError.Message,
+                    errorsDict);
             case ValidationError:
                 var validationProblem = new ValidationProblemDetails(errorsDict)
                 {
@@ -75,16 +80,26 @@ public static class ResultExtensions
                 return CreateProblemResult(
                     StatusCodes.Status400BadRequest,
                     "An error occurred",
-                    firstError?.Message ?? "An unknown error occurred.");
+                    firstError?.Message ?? "An unknown error occurred.",
+                    errorsDict);
         }
     }
 
-    private static IResult CreateProblemResult(int statusCode, string title, string detail)
+    private static IResult CreateProblemResult(int statusCode, string title, string detail, IDictionary<string, string[]>? errors = null)
     {
-        return Results.Problem(
-            statusCode: statusCode,
-            title: title,
-            detail: detail
-        );
+        var problemDetails = new ProblemDetails
+        {
+            Status = statusCode,
+            Title = title,
+            Detail = detail,
+            Type = $"https://httpstatuses.io/{statusCode}"
+        };
+
+        if (errors != null && errors.Count > 0)
+        {
+            problemDetails.Extensions["errors"] = errors;
+        }
+
+        return Results.Problem(problemDetails);
     }
 }

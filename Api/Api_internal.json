@@ -4,6 +4,16 @@
     "title": "Api | internal",
     "version": "1.0.0"
   },
+  "servers": [
+    {
+      "url": "http://localhost:8080",
+      "description": "Local docker1"
+    },
+    {
+      "url": "https://localhost:5045",
+      "description": "Local kestrel"
+    }
+  ],
   "paths": {
     "/api/users/login": {
       "post": {
@@ -245,8 +255,21 @@
           }
         }
       }
+    },
+    "securitySchemes": {
+      "Bearer": {
+        "type": "http",
+        "description": "Please enter a valid token",
+        "scheme": "Bearer",
+        "bearerFormat": "JWT"
+      }
     }
   },
+  "security": [
+    {
+      "Bearer": [ ]
+    }
+  ],
   "tags": [
     {
       "name": "Users"

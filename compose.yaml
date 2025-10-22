@@ -52,6 +52,12 @@ services:
       - SmtpSettings__Password=${SMTP_PASSWORD:-}
       - SmtpSettings__From=${SMTP_FROM:-noreply@api.local}
       - SmtpSettings__UseSsl=${SMTP_USE_SSL:-false}
+      
+      # Openapi settings
+      - OpenApiSettings__Servers__0__Url=${OPENAPI_SERVER_URL:-http://localhost:8080}
+      - OpenApiSettings__Servers__0__Description=${OPENAPI_SERVER_DESCRIPTION:-Local docker}
+      - OpenApiSettings__Servers__1__Url=${OPENAPI_SERVER_URL_2:-https://localhost:5045}
+      - OpenApiSettings__Servers__1__Description=${OPENAPI_SERVER_DESCRIPTION_2:-Local kestrel}
     restart: unless-stopped
     networks:
       - monitoring

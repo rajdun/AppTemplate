@@ -1,6 +1,6 @@
 ﻿using Api.Common;
+using Api.Common.Dto;
 using Carter;
-
 namespace Api;
 
 public static class DependencyInjection
@@ -8,7 +8,11 @@ public static class DependencyInjection
     public static IServiceCollection AddPresentation(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddCarter();
-        services.AddOpenApi("internal");
+        services.AddOpenApi("internal", options =>
+        {
+            var openApiSettings = configuration.GetSection("OpenApiSettings").Get<OpenApiSettings>() ?? new OpenApiSettings();
+            options.AddDocumentTransformer(new OpenApiDocumentTransformer(openApiSettings));
+        });
         services.AddEndpointsApiExplorer();
         services.AddLocalization();
 

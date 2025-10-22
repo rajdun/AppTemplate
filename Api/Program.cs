@@ -50,7 +50,7 @@ if (app.Environment.IsDevelopment()) app.MapOpenApi("/openapi/{documentName}/ope
 app.UseCors(app.Configuration.GetValue<string>("Cors:PolicyName") ?? "DefaultCorsPolicy");
 app.UseExceptionHandler();
 
-var supportedCultures = new[] { "en-US", "pl-PL" };
+var supportedCultures = new[] { "pl-PL", "en-US" };
 var localizationOptions = new RequestLocalizationOptions()
     .SetDefaultCulture(supportedCultures[0])
     .AddSupportedCultures(supportedCultures)

@@ -27,7 +27,6 @@ public class LoginCommandValidator : AbstractValidator<LoginCommand>
 internal sealed class LoginCommandHandler(
     UserManager<ApplicationUser> userManager,
     IJwtTokenGenerator jwtTokenGenerator,
-    IStringLocalizer<UserTranslations> localizer,
     ICacheService cacheService)
     : IRequestHandler<LoginCommand, TokenResult>
 {
@@ -36,7 +35,7 @@ internal sealed class LoginCommandHandler(
         var user = await userManager.FindByNameAsync(request.Username);
 
         if (user == null || !await userManager.CheckPasswordAsync(user, request.Password))
-            return Result.Fail<TokenResult>(localizer["InvalidUsernameOrPassword"]);
+            return Result.Fail<TokenResult>(UserTranslations.InvalidPasswordOrUsername);
 
         var token = await jwtTokenGenerator.GenerateToken(user);
         var refreshToken = jwtTokenGenerator.GenerateRefreshToken();

@@ -19,9 +19,18 @@
         <value>User not found</value>
     </data>
     <data name="InvalidPassword" xml:space="preserve">
-        <value>Invalid password</value>
+        <value>Invalid username or password</value>
     </data>
     <data name="UsernameAlreadyExists" xml:space="preserve">
         <value>Username is already taken</value>
+    </data>
+    <data name="InvalidRefreshToken" xml:space="preserve">
+        <value>Invalid session.</value>
+    </data>
+    <data name="Unauthorized" xml:space="preserve">
+        <value>Not logged in.</value>
+    </data>
+    <data name="InvalidPasswordOrUsername" xml:space="preserve">
+        <value>Invalid username or password</value>
     </data>
 </root>
