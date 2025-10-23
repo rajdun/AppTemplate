@@ -23,6 +23,7 @@
 
     <ItemGroup>
         <PackageReference Include="AspNetCore.HealthChecks.Redis" Version="9.0.0"/>
+        <PackageReference Include="Elastic.Clients.Elasticsearch" Version="9.2.0" />
         <PackageReference Include="Eonix.Microsoft.Extensions.Diagnostics.HealthChecks.Elasticsearch" Version="1.0.0"/>
         <PackageReference Include="FluentResults" Version="4.0.0"/>
         <PackageReference Include="Hangfire.AspNetCore" Version="1.8.21"/>

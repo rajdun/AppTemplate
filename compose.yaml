@@ -8,6 +8,7 @@ volumes:
   prometheus_data: { }
   loki_data: { }
   grafana_data: { }
+  es_data: { }
 
 services:
   api:
@@ -20,6 +21,7 @@ services:
     depends_on:
       - database
       - cache
+      - elasticsearch
     environment:
       # Connection strings
       - ConnectionStrings__DefaultConnection=${DB_CONNECTION_STRING:-Server=database;Port=5432;Database=dev_db;User Id=dev_user;Password=dev_password;}
@@ -72,6 +74,7 @@ services:
     depends_on:
       - database
       - cache
+      - elasticsearch
     environment:
       # Connection strings
       - ConnectionStrings__DefaultConnection=${DB_CONNECTION_STRING:-Server=database;Port=5432;Database=dev_db;User Id=dev_user;Password=dev_password;}
@@ -171,6 +174,25 @@ services:
       - prometheus
       - loki
       - jaeger
+    restart: unless-stopped
+    networks:
+      - monitoring
+        
+  elasticsearch:
+    image: elasticsearch:9.1.5
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - xpack.monitoring.collection.enabled=true
+      - ES_JAVA_OPTS=-Xms1024m -Xmx1024m
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
     restart: unless-stopped
     networks:
       - monitoring
