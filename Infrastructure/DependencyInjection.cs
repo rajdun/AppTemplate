@@ -7,6 +7,7 @@ using Domain.Entities.Users;
 using Hangfire;
 using Hangfire.Redis.StackExchange;
 using Infrastructure.Data;
+using Infrastructure.Elasticsearch;
 using Infrastructure.Implementation;
 using Infrastructure.Implementation.Dto;
 using Infrastructure.Mailing;
@@ -45,6 +46,7 @@ public static class DependencyInjection
         services.AddHealthChecks(configuration);
         services.AddHangfire(configuration);
         services.AddMailing(configuration);
+        services.AddElasticsearch(configuration);
 
         return services;
     }

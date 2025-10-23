@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.Runtime.CompilerServices;
 using Domain.Common;
 using Domain.DomainEvents.User;
 using Microsoft.AspNetCore.Identity;
@@ -29,7 +30,7 @@ public class ApplicationUser : IdentityUser<Guid>, IEntity
             Email = email,
             UserName = userName
         };
-
+        
         if (!string.IsNullOrWhiteSpace(email)) user.AddDomainEvent(new UserRegistered(userName, email, language));
 
         return user;

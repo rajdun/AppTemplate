@@ -1,31 +1,55 @@
 using System;
+using Application.Common.Elasticsearch;
 using Elastic.Clients.Elasticsearch;
+using Elastic.Transport;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 
-namespace Infrastructure.Elasticsearch
+namespace Infrastructure.Elasticsearch;
+
+internal static class ServiceCollectionExtensions
 {
-    public static class ServiceCollectionExtensions
+    internal static IServiceCollection AddElasticsearch(this IServiceCollection services, IConfiguration configuration)
     {
-        public static IServiceCollection AddElasticsearch(this IServiceCollection services, IConfiguration configuration)
+        services.Configure<ElasticsearchSettings>(
+            configuration.GetSection(ElasticsearchSettings.SectionName)
+        );
+        
+        services.AddSingleton<ElasticsearchClient>(sp =>
         {
-            // Bind options (section "Elasticsearch")
-            var options = new ElasticSearchOptions();
-            configuration.GetSection("Elasticsearch").Bind(options);
+            var settings = sp.GetRequiredService<IOptions<ElasticsearchSettings>>().Value;
+            
+            var clientSettings = new ElasticsearchClientSettings(new Uri(settings.Uri))
+                .DefaultIndex(settings.DefaultIndex);
+            
+            if (!string.IsNullOrEmpty(settings.Username) && !string.IsNullOrEmpty(settings.Password))
+            {
+                clientSettings.Authentication(
+                    new BasicAuthentication(settings.Username, settings.Password)
+                );
+            }
+            
+#if DEBUG
+            clientSettings.DisableDirectStreaming()
+                .EnableDebugMode();
+#endif
 
-            // Register options
-            services.AddSingleton(options);
 
-            // Create and register ElasticsearchClient
-            var settings = new ElasticsearchClientSettings(new Uri(options.Uri));
-            var client = new ElasticsearchClient(settings);
-            services.AddSingleton(client);
+            return new ElasticsearchClient(clientSettings);
+        });
 
-            // Register service wrapper
-            services.AddSingleton<IElasticSearch, ElasticSearch>();
-
-            return services;
-        }
+        services.AddScoped(typeof(IElasticSearchService<>), typeof(ElasticSearchService<>));
+        
+        return services;
     }
 }
 
+internal class ElasticsearchSettings
+{
+    public string Uri { get; set; } = string.Empty;
+    public string DefaultIndex { get; set; } = string.Empty;
+    public string Username { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
+    public static string SectionName => "ElasticsearchSettings";
+}
