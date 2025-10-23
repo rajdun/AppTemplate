@@ -60,6 +60,12 @@ services:
       - OpenApiSettings__Servers__0__Description=${OPENAPI_SERVER_DESCRIPTION:-Local docker}
       - OpenApiSettings__Servers__1__Url=${OPENAPI_SERVER_URL_2:-https://localhost:5045}
       - OpenApiSettings__Servers__1__Description=${OPENAPI_SERVER_DESCRIPTION_2:-Local kestrel}
+        
+      # Elasticsearch settings
+      - ElasticsearchSettings__Uri=http://elasticsearch:9200
+      - ElasticsearchSettings__DefaultIndex=my-default-index
+      - ElasticsearchSettings__Username=elastic
+      - ElasticsearchSettings__Password=changeme
     restart: unless-stopped
     networks:
       - monitoring
@@ -87,6 +93,12 @@ services:
       - SmtpSettings__Password=${SMTP_PASSWORD:-}
       - SmtpSettings__From=${SMTP_FROM:-noreply@api.local}
       - SmtpSettings__UseSsl=${SMTP_USE_SSL:-false}
+        
+      # Elasticsearch settings
+      - ElasticsearchSettings__Uri=http://elasticsearch:9200
+      - ElasticsearchSettings__DefaultIndex=my-default-index
+      - ElasticsearchSettings__Username=elastic
+      - ElasticsearchSettings__Password=changeme
     restart: unless-stopped
     networks:
       - monitoring
@@ -184,6 +196,7 @@ services:
       - discovery.type=single-node
       - xpack.security.enabled=false
       - xpack.monitoring.collection.enabled=true
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD:-changeme}
       - ES_JAVA_OPTS=-Xms1024m -Xmx1024m
     ulimits:
       memlock:
