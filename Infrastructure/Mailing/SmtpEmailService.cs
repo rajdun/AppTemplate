@@ -2,6 +2,7 @@
 using Infrastructure.Mailing.Dto;
 using System.Net;
 using System.Net.Mail;
+using Application.Common.ExtensionMethods;
 using Microsoft.Extensions.Options;
 
 namespace Infrastructure.Mailing;
@@ -36,7 +37,7 @@ internal class SmtpEmailService(IOptions<SmtpSettings> settings)
             AppContext.BaseDirectory, 
             "Mailing", 
             "Templates", 
-            template.Language.ToString(), 
+            template.Language.ToLanguageCode(), 
             $"{template.TemplateName}.html"
         );
 
