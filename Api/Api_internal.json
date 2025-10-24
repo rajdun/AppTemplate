@@ -160,10 +160,66 @@
           }
         }
       }
+    },
+    "/api/users/search": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Wyszukiwanie użytkowników z paginacją na podstawie podanych kryteriów.",
+        "description": "Wyszukuje użytkowników na podstawie podanych kryteriów. Zwraca paginowaną listę użytkowników spełniających kryteria wyszukiwania.",
+        "operationId": "SearchUsers",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PagedUserRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PagedResultOfElasticUser"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "ElasticUser": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          }
+        }
+      },
       "LoginRequest": {
         "required": [
           "login",
@@ -176,6 +232,69 @@
           },
           "password": {
             "type": "string"
+          }
+        }
+      },
+      "PagedResultOfElasticUser": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ElasticUser"
+            }
+          },
+          "totalCount": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "totalPages": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "PagedUserRequest": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "$ref": "#/components/schemas/StringFilterField"
+          },
+          "email": {
+            "$ref": "#/components/schemas/StringFilterField"
+          },
+          "sortBy": {
+            "type": "string",
+            "nullable": true
+          },
+          "pageNumber": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pageSize": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sortOrder": {
+            "$ref": "#/components/schemas/SortDirection"
+          },
+          "query": {
+            "type": "string",
+            "nullable": true
+          },
+          "queryColumns": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       },
@@ -239,6 +358,49 @@
             "nullable": true
           }
         }
+      },
+      "SortDirection": {
+        "type": "integer"
+      },
+      "StringFilterField": {
+        "type": "object",
+        "properties": {
+          "isEqual": {
+            "type": "string",
+            "nullable": true
+          },
+          "isNotEqual": {
+            "type": "string",
+            "nullable": true
+          },
+          "contains": {
+            "type": "string",
+            "nullable": true
+          },
+          "startsWith": {
+            "type": "string",
+            "nullable": true
+          },
+          "inArray": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "notInArray": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "isNull": {
+            "type": "boolean",
+            "nullable": true
+          }
+        },
+        "nullable": true
       },
       "TokenResult": {
         "required": [

@@ -36,7 +36,7 @@ services:
       - ASPNETCORE_URLS=http://+:80
       
       # Jwt settings
-      - JwtSettings__Secret=${JWT_SECRET:-SUPER_SECRET_AND_SECURE_AND_VERY_LONG_KEY_USED_FOR_ENCRYPTION}
+      - JwtSettings__Secret=${JWT_SECRET:-SUPER_SECRET_AND_SECURE_AND_VERY_LONG_KEY_USED_FOR_ENCRYPTION_SUPER_SECRET_AND_SECURE_AND_VERY_LONG_KEY_USED_FOR_ENCRYPTION}
       - JwtSettings__Issuer=${JWT_ISSUER:-Api}
       - JwtSettings__Audience=${JWT_AUDIENCE:-ApiUsers}
       

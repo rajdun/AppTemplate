@@ -6,6 +6,7 @@ using Application.Common.Elasticsearch.Models;
 using Application.Common.Mediator;
 using Application.Users.Commands;
 using Application.Users.Dto;
+using Application.Users.Queries;
 using Microsoft.AspNetCore.Mvc;
 using LoginRequest = Api.Modules.Users.Requests.LoginRequest;
 using RegisterRequest = Api.Modules.Users.Requests.RegisterRequest;
@@ -38,6 +39,16 @@ public partial class UsersModule
         var command = new RefreshTokenCommand(request.RefreshToken);
 
         var response = await mediator.SendAsync<RefreshTokenCommand, TokenResult>(command);
+
+        return response.ToHttpResult();
+    }
+    
+    private static async Task<IResult> SearchUsers([FromServices] IMediator mediator,
+        [FromBody] PagedUserRequest request, CancellationToken cancellationToken = new())
+    {
+        var query = new SearchUsersQuery(request);
+
+        var response = await mediator.SendAsync<SearchUsersQuery, PagedResult<ElasticUser>>(query, cancellationToken);
 
         return response.ToHttpResult();
     }

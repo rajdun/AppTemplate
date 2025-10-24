@@ -23,7 +23,7 @@ public class UserSearchService : IUserSearchService
         _indexName = nameof(ElasticUser).ToLowerInvariant();
     }
 
-    public async Task<PagedResult<ElasticUser>> SearchUsersAsync(PagedUserRequest request)
+    public async Task<PagedResult<ElasticUser>> SearchUsersAsync(PagedUserRequest request, CancellationToken cancellationToken = new())
     {
         // 1. Pagination
         var from = (request.PageNumber - 1) * request.PageSize;
@@ -63,8 +63,7 @@ public class UserSearchService : IUserSearchService
                         .Filter(filterQueries)
                     )
                 )
-                .Sort(sortOptions)
-            );
+                .Sort(sortOptions), cancellationToken);
 
             if (!searchResponse.IsValidResponse)
             {

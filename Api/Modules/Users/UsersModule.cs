@@ -1,4 +1,5 @@
-﻿using Application.Common.Elasticsearch.Models;
+﻿using Application.Common.Elasticsearch.Dto;
+using Application.Common.Elasticsearch.Models;
 using Application.Users.Dto;
 using Carter;
 using Microsoft.AspNetCore.Mvc;
@@ -7,6 +8,8 @@ namespace Api.Modules.Users;
 
 public partial class UsersModule : ICarterModule
 {
+    private const string JsonContentType = "application/json";
+    
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("api/users")
@@ -14,7 +17,7 @@ public partial class UsersModule : ICarterModule
 
         group.MapPost("login", Login)
             .WithName("Login")
-            .Produces<TokenResult>(StatusCodes.Status200OK, "application/json")
+            .Produces<TokenResult>(StatusCodes.Status200OK, JsonContentType)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status401Unauthorized)
             .WithDisplayName("User Login")
@@ -26,7 +29,7 @@ public partial class UsersModule : ICarterModule
 
         group.MapPost("register", Register)
             .WithName("Register")
-            .Produces<TokenResult>(StatusCodes.Status200OK, "application/json")
+            .Produces<TokenResult>(StatusCodes.Status200OK, JsonContentType)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithDisplayName("Register a new user")
             .WithDescription(
@@ -38,7 +41,7 @@ public partial class UsersModule : ICarterModule
         group.MapPost("refresh-token", RefreshToken)
             .WithName("RefreshToken")
             .RequireAuthorization()
-            .Produces<TokenResult>(StatusCodes.Status200OK, "application/json")
+            .Produces<TokenResult>(StatusCodes.Status200OK, JsonContentType)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status401Unauthorized)
             .WithDisplayName("Refresh User Token")
@@ -46,6 +49,17 @@ public partial class UsersModule : ICarterModule
                 "Odświeża token JWT na podstawie przesłanego refresh tokena. Zwraca nowy token JWT oraz refresh token przy poprawnych danych. W przypadku błędnych danych (np. nieważny refresh token) zwraca odpowiedni kod błędu.")
             .WithSummary(
                 "Odświeżanie tokena użytkownika. Wymaga refresh tokena. Nowy token JWT oraz refresh token w odpowiedzi.")
+            .WithOpenApi();
+        
+        
+        group.MapPost("search", SearchUsers)
+            .WithName("SearchUsers")
+            .RequireAuthorization()
+            .Produces<PagedResult<ElasticUser>>(StatusCodes.Status200OK, JsonContentType)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .WithDisplayName("Search Users")
+            .WithDescription("Wyszukuje użytkowników na podstawie podanych kryteriów. Zwraca paginowaną listę użytkowników spełniających kryteria wyszukiwania.")
+            .WithSummary("Wyszukiwanie użytkowników z paginacją na podstawie podanych kryteriów.")
             .WithOpenApi();
     }
 }
