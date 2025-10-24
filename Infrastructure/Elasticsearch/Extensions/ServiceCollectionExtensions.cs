@@ -41,6 +41,8 @@ internal static class ServiceCollectionExtensions
 
         services.AddScoped(typeof(IElasticSearchService<>), typeof(ElasticSearchService<>));
         
+        services.AddScoped<IUserSearchService, UserSearchService>();
+        
         return services;
     }
 }

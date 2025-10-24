@@ -1,5 +1,8 @@
 ﻿using Api.Common;
 using Api.Modules.Users.Requests;
+using Application.Common.Elasticsearch;
+using Application.Common.Elasticsearch.Dto;
+using Application.Common.Elasticsearch.Models;
 using Application.Common.Mediator;
 using Application.Users.Commands;
 using Application.Users.Dto;

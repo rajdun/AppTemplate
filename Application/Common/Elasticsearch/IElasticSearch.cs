@@ -1,4 +1,5 @@
-﻿using Application.Common.Elasticsearch.Dto;
+﻿
+using Application.Common.Elasticsearch.Dto;
 
 namespace Application.Common.Elasticsearch;
 
@@ -18,9 +19,4 @@ public interface IElasticSearchService<T> where T : class, IElasticDocument
     /// Usuwa dokument po jego identyfikatorze.
     /// </summary>
     Task<bool> DeleteDocumentAsync(string id);
-
-    /// <summary>
-    /// Przeprowadza zaawansowane, spaginowane wyszukiwanie z filtrowaniem i sortowaniem.
-    /// </summary>
-    Task<SearchResult<T>> SearchAsync(SearchRequest request);
 }

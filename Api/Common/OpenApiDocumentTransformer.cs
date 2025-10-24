@@ -34,7 +34,7 @@ public class OpenApiDocumentTransformer : IOpenApiDocumentTransformer
         {
             // fallback if no config provided
             document.Servers.Add(new OpenApiServer { Url = "http://localhost:8080", Description = "Local docker" });
-            document.Servers.Add(new OpenApiServer { Url = "https://localhost:5045", Description = "Local kestrel" });
+            document.Servers.Add(new OpenApiServer { Url = "http://localhost:5045", Description = "Local kestrel" });
         }
         
         document.Components ??= new OpenApiComponents();

@@ -1,5 +1,7 @@
-﻿using Application.Users.Dto;
+﻿using Application.Common.Elasticsearch.Models;
+using Application.Users.Dto;
 using Carter;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Modules.Users;
 
