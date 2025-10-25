@@ -52,4 +52,14 @@ public partial class UsersModule
 
         return response.ToHttpResult();
     }
+
+    private static async Task<IResult> DeactivateUser([FromServices] IMediator mediator, [FromRoute] Guid userId,
+        CancellationToken cancellationToken = new())
+    {
+        var command = new DeactivateUserCommand(userId);
+        
+        var response = await mediator.SendAsync<DeactivateUserCommand, DeactivateUserResult>(command, cancellationToken);
+        
+        return response.ToHttpResult();
+    }
 }

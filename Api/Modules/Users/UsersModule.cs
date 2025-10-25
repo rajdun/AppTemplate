@@ -51,7 +51,6 @@ public partial class UsersModule : ICarterModule
                 "Odświeżanie tokena użytkownika. Wymaga refresh tokena. Nowy token JWT oraz refresh token w odpowiedzi.")
             .WithOpenApi();
         
-        
         group.MapPost("search", SearchUsers)
             .WithName("SearchUsers")
             .RequireAuthorization()
@@ -60,6 +59,18 @@ public partial class UsersModule : ICarterModule
             .WithDisplayName("Search Users")
             .WithDescription("Wyszukuje użytkowników na podstawie podanych kryteriów. Zwraca paginowaną listę użytkowników spełniających kryteria wyszukiwania.")
             .WithSummary("Wyszukiwanie użytkowników z paginacją na podstawie podanych kryteriów.")
+            .WithOpenApi();
+        
+        group.MapDelete("{userId:guid}/deactivate", DeactivateUser)
+            .WithName("DeactivateUser")
+            .RequireAuthorization()
+            .Produces<DeactivateUserResult>(StatusCodes.Status200OK, JsonContentType)
+            .ProducesProblem(StatusCodes.Status400BadRequest)
+            .ProducesProblem(StatusCodes.Status401Unauthorized)
+            .ProducesProblem(StatusCodes.Status404NotFound)
+            .WithDisplayName("Deactivate User")
+            .WithDescription("Dezaktywuje użytkownika o podanym identyfikatorze. Zwraca wynik operacji dezaktywacji. W przypadku nieistniejącego użytkownika lub błędnych danych zwraca odpowiedni kod błędu.")
+            .WithSummary("Dezaktywacja użytkownika na podstawie jego identyfikatora.")
             .WithOpenApi();
     }
 }

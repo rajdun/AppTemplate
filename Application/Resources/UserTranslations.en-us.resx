@@ -33,4 +33,10 @@
     <data name="InvalidPasswordOrUsername" xml:space="preserve">
         <value>Invalid username or password</value>
     </data>
+    <data name="UserNotActive" xml:space="preserve">
+        <value>User is not active</value>
+    </data>
+    <data name="UserExistsButIsNotActive" xml:space="preserve">
+        <value>User already exists but is inactive</value>
+    </data>
 </root>

@@ -41,6 +41,11 @@ internal class RefreshTokenCommandHandler(
 
         var user = await userManager.FindByIdAsync(currentUser.UserId.ToString());
         if (user == null) return Result.Fail(UserTranslations.InvalidRefreshToken);
+        
+        if (user.DeactivatedAt is not null)
+        {
+            return Result.Fail(UserTranslations.UserNotActive);
+        }
 
         var newJwtToken = await jwtTokenGenerator.GenerateToken(user);
         var newRefreshToken = jwtTokenGenerator.GenerateRefreshToken();

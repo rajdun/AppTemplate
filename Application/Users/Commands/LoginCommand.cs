@@ -35,7 +35,14 @@ internal sealed class LoginCommandHandler(
         var user = await userManager.FindByNameAsync(request.Username);
 
         if (user == null || !await userManager.CheckPasswordAsync(user, request.Password))
+        {
             return Result.Fail<TokenResult>(UserTranslations.InvalidPasswordOrUsername);
+        }
+
+        if (user.DeactivatedAt is not null)
+        {
+            return Result.Fail(UserTranslations.UserNotActive);
+        }
 
         var token = await jwtTokenGenerator.GenerateToken(user);
         var refreshToken = jwtTokenGenerator.GenerateRefreshToken();

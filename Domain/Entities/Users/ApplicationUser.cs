@@ -9,7 +9,9 @@ namespace Domain.Entities.Users;
 [Table("Users", Schema = "Users")]
 public class ApplicationUser : IdentityUser<Guid>, IEntity
 {
+    #region Domain Events
     private readonly List<IDomainEvent> _domainEvents = new();
+    private DateTimeOffset? _deactivatedAt;
 
     public void AddDomainEvent(IDomainEvent domainEvent)
     {
@@ -22,6 +24,20 @@ public class ApplicationUser : IdentityUser<Guid>, IEntity
     }
 
     public IReadOnlyCollection<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
+    #endregion
+
+    public DateTimeOffset? DeactivatedAt
+    {
+        get => _deactivatedAt;
+        set
+        {
+                        if (_deactivatedAt == null && value != null)
+            {
+                AddDomainEvent(new UserDeactivated(Id));
+            }
+            _deactivatedAt = value;
+        }
+    }
 
     public static ApplicationUser Create(string userName, string? email, string language = "pl")
     {
