@@ -2,20 +2,16 @@ namespace Application.Common.Elasticsearch.Dto;
 
 public class PagedUserRequest : PagedRequest
 {
-    private string? _sortBy;
     public StringFilterField? Name { get; set; }
     public StringFilterField? Email { get; set; }
 
-    public override string? SortBy
+    public override string? GetActualSortField()
     {
-        get
+        return this.SortBy?.ToLowerInvariant() switch
         {
-            if (_sortBy == null)
-            {
-                return null;
-            }
-            return $"{_sortBy.ToLowerInvariant()}.keyword";
-        }
-        set => _sortBy = value;
+            "name" => "name.keyword",
+            "email" => "email.keyword",
+            _ => base.GetActualSortField()
+        };
     }
 }

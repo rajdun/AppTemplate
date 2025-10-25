@@ -1,7 +1,6 @@
 ﻿FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
 USER root
 RUN apt-get update && apt-get install -y libicu-dev && rm -rf /var/lib/apt/lists/*
-ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=false
 USER $APP_UID
 WORKDIR /app
 EXPOSE 8080

@@ -18,7 +18,7 @@ internal static class ElasticSearchQueryExtensions
         {
             Field = new FieldSort()
             {
-                Field = new Field(request.SortBy),
+                Field = new Field(request.GetActualSortField()!),
                 Order = esSortOrder
             }
         });

@@ -5,11 +5,16 @@ public class PagedRequest
     public int PageNumber { get; set; } = 1;
     public int PageSize { get; set; } = 10;
     
-    public virtual string? SortBy { get; set; }
+    public string? SortBy { get; set; }
     public SortDirection SortOrder { get; set; } = SortDirection.Asc;
     
     public string? Query { get; set; }
     public ICollection<string> QueryColumns { get; set; } = [];
+
+    public virtual string? GetActualSortField()
+    {
+        return this.SortBy?.ToLowerInvariant();
+    }
 }
 
 public class StringFilterField
