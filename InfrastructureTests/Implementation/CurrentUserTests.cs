@@ -1,5 +1,7 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Application.Common.ExtensionMethods;
+using Application.Common.Interfaces;
 using Application.Common.ValueObjects;
 using Infrastructure.Implementation;
 using Microsoft.AspNetCore.Http;
@@ -10,8 +12,10 @@ namespace InfrastructureTests.Implementation;
 
 public class CurrentUserTests
 {
+    private readonly ICacheService _cacheService = Substitute.For<ICacheService>();
+
     [Fact]
-    public void CurrentUser_WhenUserIsAuthenticated_ShouldSetPropertiesCorrectly()
+    public async Task CurrentUser_WhenUserIsAuthenticated_ShouldSetPropertiesCorrectly()
     {
         // Arrange
         var userId = Guid.NewGuid();
@@ -21,7 +25,9 @@ public class CurrentUserTests
         var claims = new List<Claim>
         {
             new(ClaimTypes.NameIdentifier, userId.ToString()),
-            new("email", email)
+            new("email", email),
+            new(JwtRegisteredClaimNames.Jti, "some-jti-value"),
+            new(ClaimTypes.Name, userName)
         };
         var identity = new ClaimsIdentity(claims, "TestAuth");
         var claimsPrincipal = new ClaimsPrincipal(identity);
@@ -38,29 +44,31 @@ public class CurrentUserTests
 
         var httpContextAccessor = Substitute.For<IHttpContextAccessor>();
         httpContextAccessor.HttpContext.Returns(httpContext);
+        _cacheService.GetAsync<string>(Arg.Any<string>()).Returns(Task.FromResult<string?>("valid"));
 
         // Act
-        var currentUser = new CurrentUser(httpContextAccessor);
+        var currentUser = await CurrentUser.CreateAsync(httpContextAccessor, _cacheService);
 
         // Assert
         Assert.True(currentUser.IsAuthenticated);
         Assert.Equal(userId, currentUser.UserId);
         Assert.Equal(userName, currentUser.UserName);
         Assert.Equal(email, currentUser.Email);
-        Assert.True(currentUser.IsAdmin);
+        Assert.False(currentUser.IsAdmin);
         Assert.Equal(AppLanguage.Pl, currentUser.Language);
     }
 
     [Fact]
-    public void CurrentUser_WhenUserIsNotAuthenticated_ShouldSetDefaultValues()
+    public async Task CurrentUser_WhenUserIsNotAuthenticated_ShouldSetDefaultValues()
     {
         // Arrange
         var httpContext = new DefaultHttpContext();
         var httpContextAccessor = Substitute.For<IHttpContextAccessor>();
         httpContextAccessor.HttpContext.Returns(httpContext);
+        _cacheService.GetAsync<string>(Arg.Any<string>()).Returns(Task.FromResult<string?>("valid"));
 
         // Act
-        var currentUser = new CurrentUser(httpContextAccessor);
+        var currentUser = await CurrentUser.CreateAsync(httpContextAccessor, _cacheService);
 
         // Assert
         Assert.False(currentUser.IsAuthenticated);
@@ -71,14 +79,15 @@ public class CurrentUserTests
     }
 
     [Fact]
-    public void CurrentUser_WhenHttpContextIsNull_ShouldSetDefaultValues()
+    public async Task CurrentUser_WhenHttpContextIsNull_ShouldSetDefaultValues()
     {
         // Arrange
         var httpContextAccessor = Substitute.For<IHttpContextAccessor>();
         httpContextAccessor.HttpContext.Returns((HttpContext?)null);
+        _cacheService.GetAsync<string>(Arg.Any<string>()).Returns(Task.FromResult<string?>("valid"));
 
         // Act
-        var currentUser = new CurrentUser(httpContextAccessor);
+        var currentUser = await CurrentUser.CreateAsync(httpContextAccessor, _cacheService);
 
         // Assert
         Assert.False(currentUser.IsAuthenticated);
@@ -88,7 +97,7 @@ public class CurrentUserTests
     }
 
     [Fact]
-    public void CurrentUser_WithEnglishCulture_ShouldSetEnglishLanguage()
+    public async Task CurrentUser_WithEnglishCulture_ShouldSetEnglishLanguage()
     {
         // Arrange
         var httpContext = new DefaultHttpContext();
@@ -98,16 +107,17 @@ public class CurrentUserTests
 
         var httpContextAccessor = Substitute.For<IHttpContextAccessor>();
         httpContextAccessor.HttpContext.Returns(httpContext);
+        _cacheService.GetAsync<string>(Arg.Any<string>()).Returns(Task.FromResult<string?>("valid"));
 
         // Act
-        var currentUser = new CurrentUser(httpContextAccessor);
+        var currentUser = await CurrentUser.CreateAsync(httpContextAccessor, _cacheService);
 
         // Assert
         Assert.Equal(AppLanguage.En, currentUser.Language);
     }
 
     [Fact]
-    public void CurrentUser_WithPolishCulture_ShouldSetPolishLanguage()
+    public async Task CurrentUser_WithPolishCulture_ShouldSetPolishLanguage()
     {
         // Arrange
         var httpContext = new DefaultHttpContext();
@@ -117,37 +127,40 @@ public class CurrentUserTests
 
         var httpContextAccessor = Substitute.For<IHttpContextAccessor>();
         httpContextAccessor.HttpContext.Returns(httpContext);
+        _cacheService.GetAsync<string>(Arg.Any<string>()).Returns(Task.FromResult<string?>("valid"));
 
         // Act
-        var currentUser = new CurrentUser(httpContextAccessor);
+        var currentUser = await CurrentUser.CreateAsync(httpContextAccessor, _cacheService);
 
         // Assert
         Assert.Equal(AppLanguage.Pl, currentUser.Language);
     }
 
     [Fact]
-    public void CurrentUser_WithNoCultureFeature_ShouldDefaultToPolish()
+    public async Task CurrentUser_WithNoCultureFeature_ShouldDefaultToPolish()
     {
         // Arrange
         var httpContext = new DefaultHttpContext();
         var httpContextAccessor = Substitute.For<IHttpContextAccessor>();
         httpContextAccessor.HttpContext.Returns(httpContext);
+        _cacheService.GetAsync<string>(Arg.Any<string>()).Returns(Task.FromResult<string?>("valid"));
 
         // Act
-        var currentUser = new CurrentUser(httpContextAccessor);
+        var currentUser = await CurrentUser.CreateAsync(httpContextAccessor, _cacheService);
 
         // Assert
         Assert.Equal(AppLanguage.Pl, currentUser.Language);
     }
 
     [Fact]
-    public void CurrentUser_WithInvalidUserIdClaim_ShouldSetEmptyGuid()
+    public async Task CurrentUser_WithInvalidUserIdClaim_ShouldSetEmptyGuid()
     {
         // Arrange
         var claims = new List<Claim>
         {
             new(ClaimTypes.NameIdentifier, "invalid-guid"),
-            new("email", "test@example.com")
+            new("email", "test@example.com"),
+            new(JwtRegisteredClaimNames.Jti, "some-jti-value")
         };
         var identity = new ClaimsIdentity(claims, "TestAuth");
         var claimsPrincipal = new ClaimsPrincipal(identity);
@@ -159,9 +172,10 @@ public class CurrentUserTests
 
         var httpContextAccessor = Substitute.For<IHttpContextAccessor>();
         httpContextAccessor.HttpContext.Returns(httpContext);
+        _cacheService.GetAsync<string>(Arg.Any<string>()).Returns(Task.FromResult<string?>("valid"));
 
         // Act
-        var currentUser = new CurrentUser(httpContextAccessor);
+        var currentUser = await CurrentUser.CreateAsync(httpContextAccessor, _cacheService);
 
         // Assert
         Assert.True(currentUser.IsAuthenticated);

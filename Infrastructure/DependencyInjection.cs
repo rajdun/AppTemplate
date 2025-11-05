@@ -15,6 +15,7 @@ using Infrastructure.Mailing.Dto;
 using Infrastructure.Messaging;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -132,7 +133,12 @@ public static class DependencyInjection
         configuration.Bind(JwtSettings.SectionName, jwtSettings);
         services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
         services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
-        services.AddScoped<IUser, CurrentUser>();
+        services.AddScoped<IUser>(sp =>
+        {
+            var httpContextAccessor = sp.GetRequiredService<IHttpContextAccessor>();
+            var cacheService = sp.GetRequiredService<ICacheService>();
+            return CurrentUser.CreateAsync(httpContextAccessor, cacheService).GetAwaiter().GetResult();
+        });
         services.AddScoped<IHangfireJobExecutor, HangfireJobExecutor>();
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 

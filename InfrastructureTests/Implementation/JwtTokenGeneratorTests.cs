@@ -17,6 +17,7 @@ public class JwtTokenGeneratorTests
     private readonly IJwtTokenGenerator _sut; 
     private readonly JwtSettings _jwtSettings;
     private readonly DateTime _now;
+    private readonly ICacheService _cacheService;
 
     public JwtTokenGeneratorTests()
     {
@@ -37,9 +38,10 @@ public class JwtTokenGeneratorTests
         mockOptions.Value.Returns(_jwtSettings);
         var datetimeProvider = Substitute.For<IDateTimeProvider>();
         datetimeProvider.UtcNow.Returns(_now);
+        _cacheService = Substitute.For<ICacheService>();
 
         // Create the instance of the class we are testing
-        _sut = new JwtTokenGenerator(mockOptions, datetimeProvider);
+        _sut = new JwtTokenGenerator(mockOptions, datetimeProvider, _cacheService);
     }
 
     [Fact]
@@ -160,6 +162,27 @@ public class JwtTokenGeneratorTests
 
         // Assert
         Assert.NotEqual(token1, token2);
+    }
+    
+    [Fact]
+    public async Task GenerateToken_ShouldSaveJtiInCache()
+    {
+        // Arrange
+        var user = new ApplicationUser()
+        {
+            Id = Guid.NewGuid(),
+            UserName = "testuser",
+            Email = "Test@test.test"
+        };
+        
+        // Act
+        await _sut.GenerateToken(user);
+    
+        // Assert
+        await _cacheService.Received(1).SetAsync(
+            Arg.Any<string>(), 
+            Arg.Any<string>(), 
+            Arg.Any<TimeSpan>());
     }
 }
 

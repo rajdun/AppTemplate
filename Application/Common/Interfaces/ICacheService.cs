@@ -16,4 +16,9 @@ public static class CacheKeys
     {
         return $"refresh-token:{userId}";
     }
+    
+    public static string GetJtiCacheKey(string jti)
+    {
+        return $"jti:{jti}";
+    }
 }
