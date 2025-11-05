@@ -23,7 +23,7 @@ internal class CurrentUser : IUser
         if (user?.Identity?.IsAuthenticated ?? false)
         {
             IsAuthenticated = true;
-            UserName = user.Identity.Name ?? string.Empty;
+            UserName = user.FindFirst(ClaimTypes.Name)?.Value ?? string.Empty;
             Email = user.FindFirst(JwtRegisteredClaimNames.Email)?.Value ?? string.Empty;
             var userIdClaim = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
             IsAdmin = true;

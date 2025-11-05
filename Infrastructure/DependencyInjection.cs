@@ -134,6 +134,7 @@ public static class DependencyInjection
         services.AddSingleton<IJwtTokenGenerator, JwtTokenGenerator>();
         services.AddScoped<IUser, CurrentUser>();
         services.AddScoped<IHangfireJobExecutor, HangfireJobExecutor>();
+        services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 
         return services;
     }

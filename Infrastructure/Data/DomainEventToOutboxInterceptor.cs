@@ -1,11 +1,13 @@
 ﻿using System.Text.Json;
+using Application.Common.Interfaces;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace Infrastructure.Data;
 
-public class DomainEventToOutboxInterceptor : SaveChangesInterceptor
+public class DomainEventToOutboxInterceptor(IDateTimeProvider dateTimeProvider)
+    : SaveChangesInterceptor
 {
     public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
     {
@@ -44,7 +46,7 @@ public class DomainEventToOutboxInterceptor : SaveChangesInterceptor
             {
                 EventType = domainEvent.GetType().AssemblyQualifiedName!,
                 EventPayload = JsonSerializer.Serialize(domainEvent, domainEvent.GetType()),
-                CreatedAt = DateTime.UtcNow,
+                CreatedAt = dateTimeProvider.UtcNow,
                 ProcessedAt = null,
                 RetryCount = 0
             });

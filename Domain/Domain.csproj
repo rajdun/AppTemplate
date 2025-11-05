@@ -17,6 +17,11 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <InternalsVisibleTo Include="ApplicationTests" />
+        <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
+    </ItemGroup>
+    
+    <ItemGroup>
         <PackageReference Include="FluentResults" Version="4.0.0"/>
         <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.3.1"/>
         <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.10"/>

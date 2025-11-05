@@ -1,4 +1,5 @@
-﻿using Domain.Entities;
+﻿using Application.Common.Interfaces;
+using Domain.Entities;
 using Hangfire;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -13,7 +14,8 @@ namespace Application.Common.Messaging;
 public class OutboxProcessor(
     ILogger<OutboxProcessor> logger,
     IApplicationDbContext dbContext,
-    IBackgroundJobClient backgroundJobClient) : IOutboxProcessor
+    IBackgroundJobClient backgroundJobClient,
+    IDateTimeProvider dateTimeProvider) : IOutboxProcessor
 {
     private const string RawSql = @"
         SELECT * FROM ""Messaging"".""OutboxMessages""
@@ -47,7 +49,7 @@ public class OutboxProcessor(
             return;
         }
 
-        var utcNow = DateTime.UtcNow;
+        var utcNow = dateTimeProvider.UtcNow;
 
         foreach (var message in messages)
             try

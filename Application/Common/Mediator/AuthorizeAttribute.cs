@@ -17,7 +17,7 @@ public class AuthorizeAttribute : Attribute
         if (!user.IsAuthenticated)
             return false;
 
-        if (AuthorizeUserBehaviour.HasFlag(AuthorizePolicy.None))
+        if (AuthorizeUserBehaviour == AuthorizePolicy.None)
             return true;
 
         if (AuthorizeUserBehaviour.HasFlag(AuthorizePolicy.Admin) && user.IsAdmin)

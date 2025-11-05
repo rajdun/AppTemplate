@@ -13,10 +13,12 @@ namespace Infrastructure.Implementation;
 internal class JwtTokenGenerator : IJwtTokenGenerator
 {
     private readonly IOptions<JwtSettings> _jwtSettings;
-
-    public JwtTokenGenerator(IOptions<JwtSettings> jwtSettings)
+    private readonly IDateTimeProvider _dateTimeProvider;
+    
+    public JwtTokenGenerator(IOptions<JwtSettings> jwtSettings, IDateTimeProvider dateTimeProvider)
     {
         _jwtSettings = jwtSettings;
+        _dateTimeProvider = dateTimeProvider;
     }
 
     public async Task<string> GenerateToken(ApplicationUser user)
@@ -38,7 +40,7 @@ internal class JwtTokenGenerator : IJwtTokenGenerator
             _jwtSettings.Value.Issuer,
             _jwtSettings.Value.Audience,
             claims,
-            expires: DateTime.UtcNow.AddMinutes(_jwtSettings.Value.ExpiryMinutes),
+            expires: _dateTimeProvider.UtcNow.AddMinutes(_jwtSettings.Value.ExpiryMinutes),
             signingCredentials: credentials);
 
         return new JwtSecurityTokenHandler().WriteToken(token);

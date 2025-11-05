@@ -19,6 +19,8 @@
     <ItemGroup>
         <ProjectReference Include="..\Application\Application.csproj"/>
         <ProjectReference Include="..\Domain\Domain.csproj"/>
+        <InternalsVisibleTo Include="InfrastructureTests" />
+        <InternalsVisibleTo Include="DynamicProxyGenAssembly2" />
     </ItemGroup>
 
     <ItemGroup>
