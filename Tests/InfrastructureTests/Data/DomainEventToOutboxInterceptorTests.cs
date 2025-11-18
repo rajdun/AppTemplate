@@ -43,7 +43,7 @@ public class DomainEventToOutboxInterceptorTests
         // Assert
         var outboxMessages = await context.OutboxMessages.ToListAsync();
         Assert.Single(outboxMessages);
-        Assert.Contains("TestDomainEvent", outboxMessages[0].EventType);
+        Assert.Contains("InfrastructureTests.Data.DomainEventToOutboxInterceptorTests+TestDomainNotification, InfrastructureTests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", outboxMessages[0].EventType);
         Assert.Contains("Test Event", outboxMessages[0].EventPayload);
         Assert.Empty(entity.DomainNotifications);
     }

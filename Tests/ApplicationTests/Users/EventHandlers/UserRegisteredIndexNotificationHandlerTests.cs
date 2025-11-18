@@ -34,7 +34,7 @@ public class UserRegisteredIndexNotificationHandlerTests
         _userManager.FindByNameAsync(domainEvent.Name).Returns((ApplicationUser?)null);
 
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentNullException>(() => 
+        await Assert.ThrowsAsync<InvalidOperationException>(() => 
             _handler.Handle(domainEvent, CancellationToken.None));
     }
 
@@ -50,7 +50,7 @@ public class UserRegisteredIndexNotificationHandlerTests
             .Returns(Task.FromResult(false));
 
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentNullException>(() => 
+        await Assert.ThrowsAsync<InvalidOperationException>(() => 
             _handler.Handle(domainEvent, CancellationToken.None));
     }
 
@@ -85,7 +85,7 @@ public class UserRegisteredIndexNotificationHandlerTests
         _userManager.FindByNameAsync(domainEvent.Name).Returns((ApplicationUser?)null);
 
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentNullException>(() => 
+        await Assert.ThrowsAsync<InvalidOperationException>(() => 
             _handler.Handle(domainEvent, CancellationToken.None));
         
         _logger.Received(1).Log(
@@ -108,7 +108,7 @@ public class UserRegisteredIndexNotificationHandlerTests
             .Returns(Task.FromResult(false));
 
         // Act & Assert
-        await Assert.ThrowsAsync<ArgumentNullException>(() => 
+        await Assert.ThrowsAsync<InvalidOperationException>(() => 
             _handler.Handle(domainEvent, CancellationToken.None));
         
         _logger.Received(1).Log(
