@@ -15,7 +15,7 @@ services:
     image: api:latest
     build:
       context: .
-      dockerfile: Api/Dockerfile
+      dockerfile: Src/Api/Dockerfile
     ports:
       - "8080:80"
     depends_on:
@@ -75,7 +75,7 @@ services:
     image: background_service:latest
     build:
       context: .
-      dockerfile: WorkerService/Dockerfile
+      dockerfile: Src/WorkerService/Dockerfile
     ports:
       - "8081:8080"
     depends_on:
