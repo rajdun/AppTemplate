@@ -1,8 +1,9 @@
+using Application.Common.Dto;
 using Application.Common.Elasticsearch.Dto;
 using Elastic.Clients.Elasticsearch;
 using Elastic.Clients.Elasticsearch.QueryDsl;
 
-namespace Infrastructure.Elasticsearch;
+namespace Infrastructure.Elasticsearch.Extensions;
 
 internal static class ElasticSearchQueryExtensions
 {
@@ -10,7 +11,7 @@ internal static class ElasticSearchQueryExtensions
     {
         if (string.IsNullOrEmpty(request.SortBy)) return sortOptions;
         
-        var esSortOrder = request.SortOrder == Application.Common.Elasticsearch.Dto.SortDirection.Asc
+        var esSortOrder = request.SortOrder == SortDirection.Asc
             ? Elastic.Clients.Elasticsearch.SortOrder.Asc
             : Elastic.Clients.Elasticsearch.SortOrder.Desc;
 

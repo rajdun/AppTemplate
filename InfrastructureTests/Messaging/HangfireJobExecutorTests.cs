@@ -12,14 +12,14 @@ public class HangfireJobExecutorTests
 {
     private readonly ILogger<HangfireJobExecutor> _logger;
     private readonly Application.Common.Mediator.IMediator _mediator;
-    private readonly IDomainEventDeserializer _deserializer;
+    private readonly IDomainNotificationDeserializer _deserializer;
     private readonly HangfireJobExecutor _sut;
 
     public HangfireJobExecutorTests()
     {
         _logger = Substitute.For<ILogger<HangfireJobExecutor>>();
         _mediator = Substitute.For<Application.Common.Mediator.IMediator>();
-        _deserializer = Substitute.For<IDomainEventDeserializer>();
+        _deserializer = Substitute.For<IDomainNotificationDeserializer>();
         _sut = new HangfireJobExecutor(_logger, _mediator, _deserializer);
     }
 

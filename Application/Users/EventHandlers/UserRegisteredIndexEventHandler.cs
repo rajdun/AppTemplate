@@ -3,7 +3,7 @@ using Application.Common.Elasticsearch.Models;
 using Application.Common.ExtensionMethods;
 using Application.Common.Mailing.Templates;
 using Domain.Common;
-using Domain.DomainEvents.User;
+using Domain.DomainNotifications.User;
 using Domain.Entities.Users;
 using FluentResults;
 using Microsoft.AspNetCore.Identity;
@@ -20,8 +20,8 @@ public class UserRegisteredIndexEventHandler(ILogger<UserRegisteredSendEmailEven
 
         if (user == null)
         {
-            logger.LogError($"User {request.Email} not found");
-            throw new ArgumentNullException("user", "User name not found");
+            logger.LogError("User {Email} not found", request.Email);
+            throw new InvalidOperationException("User name not found");
         }
 
         var result = await elasticSearchService.IndexDocumentAsync(new ElasticUser()
@@ -33,8 +33,8 @@ public class UserRegisteredIndexEventHandler(ILogger<UserRegisteredSendEmailEven
 
         if (!result)
         {
-            logger.LogError($"Could not index user {request.Email}");
-            throw new ArgumentNullException("user", "User name not found");
+            logger.LogError("Could not index user {Email}", request.Email);
+            throw new InvalidOperationException("User name not found");
         }
 
         return Result.Ok();

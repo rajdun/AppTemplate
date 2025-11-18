@@ -5,7 +5,7 @@ using Application.Common.Mailing;
 using Application.Common.Mailing.Templates;
 using Application.Common.ValueObjects;
 using Domain.Common;
-using Domain.DomainEvents.User;
+using Domain.DomainNotifications.User;
 using FluentResults;
 using Microsoft.Extensions.Logging;
 

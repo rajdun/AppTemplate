@@ -1,4 +1,5 @@
-﻿using Application.Common.Elasticsearch.Dto;
+﻿using Application.Common.Dto;
+using Application.Common.Elasticsearch.Dto;
 using Application.Common.Elasticsearch.Models;
 using Application.Users.Dto;
 using Carter;

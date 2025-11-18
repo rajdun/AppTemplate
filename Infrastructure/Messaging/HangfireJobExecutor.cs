@@ -9,13 +9,13 @@ namespace Infrastructure.Messaging;
 public class HangfireJobExecutor(
     ILogger<HangfireJobExecutor> logger,
     IMediator mediator,
-    IDomainEventDeserializer domainEventDeserializer) : IHangfireJobExecutor
+    IDomainNotificationDeserializer domainNotificationDeserializer) : IHangfireJobExecutor
 {
     public async Task ProcessEventAsync(string eventType, string eventPayload, CancellationToken cancellationToken)
     {
         logger.LogInformation("Hangfire job started for event type {EventType}", eventType);
 
-        var domainEvent = domainEventDeserializer.Deserialize(eventType, eventPayload);
+        var domainEvent = domainNotificationDeserializer.Deserialize(eventType, eventPayload);
 
         if (domainEvent is null)
         {

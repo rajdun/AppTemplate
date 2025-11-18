@@ -4,16 +4,16 @@ using Microsoft.Extensions.Logging;
 
 namespace Domain.Common;
 
-public interface IDomainEvent : IRequest
+public interface IDomainNotification : IRequest
 {
 }
 
-public interface IDomainEventDeserializer
+public interface IDomainNotificationDeserializer
 {
     dynamic? Deserialize(string eventType, string eventPayload);
 }
 
-public class DomainEventDeserializer : IDomainEventDeserializer
+public class DomainNotificationDeserializer : IDomainNotificationDeserializer
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -21,13 +21,13 @@ public class DomainEventDeserializer : IDomainEventDeserializer
     };
 
     private readonly Dictionary<string, Type> _eventTypes;
-    private readonly ILogger<DomainEventDeserializer> _logger;
+    private readonly ILogger<DomainNotificationDeserializer> _logger;
 
-    public DomainEventDeserializer(IEnumerable<Type> domainEventTypes, ILogger<DomainEventDeserializer> logger)
+    public DomainNotificationDeserializer(IEnumerable<Type> domainEventTypes, ILogger<DomainNotificationDeserializer> logger)
     {
         _logger = logger;
         _eventTypes = domainEventTypes
-            .Where(t => t.IsClass && !t.IsAbstract && typeof(IDomainEvent).IsAssignableFrom(t))
+            .Where(t => t.IsClass && !t.IsAbstract && typeof(IDomainNotification).IsAssignableFrom(t))
             .ToDictionary(t => t.AssemblyQualifiedName!, t => t);
     }
 
@@ -50,9 +50,9 @@ public class DomainEventDeserializer : IDomainEventDeserializer
         }
     }
 
-    public static IEnumerable<Type> ScanDomainEventTypes(Assembly assembly)
+    public static IEnumerable<Type> ScanDomainNotificationsTypes(Assembly assembly)
     {
         return assembly.GetTypes()
-            .Where(t => t.IsClass && !t.IsAbstract && typeof(IDomainEvent).IsAssignableFrom(t));
+            .Where(t => t.IsClass && !t.IsAbstract && typeof(IDomainNotification).IsAssignableFrom(t));
     }
 }

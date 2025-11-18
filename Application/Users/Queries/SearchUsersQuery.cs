@@ -1,3 +1,4 @@
+using Application.Common.Dto;
 using Application.Common.Elasticsearch;
 using Application.Common.Elasticsearch.Dto;
 using Application.Common.Elasticsearch.Models;

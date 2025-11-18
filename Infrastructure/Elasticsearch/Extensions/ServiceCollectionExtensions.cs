@@ -1,4 +1,3 @@
-using System;
 using Application.Common.Elasticsearch;
 using Elastic.Clients.Elasticsearch;
 using Elastic.Transport;
@@ -6,7 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
-namespace Infrastructure.Elasticsearch;
+namespace Infrastructure.Elasticsearch.Extensions;
 
 internal static class ServiceCollectionExtensions
 {

@@ -8,6 +8,7 @@ using Hangfire;
 using Hangfire.Redis.StackExchange;
 using Infrastructure.Data;
 using Infrastructure.Elasticsearch;
+using Infrastructure.Elasticsearch.Extensions;
 using Infrastructure.Implementation;
 using Infrastructure.Implementation.Dto;
 using Infrastructure.Mailing;

@@ -33,7 +33,7 @@ public class DomainEventToOutboxInterceptorTests
         await using var context = new TestDbContext(options);
         
         var entity = new TestEntity();
-        entity.AddDomainEvent(new TestDomainEvent { Message = "Test Event" });
+        entity.AddDomainEvent(new TestDomainNotification { Message = "Test Event" });
         
         context.TestEntities.Add(entity);
 
@@ -60,9 +60,9 @@ public class DomainEventToOutboxInterceptorTests
         await using var context = new TestDbContext(options);
         
         var entity = new TestEntity();
-        entity.AddDomainEvent(new TestDomainEvent { Message = "Event 1" });
-        entity.AddDomainEvent(new TestDomainEvent { Message = "Event 2" });
-        entity.AddDomainEvent(new TestDomainEvent { Message = "Event 3" });
+        entity.AddDomainEvent(new TestDomainNotification { Message = "Event 1" });
+        entity.AddDomainEvent(new TestDomainNotification { Message = "Event 2" });
+        entity.AddDomainEvent(new TestDomainNotification { Message = "Event 3" });
         
         context.TestEntities.Add(entity);
 
@@ -109,10 +109,10 @@ public class DomainEventToOutboxInterceptorTests
         await using var context = new TestDbContext(options);
         
         var entity1 = new TestEntity();
-        entity1.AddDomainEvent(new TestDomainEvent { Message = "Entity 1 Event" });
+        entity1.AddDomainEvent(new TestDomainNotification { Message = "Entity 1 Event" });
         
         var entity2 = new TestEntity();
-        entity2.AddDomainEvent(new TestDomainEvent { Message = "Entity 2 Event" });
+        entity2.AddDomainEvent(new TestDomainNotification { Message = "Entity 2 Event" });
         
         context.TestEntities.Add(entity1);
         context.TestEntities.Add(entity2);
@@ -139,7 +139,7 @@ public class DomainEventToOutboxInterceptorTests
         await using var context = new TestDbContext(options);
         
         var entity = new TestEntity();
-        entity.AddDomainEvent(new TestDomainEvent { Message = "Test" });
+        entity.AddDomainEvent(new TestDomainNotification { Message = "Test" });
         
         context.TestEntities.Add(entity);
         var beforeSave = _dateTimeProvider.UtcNow;
@@ -168,7 +168,7 @@ public class DomainEventToOutboxInterceptorTests
         using var context = new TestDbContext(options);
         
         var entity = new TestEntity();
-        entity.AddDomainEvent(new TestDomainEvent { Message = "Test Event" });
+        entity.AddDomainEvent(new TestDomainNotification { Message = "Test Event" });
         
         context.TestEntities.Add(entity);
 
@@ -220,17 +220,17 @@ public class DomainEventToOutboxInterceptorTests
         public Guid Id { get; set; } = Guid.NewGuid();
         public string Name { get; set; } = string.Empty;
         
-        private readonly List<IDomainEvent> _domainEvents = new();
-        public IReadOnlyCollection<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
+        private readonly List<IDomainNotification> _domainEvents = new();
+        public IReadOnlyCollection<IDomainNotification> DomainEvents => _domainEvents.AsReadOnly();
 
-        public void AddDomainEvent(IDomainEvent domainEvent)
+        public void AddDomainEvent(IDomainNotification domainNotification)
         {
-            _domainEvents.Add(domainEvent);
+            _domainEvents.Add(domainNotification);
         }
 
-        public void RemoveDomainEvent(IDomainEvent eventItem)
+        public void RemoveDomainEvent(IDomainNotification notificationItem)
         {
-            _domainEvents.Remove(eventItem);
+            _domainEvents.Remove(notificationItem);
         }
 
         public void ClearDomainEvents()
@@ -239,7 +239,7 @@ public class DomainEventToOutboxInterceptorTests
         }
     }
 
-    private class TestDomainEvent : IDomainEvent
+    private class TestDomainNotification : IDomainNotification
     {
         public string Message { get; set; } = string.Empty;
     }

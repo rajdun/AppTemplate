@@ -1,7 +1,7 @@
 using Application.Common.Elasticsearch;
 using Application.Common.Elasticsearch.Models;
 using Application.Users.EventHandlers;
-using Domain.DomainEvents.User;
+using Domain.DomainNotifications.User;
 using Domain.Entities.Users;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;

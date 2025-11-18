@@ -2,7 +2,7 @@ using Application.Common.Mailing;
 using Application.Common.Mailing.Templates;
 using Application.Common.ValueObjects;
 using Application.Users.EventHandlers;
-using Domain.DomainEvents.User;
+using Domain.DomainNotifications.User;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;

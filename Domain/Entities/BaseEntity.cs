@@ -4,15 +4,15 @@ namespace Domain.Entities;
 
 public abstract class BaseEntity : IEntity
 {
-    private readonly List<IDomainEvent> _domainEvents = new();
-    public IReadOnlyCollection<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
+    private readonly List<IDomainNotification> _domainEvents = new();
+    public IReadOnlyCollection<IDomainNotification> DomainEvents => _domainEvents.AsReadOnly();
 
     public Guid Id { get; set; }
 
 
-    public void AddDomainEvent(IDomainEvent domainEvent)
+    public void AddDomainEvent(IDomainNotification domainNotification)
     {
-        _domainEvents.Add(domainEvent);
+        _domainEvents.Add(domainNotification);
     }
 
     public void ClearDomainEvents()
@@ -24,7 +24,7 @@ public abstract class BaseEntity : IEntity
 public interface IEntity
 {
     Guid Id { get; set; }
-    public IReadOnlyCollection<IDomainEvent> DomainEvents { get; }
-    public void AddDomainEvent(IDomainEvent domainEvent);
+    public IReadOnlyCollection<IDomainNotification> DomainEvents { get; }
+    public void AddDomainEvent(IDomainNotification domainNotification);
     public void ClearDomainEvents();
 }

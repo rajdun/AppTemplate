@@ -13,9 +13,9 @@ public static class DependencyInjection
 
     private static IServiceCollection AddDomainEvents(this IServiceCollection services)
     {
-        var domainEventTypes = DomainEventDeserializer.ScanDomainEventTypes(typeof(IDomainEvent).Assembly);
+        var domainEventTypes = DomainNotificationDeserializer.ScanDomainNotificationsTypes(typeof(IDomainNotification).Assembly);
         services.AddSingleton(domainEventTypes);
-        services.AddSingleton<IDomainEventDeserializer, DomainEventDeserializer>();
+        services.AddSingleton<IDomainNotificationDeserializer, DomainNotificationDeserializer>();
 
         return services;
     }

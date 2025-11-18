@@ -1,4 +1,4 @@
-namespace Application.Common.Elasticsearch.Dto;
+namespace Application.Common.Dto;
 
 public class PagedRequest
 {

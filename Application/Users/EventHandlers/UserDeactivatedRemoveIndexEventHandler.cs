@@ -1,7 +1,7 @@
 ﻿using Application.Common.Elasticsearch;
 using Application.Common.Elasticsearch.Models;
 using Domain.Common;
-using Domain.DomainEvents.User;
+using Domain.DomainNotifications.User;
 using FluentResults;
 using Microsoft.Extensions.Logging;
 

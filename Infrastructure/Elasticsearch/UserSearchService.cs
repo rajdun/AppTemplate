@@ -1,8 +1,10 @@
+using Application.Common.Dto;
 using Application.Common.Elasticsearch;
 using Application.Common.Elasticsearch.Dto;
 using Application.Common.Elasticsearch.Models;
 using Elastic.Clients.Elasticsearch;
 using Elastic.Clients.Elasticsearch.QueryDsl;
+using Infrastructure.Elasticsearch.Extensions;
 using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Elasticsearch;

@@ -1,3 +1,5 @@
+using Application.Common.Dto;
+
 namespace Application.Common.Elasticsearch.Dto;
 
 public class PagedUserRequest : PagedRequest

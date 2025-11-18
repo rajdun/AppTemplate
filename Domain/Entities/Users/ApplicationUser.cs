@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.CompilerServices;
 using Domain.Common;
-using Domain.DomainEvents.User;
+using Domain.DomainNotifications.User;
 using Microsoft.AspNetCore.Identity;
 
 namespace Domain.Entities.Users;
@@ -10,12 +10,12 @@ namespace Domain.Entities.Users;
 public class ApplicationUser : IdentityUser<Guid>, IEntity
 {
     #region Domain Events
-    private readonly List<IDomainEvent> _domainEvents = new();
+    private readonly List<IDomainNotification> _domainEvents = new();
     private DateTimeOffset? _deactivatedAt;
 
-    public void AddDomainEvent(IDomainEvent domainEvent)
+    public void AddDomainEvent(IDomainNotification domainNotification)
     {
-        _domainEvents.Add(domainEvent);
+        _domainEvents.Add(domainNotification);
     }
 
     public void ClearDomainEvents()
@@ -23,7 +23,7 @@ public class ApplicationUser : IdentityUser<Guid>, IEntity
         _domainEvents.Clear();
     }
 
-    public IReadOnlyCollection<IDomainEvent> DomainEvents => _domainEvents.AsReadOnly();
+    public IReadOnlyCollection<IDomainNotification> DomainEvents => _domainEvents.AsReadOnly();
     #endregion
 
     public DateTimeOffset? DeactivatedAt
