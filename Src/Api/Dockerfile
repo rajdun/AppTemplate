@@ -1,4 +1,4 @@
-﻿FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
+﻿FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
 USER root
 RUN apt-get update && apt-get install -y libicu-dev && rm -rf /var/lib/apt/lists/*
 USER $APP_UID
@@ -6,19 +6,33 @@ WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
 
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["Src/Api/Api.csproj", "Api/"]
-RUN dotnet restore "Api/Api.csproj"
-COPY Src .
-WORKDIR "/src/Api"
-run dotnet tool restore
-RUN dotnet build "./Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
+
+# 1. Copy the Package Management file to the root of the build context
+COPY ["Directory.Packages.props", "."]
+
+# 2. Copy the ENTIRE Src folder to ./Src
+# This is critical! It preserves the structure so Api can find Domain/Application
+COPY Src ./Src
+
+# 3. Switch context to the Api project folder
+WORKDIR "/src/Src/Api"
+
+# 4. Restore and Build
+# The restore command will automatically look up the directory tree 
+# and find Directory.Packages.props in /src
+RUN dotnet restore "Api.csproj"
+
+# (Optional) Only uncomment if you copied the .config folder and really need tools
+# RUN dotnet tool restore 
+
+RUN dotnet build "Api.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "./Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "Api.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
