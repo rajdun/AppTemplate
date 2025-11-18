@@ -31,7 +31,7 @@ public class HangfireJobExecutorTests
         var eventPayload = "{\"data\":\"test\"}";
         var domainEvent = Substitute.For<IRequest>();
         
-        _deserializer.Deserialize(eventType, eventPayload).Returns(domainEvent);
+        _deserializer.Deserialize(eventType, eventPayload)?.Returns(domainEvent);
         _mediator.PublishAsync(domainEvent, Arg.Any<CancellationToken>()).Returns(Result.Ok());
 
         // Act
@@ -49,7 +49,7 @@ public class HangfireJobExecutorTests
         var eventType = "UnknownEvent";
         var eventPayload = "{\"data\":\"test\"}";
         
-        _deserializer.Deserialize(eventType, eventPayload).Returns((IRequest?)null);
+        _deserializer.Deserialize(eventType, eventPayload)?.Returns((IRequest?)null);
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(
@@ -68,7 +68,7 @@ public class HangfireJobExecutorTests
         var domainEvent = Substitute.For<IRequest>();
         var failedResult = Result.Fail("Processing failed");
         
-        _deserializer.Deserialize(eventType, eventPayload).Returns(domainEvent);
+        _deserializer.Deserialize(eventType, eventPayload)?.Returns(domainEvent);
         _mediator.PublishAsync(domainEvent, Arg.Any<CancellationToken>()).Returns(failedResult);
 
         // Act & Assert
@@ -87,7 +87,7 @@ public class HangfireJobExecutorTests
         var eventPayload = "{\"data\":\"test\"}";
         var domainEvent = Substitute.For<IRequest>();
         
-        _deserializer.Deserialize(eventType, eventPayload).Returns(domainEvent);
+        _deserializer.Deserialize(eventType, eventPayload)!.Returns(domainEvent);
         _mediator.PublishAsync(domainEvent, Arg.Any<CancellationToken>()).Returns(Result.Ok());
 
         // Act

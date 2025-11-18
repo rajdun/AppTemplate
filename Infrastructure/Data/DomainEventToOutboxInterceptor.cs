@@ -29,17 +29,17 @@ public class DomainEventToOutboxInterceptor(IDateTimeProvider dateTimeProvider)
 
         var entitiesWithDomainEvents = context.ChangeTracker
             .Entries<IEntity>()
-            .Where(e => e.Entity.DomainEvents.Count > 0)
+            .Where(e => e.Entity.DomainNotifications.Count > 0)
             .Select(e => e.Entity)
             .ToList();
 
         if (entitiesWithDomainEvents.Count == 0) return;
 
         var domainEvents = entitiesWithDomainEvents
-            .SelectMany(e => e.DomainEvents)
+            .SelectMany(e => e.DomainNotifications)
             .ToList();
 
-        entitiesWithDomainEvents.ForEach(e => e.ClearDomainEvents());
+        entitiesWithDomainEvents.ForEach(e => e.ClearDomainNotifications());
 
         var outboxMessages = domainEvents.Select(domainEvent =>
             new OutboxMessage

@@ -1,7 +1,7 @@
 using Application.Common.Mailing;
 using Application.Common.Mailing.Templates;
 using Application.Common.ValueObjects;
-using Application.Users.EventHandlers;
+using Application.Users.NotificationHandlers;
 using Domain.DomainNotifications.User;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -9,17 +9,17 @@ using NSubstitute.ExceptionExtensions;
 
 namespace ApplicationTests.Users.EventHandlers;
 
-public class UserRegisteredSendEmailEventHandlerTests
+public class UserRegisteredSendEmailNotificationHandlerTests
 {
-    private readonly ILogger<UserRegisteredSendEmailEventHandler> _logger;
+    private readonly ILogger<UserRegisteredSendEmailNotificationHandler> _logger;
     private readonly IEmailService _emailService;
-    private readonly UserRegisteredSendEmailEventHandler _handler;
+    private readonly UserRegisteredSendEmailNotificationHandler _handler;
 
-    public UserRegisteredSendEmailEventHandlerTests()
+    public UserRegisteredSendEmailNotificationHandlerTests()
     {
-        _logger = Substitute.For<ILogger<UserRegisteredSendEmailEventHandler>>();
+        _logger = Substitute.For<ILogger<UserRegisteredSendEmailNotificationHandler>>();
         _emailService = Substitute.For<IEmailService>();
-        _handler = new UserRegisteredSendEmailEventHandler(_logger, _emailService);
+        _handler = new UserRegisteredSendEmailNotificationHandler(_logger, _emailService);
     }
 
     [Fact]

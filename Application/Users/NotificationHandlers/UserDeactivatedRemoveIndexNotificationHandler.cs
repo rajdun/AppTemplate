@@ -5,9 +5,9 @@ using Domain.DomainNotifications.User;
 using FluentResults;
 using Microsoft.Extensions.Logging;
 
-namespace Application.Users.EventHandlers;
+namespace Application.Users.NotificationHandlers;
 
-public class UserDeactivatedRemoveIndexEventHandler(IElasticSearchService<ElasticUser> elasticSearchService, ILogger<UserDeactivatedRemoveIndexEventHandler> logger)
+public class UserDeactivatedRemoveIndexNotificationHandler(IElasticSearchService<ElasticUser> elasticSearchService, ILogger<UserDeactivatedRemoveIndexNotificationHandler> logger)
     : IRequestHandler<UserDeactivated>
 {
     public async Task<Result> Handle(UserDeactivated request, CancellationToken cancellationToken = new CancellationToken())

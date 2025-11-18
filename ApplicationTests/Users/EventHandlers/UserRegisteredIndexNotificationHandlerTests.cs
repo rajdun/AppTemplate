@@ -1,6 +1,6 @@
 using Application.Common.Elasticsearch;
 using Application.Common.Elasticsearch.Models;
-using Application.Users.EventHandlers;
+using Application.Users.NotificationHandlers;
 using Domain.DomainNotifications.User;
 using Domain.Entities.Users;
 using Microsoft.AspNetCore.Identity;
@@ -9,21 +9,21 @@ using NSubstitute;
 
 namespace ApplicationTests.Users.EventHandlers;
 
-public class UserRegisteredIndexEventHandlerTests
+public class UserRegisteredIndexNotificationHandlerTests
 {
-    private readonly ILogger<UserRegisteredSendEmailEventHandler> _logger;
+    private readonly ILogger<UserRegisteredSendEmailNotificationHandler> _logger;
     private readonly IElasticSearchService<ElasticUser> _elasticSearchService;
     private readonly UserManager<ApplicationUser> _userManager;
-    private readonly UserRegisteredIndexEventHandler _handler;
+    private readonly UserRegisteredIndexNotificationHandler _handler;
 
-    public UserRegisteredIndexEventHandlerTests()
+    public UserRegisteredIndexNotificationHandlerTests()
     {
-        _logger = Substitute.For<ILogger<UserRegisteredSendEmailEventHandler>>();
+        _logger = Substitute.For<ILogger<UserRegisteredSendEmailNotificationHandler>>();
         _elasticSearchService = Substitute.For<IElasticSearchService<ElasticUser>>();
         var userStore = Substitute.For<IUserStore<ApplicationUser>>();
         _userManager = Substitute.For<UserManager<ApplicationUser>>(
             userStore, null, null, null, null, null, null, null, null);
-        _handler = new UserRegisteredIndexEventHandler(_logger, _elasticSearchService, _userManager);
+        _handler = new UserRegisteredIndexNotificationHandler(_logger, _elasticSearchService, _userManager);
     }
 
     [Fact]

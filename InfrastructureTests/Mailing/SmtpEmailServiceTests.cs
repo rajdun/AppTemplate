@@ -49,8 +49,8 @@ public class SmtpEmailServiceTests
             Host = "smtp.test.com",
             Port = 25,
             UseSsl = false,
-            Username = null,
-            Password = null,
+            Username = "",
+            Password = "",
             From = "noreply@test.com"
         };
         var options = Substitute.For<IOptions<SmtpSettings>>();

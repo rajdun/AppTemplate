@@ -1,23 +1,23 @@
 using Application.Common.Elasticsearch;
 using Application.Common.Elasticsearch.Models;
-using Application.Users.EventHandlers;
+using Application.Users.NotificationHandlers;
 using Domain.DomainNotifications.User;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 
 namespace ApplicationTests.Users.EventHandlers;
 
-public class UserDeactivatedRemoveIndexEventHandlerTests
+public class UserDeactivatedRemoveIndexNotificationHandlerTests
 {
     private readonly IElasticSearchService<ElasticUser> _elasticSearchService;
-    private readonly ILogger<UserDeactivatedRemoveIndexEventHandler> _logger;
-    private readonly UserDeactivatedRemoveIndexEventHandler _handler;
+    private readonly ILogger<UserDeactivatedRemoveIndexNotificationHandler> _logger;
+    private readonly UserDeactivatedRemoveIndexNotificationHandler _handler;
 
-    public UserDeactivatedRemoveIndexEventHandlerTests()
+    public UserDeactivatedRemoveIndexNotificationHandlerTests()
     {
         _elasticSearchService = Substitute.For<IElasticSearchService<ElasticUser>>();
-        _logger = Substitute.For<ILogger<UserDeactivatedRemoveIndexEventHandler>>();
-        _handler = new UserDeactivatedRemoveIndexEventHandler(_elasticSearchService, _logger);
+        _logger = Substitute.For<ILogger<UserDeactivatedRemoveIndexNotificationHandler>>();
+        _handler = new UserDeactivatedRemoveIndexNotificationHandler(_elasticSearchService, _logger);
     }
 
     [Fact]

@@ -13,17 +13,17 @@ public class ApplicationUser : IdentityUser<Guid>, IEntity
     private readonly List<IDomainNotification> _domainEvents = new();
     private DateTimeOffset? _deactivatedAt;
 
-    public void AddDomainEvent(IDomainNotification domainNotification)
+    public void AddDomainNotification(IDomainNotification domainNotification)
     {
         _domainEvents.Add(domainNotification);
     }
 
-    public void ClearDomainEvents()
+    public void ClearDomainNotifications()
     {
         _domainEvents.Clear();
     }
 
-    public IReadOnlyCollection<IDomainNotification> DomainEvents => _domainEvents.AsReadOnly();
+    public IReadOnlyCollection<IDomainNotification> DomainNotifications => _domainEvents.AsReadOnly();
     #endregion
 
     public DateTimeOffset? DeactivatedAt
@@ -33,7 +33,7 @@ public class ApplicationUser : IdentityUser<Guid>, IEntity
         {
                         if (_deactivatedAt == null && value != null)
             {
-                AddDomainEvent(new UserDeactivated(Id));
+                AddDomainNotification(new UserDeactivated(Id));
             }
             _deactivatedAt = value;
         }
@@ -47,7 +47,7 @@ public class ApplicationUser : IdentityUser<Guid>, IEntity
             UserName = userName
         };
         
-        if (!string.IsNullOrWhiteSpace(email)) user.AddDomainEvent(new UserRegistered(userName, email, language));
+        if (!string.IsNullOrWhiteSpace(email)) user.AddDomainNotification(new UserRegistered(userName, email, language));
 
         return user;
     }
