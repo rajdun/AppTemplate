@@ -25,8 +25,7 @@ public partial class UsersModule : ICarterModule
             .WithDescription(
                 "Autoryzuje użytkownika na podstawie loginu i hasła. Zwraca token JWT oraz refresh token przy poprawnych danych. W przypadku błędnych danych zwraca odpowiedni kod błędu.")
             .WithSummary(
-                "Uwierzytelnianie użytkownika. Wymaga loginu i hasła. Token JWT oraz refresh token w odpowiedzi.")
-            .WithOpenApi();
+                "Uwierzytelnianie użytkownika. Wymaga loginu i hasła. Token JWT oraz refresh token w odpowiedzi.");
 
         group.MapPost("register", Register)
             .WithName("Register")
@@ -36,8 +35,7 @@ public partial class UsersModule : ICarterModule
             .WithDescription(
                 "Rejestruje nowego użytkownika na podstawie podanych danych: username, email, password, repeatPassword. Zwraca token JWT oraz refresh token przy poprawnej rejestracji. W przypadku błędnych danych (np. niezgodność haseł, istniejący użytkownik) zwraca kod błędu.")
             .WithSummary(
-                "Rejestracja użytkownika. Wymaga username, email, password, repeatPassword. Token JWT oraz refresh token w odpowiedzi.")
-            .WithOpenApi();
+                "Rejestracja użytkownika. Wymaga username, email, password, repeatPassword. Token JWT oraz refresh token w odpowiedzi.");
 
         group.MapPost("refresh-token", RefreshToken)
             .WithName("RefreshToken")
@@ -49,8 +47,7 @@ public partial class UsersModule : ICarterModule
             .WithDescription(
                 "Odświeża token JWT na podstawie przesłanego refresh tokena. Zwraca nowy token JWT oraz refresh token przy poprawnych danych. W przypadku błędnych danych (np. nieważny refresh token) zwraca odpowiedni kod błędu.")
             .WithSummary(
-                "Odświeżanie tokena użytkownika. Wymaga refresh tokena. Nowy token JWT oraz refresh token w odpowiedzi.")
-            .WithOpenApi();
+                "Odświeżanie tokena użytkownika. Wymaga refresh tokena. Nowy token JWT oraz refresh token w odpowiedzi.");
         
         group.MapPost("search", SearchUsers)
             .WithName("SearchUsers")
@@ -59,8 +56,7 @@ public partial class UsersModule : ICarterModule
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithDisplayName("Search Users")
             .WithDescription("Wyszukuje użytkowników na podstawie podanych kryteriów. Zwraca paginowaną listę użytkowników spełniających kryteria wyszukiwania.")
-            .WithSummary("Wyszukiwanie użytkowników z paginacją na podstawie podanych kryteriów.")
-            .WithOpenApi();
+            .WithSummary("Wyszukiwanie użytkowników z paginacją na podstawie podanych kryteriów.");
         
         group.MapDelete("{userId:guid}/deactivate", DeactivateUser)
             .WithName("DeactivateUser")
@@ -71,7 +67,6 @@ public partial class UsersModule : ICarterModule
             .ProducesProblem(StatusCodes.Status404NotFound)
             .WithDisplayName("Deactivate User")
             .WithDescription("Dezaktywuje użytkownika o podanym identyfikatorze. Zwraca wynik operacji dezaktywacji. W przypadku nieistniejącego użytkownika lub błędnych danych zwraca odpowiedni kod błędu.")
-            .WithSummary("Dezaktywacja użytkownika na podstawie jego identyfikatora.")
-            .WithOpenApi();
+            .WithSummary("Dezaktywacja użytkownika na podstawie jego identyfikatora.");
     }
 }
