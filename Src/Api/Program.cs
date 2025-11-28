@@ -8,6 +8,7 @@ using Hangfire;
 using Infrastructure;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Scalar.AspNetCore;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -45,7 +46,11 @@ if (args.Contains("migrate"))
     return;
 }
 
-if (app.Environment.IsDevelopment()) app.MapOpenApi("/openapi/{documentName}/openapi.json");
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+    app.MapScalarApiReference();
+}
 
 app.UseCors(app.Configuration.GetValue<string>("Cors:PolicyName") ?? "DefaultCorsPolicy");
 app.UseExceptionHandler();

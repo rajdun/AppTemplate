@@ -7,11 +7,13 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddPresentation(this IServiceCollection services, IConfiguration configuration)
     {
+        var openApiSettings = configuration.GetSection("OpenApiSettings").Get<OpenApiSettings>() ?? new OpenApiSettings();
+        services.AddSingleton(openApiSettings);
+        
         services.AddCarter();
-        services.AddOpenApi("internal", options =>
+        services.AddOpenApi(options =>
         {
-            var openApiSettings = configuration.GetSection("OpenApiSettings").Get<OpenApiSettings>() ?? new OpenApiSettings();
-            options.AddDocumentTransformer(new OpenApiDocumentTransformer(openApiSettings));
+            options.AddDocumentTransformer<OpenApiDocumentTransformer>();
         });
         services.AddEndpointsApiExplorer();
         services.AddLocalization();

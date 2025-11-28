@@ -1,68 +1,39 @@
 using Api.Common.Dto;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.OpenApi;
-using Microsoft.OpenApi.Models;
+using Microsoft.OpenApi;
 
 namespace Api.Common;
 
-public class OpenApiDocumentTransformer : IOpenApiDocumentTransformer
+internal sealed class OpenApiDocumentTransformer(OpenApiSettings openApiSettings, IAuthenticationSchemeProvider authenticationSchemeProvider)
+    : IOpenApiDocumentTransformer
 {
-    private readonly OpenApiSettings _settings;
-
-    public OpenApiDocumentTransformer(OpenApiSettings settings)
+    public async Task TransformAsync(OpenApiDocument document, OpenApiDocumentTransformerContext context,
+        CancellationToken cancellationToken)
     {
-        _settings = settings;
-    }
-    
-    public Task TransformAsync(OpenApiDocument document, OpenApiDocumentTransformerContext context, CancellationToken cancellationToken)
-    {
-        if (context.DocumentName != "internal") return Task.CompletedTask;
+        document.Servers = openApiSettings.Servers.Select(x => new OpenApiServer()
+        {
+            Description = x.Description,
+            Url = x.Url
+        }).ToList();
         
-        document.Servers.Clear();
+        var authenticationSchemes = await authenticationSchemeProvider.GetAllSchemesAsync();
+        if (authenticationSchemes.Any(authScheme => authScheme.Name == "Bearer"))
+        {
+            var securitySchemes = new Dictionary<string, IOpenApiSecurityScheme>
+            {
+                ["Bearer"] = new OpenApiSecurityScheme
+                {
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "bearer",
+                    In = ParameterLocation.Header,
+                    BearerFormat = "Json Web Token"
+                }
+            };
+            document.Components ??= new OpenApiComponents();
+            document.Components.SecuritySchemes = securitySchemes;
+        }
 
-        if (_settings.Servers.Count > 0)
-        {
-            foreach (var s in _settings.Servers.Where(x => !string.IsNullOrWhiteSpace(x.Url)))
-            {
-                document.Servers.Add(new OpenApiServer
-                {
-                    Url = s.Url,
-                    Description = s.Description
-                });
-            }
-        }
-        else
-        {
-            // fallback if no config provided
-            document.Servers.Add(new OpenApiServer { Url = "http://localhost:8080", Description = "Local docker" });
-            document.Servers.Add(new OpenApiServer { Url = "http://localhost:5045", Description = "Local kestrel" });
-        }
-        
-        document.Components ??= new OpenApiComponents();
-        document.Components.SecuritySchemes ??= new Dictionary<string, OpenApiSecurityScheme>();
-        document.Components.SecuritySchemes.Add("Bearer", new OpenApiSecurityScheme
-        {
-            In = ParameterLocation.Header,
-            Description = "Please enter a valid token",
-            Name = "Authorization",
-            Type = SecuritySchemeType.Http,
-            BearerFormat = "JWT",
-            Scheme = "Bearer"
-        });
-        document.SecurityRequirements ??= new List<OpenApiSecurityRequirement>();
-        document.SecurityRequirements.Add(new OpenApiSecurityRequirement
-        {
-            {
-                new OpenApiSecurityScheme
-                {
-                    Reference = new OpenApiReference
-                    {
-                        Type = ReferenceType.SecurityScheme,
-                        Id = "Bearer"
-                    }
-                },
-                new string[] {}
-            }
-        });
-        return Task.CompletedTask;
+        await Task.CompletedTask;
     }
 }
