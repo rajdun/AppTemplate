@@ -26,7 +26,7 @@ public class RedisCacheServiceTests
         var key = "test-key";
         var testObject = new TestCacheObject { Id = 1, Name = "Test" };
         var serialized = JsonSerializer.Serialize(testObject);
-        
+
         _database.StringGetAsync(key, Arg.Any<CommandFlags>())
             .Returns(new RedisValue(serialized));
 
@@ -142,8 +142,8 @@ public class RedisCacheServiceTests
         // Assert
         await _database.Received(1).StringSetAsync(
             key,
-            Arg.Is<RedisValue>(v => 
-                v.ToString().Contains("Complex") && 
+            Arg.Is<RedisValue>(v =>
+                v.ToString().Contains("Complex") &&
                 v.ToString().Contains("tag1")),
             null,
             Arg.Any<bool>(),
@@ -164,7 +164,7 @@ public class RedisCacheServiceTests
             Metadata = new Dictionary<string, string> { { "key1", "value1" } }
         };
         var serialized = JsonSerializer.Serialize(complexObject);
-        
+
         _database.StringGetAsync(key, Arg.Any<CommandFlags>())
             .Returns(new RedisValue(serialized));
 

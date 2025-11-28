@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using Application.Common;
 using Application.Common.Interfaces;
 using Application.Common.Mailing;
@@ -95,7 +95,7 @@ public static class DependencyInjection
 
         return builder;
     }
-    
+
     private static IServiceCollection AddMailing(this IServiceCollection services, IConfiguration configuration)
     {
         services.Configure<SmtpSettings>(configuration.GetSection(SmtpSettings.SectionName));
@@ -103,7 +103,7 @@ public static class DependencyInjection
 
         return services;
     }
-    
+
     private static IServiceCollection AddHangfire(this IServiceCollection services, IConfiguration configuration)
     {
         var connectionString = configuration.GetConnectionString(RedisConnectionStringName) ?? "localhost:6379";
@@ -120,7 +120,10 @@ public static class DependencyInjection
     private static IServiceCollection AddCache(this IServiceCollection services, IConfiguration configuration)
     {
         var redisConnectionString = configuration.GetConnectionString(RedisConnectionStringName);
-        if (string.IsNullOrWhiteSpace(redisConnectionString)) return services;
+        if (string.IsNullOrWhiteSpace(redisConnectionString))
+        {
+            return services;
+        }
 
         services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnectionString));
         services.AddSingleton<ICacheService, RedisCacheService>();
@@ -161,7 +164,9 @@ public static class DependencyInjection
                 var key = configuration["JwtSettings:Secret"];
 
                 if (string.IsNullOrWhiteSpace(key))
+                {
                     throw new ArgumentNullException("JWTSettings:Secret", "JWT Secret is not configured.");
+                }
 
                 options.TokenValidationParameters = new TokenValidationParameters
                 {

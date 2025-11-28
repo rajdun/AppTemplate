@@ -38,7 +38,7 @@ public class SearchUsersQueryHandlerTests
             PageNumber = 1,
             PageSize = 10
         };
-        
+
         _userSearchService.SearchUsersAsync(request, Arg.Any<CancellationToken>())
             .Returns(expectedResult);
 
@@ -57,7 +57,7 @@ public class SearchUsersQueryHandlerTests
         // Arrange
         var request = new PagedUserRequest { PageNumber = 1, PageSize = 10 };
         var query = new SearchUsersQuery(request);
-        
+
         _userSearchService.SearchUsersAsync(request, Arg.Any<CancellationToken>())
             .Returns(new PagedResult<ElasticUser>
             {
@@ -125,9 +125,9 @@ public class SearchUsersQueryHandlerTests
     {
         // Arrange
         var validator = new SearchUsersQueryValidator();
-        var query = new SearchUsersQuery(new PagedUserRequest 
-        { 
-            PageNumber = 1, 
+        var query = new SearchUsersQuery(new PagedUserRequest
+        {
+            PageNumber = 1,
             PageSize = 10,
             SortBy = "invalid_field"
         });
@@ -145,9 +145,9 @@ public class SearchUsersQueryHandlerTests
     {
         // Arrange
         var validator = new SearchUsersQueryValidator();
-        var query = new SearchUsersQuery(new PagedUserRequest 
-        { 
-            PageNumber = 1, 
+        var query = new SearchUsersQuery(new PagedUserRequest
+        {
+            PageNumber = 1,
             PageSize = 10,
             SortBy = "name"
         });

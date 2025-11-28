@@ -1,3 +1,3 @@
-﻿namespace Application.Users.Dto;
+namespace Application.Users.Dto;
 
 public record TokenResult(string Token, string RefreshToken);

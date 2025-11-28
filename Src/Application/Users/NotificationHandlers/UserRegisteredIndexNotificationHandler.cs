@@ -1,4 +1,4 @@
-﻿using Application.Common.Elasticsearch;
+using Application.Common.Elasticsearch;
 using Application.Common.Elasticsearch.Models;
 using Domain.Common;
 using Domain.DomainNotifications.User;
@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.Users.NotificationHandlers;
 
-public class UserRegisteredIndexNotificationHandler(ILogger<UserRegisteredSendEmailNotificationHandler> logger, IElasticSearchService<ElasticUser> elasticSearchService, UserManager<ApplicationUser>  userManager)
+public class UserRegisteredIndexNotificationHandler(ILogger<UserRegisteredSendEmailNotificationHandler> logger, IElasticSearchService<ElasticUser> elasticSearchService, UserManager<ApplicationUser> userManager)
     : IRequestHandler<UserRegistered>
 {
     public async Task<Result> Handle(UserRegistered request, CancellationToken cancellationToken = new())

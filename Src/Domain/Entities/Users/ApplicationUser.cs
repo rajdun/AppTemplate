@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Runtime.CompilerServices;
 using Domain.Common;
 using Domain.DomainNotifications.User;
@@ -31,7 +31,7 @@ public class ApplicationUser : IdentityUser<Guid>, IEntity
         get => _deactivatedAt;
         set
         {
-                        if (_deactivatedAt == null && value != null)
+            if (_deactivatedAt == null && value != null)
             {
                 AddDomainNotification(new UserDeactivated(Id));
             }
@@ -46,8 +46,11 @@ public class ApplicationUser : IdentityUser<Guid>, IEntity
             Email = email,
             UserName = userName
         };
-        
-        if (!string.IsNullOrWhiteSpace(email)) user.AddDomainNotification(new UserRegistered(userName, email, language));
+
+        if (!string.IsNullOrWhiteSpace(email))
+        {
+            user.AddDomainNotification(new UserRegistered(userName, email, language));
+        }
 
         return user;
     }

@@ -1,4 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
@@ -15,7 +15,7 @@ internal class JwtTokenGenerator : IJwtTokenGenerator
     private readonly IOptions<JwtSettings> _jwtSettings;
     private readonly IDateTimeProvider _dateTimeProvider;
     private readonly ICacheService _cacheService;
-    
+
     public JwtTokenGenerator(IOptions<JwtSettings> jwtSettings, IDateTimeProvider dateTimeProvider, ICacheService cacheService)
     {
         _jwtSettings = jwtSettings;
@@ -25,7 +25,7 @@ internal class JwtTokenGenerator : IJwtTokenGenerator
 
     public async Task<string> GenerateToken(ApplicationUser user)
     {
-        var jti = Guid.NewGuid(); 
+        var jti = Guid.NewGuid();
         var claims = new List<Claim>
         {
             new(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
@@ -44,7 +44,7 @@ internal class JwtTokenGenerator : IJwtTokenGenerator
             claims,
             expires: _dateTimeProvider.UtcNow.AddMinutes(_jwtSettings.Value.ExpiryMinutes),
             signingCredentials: credentials);
-        
+
         await _cacheService.SetAsync(CacheKeys.GetJtiCacheKey(jti.ToString()), "valid", TimeSpan.FromMinutes(_jwtSettings.Value.ExpiryMinutes));
 
         return new JwtSecurityTokenHandler().WriteToken(token);

@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Application.Common.Mediator;
 using Application.Common.Messaging;
 using Domain.Common;

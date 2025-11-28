@@ -1,4 +1,4 @@
-﻿using System.IdentityModel.Tokens.Jwt;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Application.Common.ExtensionMethods;
 using Application.Common.Interfaces;
@@ -53,7 +53,7 @@ internal class CurrentUser : IUser
         var revokedJti = await cacheService.GetAsync<string>(CacheKeys.GetJtiCacheKey(jti));
         if (revokedJti != "valid")
         {
-            return currentUser; 
+            return currentUser;
         }
 
         // If all checks pass, populate the user properties.

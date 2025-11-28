@@ -1,4 +1,4 @@
-﻿using Application.Common.Dto;
+using Application.Common.Dto;
 using Application.Common.Elasticsearch.Dto;
 using Application.Common.Elasticsearch.Models;
 using Application.Users.Dto;
@@ -10,7 +10,7 @@ namespace Api.Modules.Users;
 public partial class UsersModule : ICarterModule
 {
     private const string JsonContentType = "application/json";
-    
+
     public void AddRoutes(IEndpointRouteBuilder app)
     {
         var group = app.MapGroup("api/users")
@@ -48,7 +48,7 @@ public partial class UsersModule : ICarterModule
                 "Odświeża token JWT na podstawie przesłanego refresh tokena. Zwraca nowy token JWT oraz refresh token przy poprawnych danych. W przypadku błędnych danych (np. nieważny refresh token) zwraca odpowiedni kod błędu.")
             .WithSummary(
                 "Odświeżanie tokena użytkownika. Wymaga refresh tokena. Nowy token JWT oraz refresh token w odpowiedzi.");
-        
+
         group.MapPost("search", SearchUsers)
             .WithName("SearchUsers")
             .RequireAuthorization()
@@ -57,7 +57,7 @@ public partial class UsersModule : ICarterModule
             .WithDisplayName("Search Users")
             .WithDescription("Wyszukuje użytkowników na podstawie podanych kryteriów. Zwraca paginowaną listę użytkowników spełniających kryteria wyszukiwania.")
             .WithSummary("Wyszukiwanie użytkowników z paginacją na podstawie podanych kryteriów.");
-        
+
         group.MapDelete("{userId:guid}/deactivate", DeactivateUser)
             .WithName("DeactivateUser")
             .RequireAuthorization()

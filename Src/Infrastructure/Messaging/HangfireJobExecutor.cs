@@ -1,4 +1,4 @@
-﻿using Application.Common.Mediator;
+using Application.Common.Mediator;
 using Application.Common.Messaging;
 using Domain.Common;
 using FluentResults;

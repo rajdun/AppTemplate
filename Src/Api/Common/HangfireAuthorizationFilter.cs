@@ -1,12 +1,20 @@
-﻿using Hangfire.Dashboard;
+using Hangfire.Dashboard;
 
 namespace Api.Common;
 
-public class HangfireAuthorizationFilter : IDashboardAuthorizationFilter
+public class HangfireAuthorizationFilter(IConfiguration configuration)
+    : IDashboardAuthorizationFilter
 {
     public bool Authorize(DashboardContext context)
     {
-        // TODO: Implement proper authorization logic here. For now, allow all access.
-        return true;
+        if (configuration.GetValue<bool>("Hangfire:AllowAnonymousDashboardAccess"))
+        {
+            return true;
+        }
+
+        var httpContext = context.GetHttpContext();
+        var isAuthorized = httpContext.User.Identity?.IsAuthenticated ?? false;
+
+        return isAuthorized;
     }
 }

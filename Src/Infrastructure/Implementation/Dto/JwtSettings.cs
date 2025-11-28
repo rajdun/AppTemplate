@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.Implementation.Dto;
+namespace Infrastructure.Implementation.Dto;
 
 public class JwtSettings
 {

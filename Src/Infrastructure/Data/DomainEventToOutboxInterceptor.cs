@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using Application.Common.Interfaces;
 using Domain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -25,7 +25,10 @@ public class DomainEventToOutboxInterceptor(IDateTimeProvider dateTimeProvider)
 
     private void ConvertDomainEventsToOutboxMessages(DbContext? context)
     {
-        if (context is null) return;
+        if (context is null)
+        {
+            return;
+        }
 
         var entitiesWithDomainEvents = context.ChangeTracker
             .Entries<IEntity>()
@@ -33,7 +36,10 @@ public class DomainEventToOutboxInterceptor(IDateTimeProvider dateTimeProvider)
             .Select(e => e.Entity)
             .ToList();
 
-        if (entitiesWithDomainEvents.Count == 0) return;
+        if (entitiesWithDomainEvents.Count == 0)
+        {
+            return;
+        }
 
         var domainEvents = entitiesWithDomainEvents
             .SelectMany(e => e.DomainNotifications)

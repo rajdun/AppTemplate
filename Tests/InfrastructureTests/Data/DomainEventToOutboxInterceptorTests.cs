@@ -31,10 +31,10 @@ public class DomainEventToOutboxInterceptorTests
             .Options;
 
         await using var context = new TestDbContext(options);
-        
+
         var entity = new TestEntity();
         entity.AddDomainNotification(new TestDomainNotification { Message = "Test Event" });
-        
+
         context.TestEntities.Add(entity);
 
         // Act
@@ -58,12 +58,12 @@ public class DomainEventToOutboxInterceptorTests
             .Options;
 
         await using var context = new TestDbContext(options);
-        
+
         var entity = new TestEntity();
         entity.AddDomainNotification(new TestDomainNotification { Message = "Event 1" });
         entity.AddDomainNotification(new TestDomainNotification { Message = "Event 2" });
         entity.AddDomainNotification(new TestDomainNotification { Message = "Event 3" });
-        
+
         context.TestEntities.Add(entity);
 
         // Act
@@ -85,7 +85,7 @@ public class DomainEventToOutboxInterceptorTests
             .Options;
 
         await using var context = new TestDbContext(options);
-        
+
         var entity = new TestEntity();
         context.TestEntities.Add(entity);
 
@@ -107,13 +107,13 @@ public class DomainEventToOutboxInterceptorTests
             .Options;
 
         await using var context = new TestDbContext(options);
-        
+
         var entity1 = new TestEntity();
         entity1.AddDomainNotification(new TestDomainNotification { Message = "Entity 1 Event" });
-        
+
         var entity2 = new TestEntity();
         entity2.AddDomainNotification(new TestDomainNotification { Message = "Entity 2 Event" });
-        
+
         context.TestEntities.Add(entity1);
         context.TestEntities.Add(entity2);
 
@@ -137,10 +137,10 @@ public class DomainEventToOutboxInterceptorTests
             .Options;
 
         await using var context = new TestDbContext(options);
-        
+
         var entity = new TestEntity();
         entity.AddDomainNotification(new TestDomainNotification { Message = "Test" });
-        
+
         context.TestEntities.Add(entity);
         var beforeSave = _dateTimeProvider.UtcNow;
 
@@ -166,10 +166,10 @@ public class DomainEventToOutboxInterceptorTests
             .Options;
 
         using var context = new TestDbContext(options);
-        
+
         var entity = new TestEntity();
         entity.AddDomainNotification(new TestDomainNotification { Message = "Test Event" });
-        
+
         context.TestEntities.Add(entity);
 
         // Act
@@ -191,7 +191,7 @@ public class DomainEventToOutboxInterceptorTests
         public DbSet<OutboxMessage> OutboxMessages { get; set; } = null!;
 
         public System.Data.Common.DbConnection GetConnection() => Database.GetDbConnection();
-        public Task<Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction> BeginTransactionAsync() => 
+        public Task<Microsoft.EntityFrameworkCore.Storage.IDbContextTransaction> BeginTransactionAsync() =>
             Database.BeginTransactionAsync();
         public Task CommitTransactionAsync() => Database.CommitTransactionAsync();
         public Task RollbackTransactionAsync() => Database.RollbackTransactionAsync();
@@ -200,7 +200,7 @@ public class DomainEventToOutboxInterceptorTests
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            
+
             modelBuilder.Entity<TestEntity>(b =>
             {
                 b.HasKey(e => e.Id);
@@ -219,7 +219,7 @@ public class DomainEventToOutboxInterceptorTests
     {
         public Guid Id { get; set; } = Guid.NewGuid();
         public string Name { get; set; } = string.Empty;
-        
+
         private readonly List<IDomainNotification> _domainEvents = new();
         public IReadOnlyCollection<IDomainNotification> DomainNotifications => _domainEvents.AsReadOnly();
 

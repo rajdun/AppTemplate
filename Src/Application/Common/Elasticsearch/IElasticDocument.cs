@@ -1,6 +1,6 @@
-﻿namespace Application.Common.Elasticsearch;
+namespace Application.Common.Elasticsearch;
 
 public interface IElasticDocument
 {
-    string Id { get; set; }
+    public string Id { get; set; }
 }

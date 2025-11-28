@@ -1,6 +1,6 @@
-﻿namespace Application.Common.Messaging;
+namespace Application.Common.Messaging;
 
 public interface IHangfireJobExecutor
 {
-    Task ProcessEventAsync(string eventType, string eventPayload, CancellationToken cancellationToken);
+    public Task ProcessEventAsync(string eventType, string eventPayload, CancellationToken cancellationToken);
 }

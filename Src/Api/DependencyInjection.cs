@@ -1,4 +1,4 @@
-﻿using Api.Common;
+using Api.Common;
 using Api.Common.Dto;
 using Carter;
 namespace Api;
@@ -9,7 +9,7 @@ public static class DependencyInjection
     {
         var openApiSettings = configuration.GetSection("OpenApiSettings").Get<OpenApiSettings>() ?? new OpenApiSettings();
         services.AddSingleton(openApiSettings);
-        
+
         services.AddCarter();
         services.AddOpenApi(options =>
         {

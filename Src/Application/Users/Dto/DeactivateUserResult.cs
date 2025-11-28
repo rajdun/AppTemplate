@@ -1,3 +1,3 @@
-﻿namespace Application.Users.Dto;
+namespace Application.Users.Dto;
 
 public record DeactivateUserResult(Guid UserId, string? Name, string? Email);

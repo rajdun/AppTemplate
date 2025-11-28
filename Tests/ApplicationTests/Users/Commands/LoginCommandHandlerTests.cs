@@ -46,7 +46,7 @@ public class LoginCommandHandlerTests
         // Arrange
         var user = ApplicationUser.Create("testuser", "test@test.com", "en");
         var command = new LoginCommand("testuser", "wrongpassword");
-        
+
         _userManager.FindByNameAsync(command.Username).Returns(user);
         _userManager.CheckPasswordAsync(user, command.Password).Returns(false);
 
@@ -65,7 +65,7 @@ public class LoginCommandHandlerTests
         var user = ApplicationUser.Create("testuser", "test@test.com", "en");
         user.DeactivatedAt = DateTimeOffset.UtcNow;
         var command = new LoginCommand("testuser", "password");
-        
+
         _userManager.FindByNameAsync(command.Username).Returns(user);
         _userManager.CheckPasswordAsync(user, command.Password).Returns(true);
 
@@ -85,7 +85,7 @@ public class LoginCommandHandlerTests
         var command = new LoginCommand("testuser", "password");
         var expectedToken = "jwt-token-123";
         var expectedRefreshToken = "refresh-token-456";
-        
+
         _userManager.FindByNameAsync(command.Username).Returns(user);
         _userManager.CheckPasswordAsync(user, command.Password).Returns(true);
         _jwtTokenGenerator.GenerateToken(user).Returns(Task.FromResult(expectedToken));
@@ -98,7 +98,7 @@ public class LoginCommandHandlerTests
         Assert.True(result.IsSuccess);
         Assert.Equal(expectedToken, result.Value.Token);
         Assert.Equal(expectedRefreshToken, result.Value.RefreshToken);
-        
+
         await _cacheService.Received(1).SetAsync(
             CacheKeys.GetRefreshTokenCacheKey(user.Id.ToString()),
             expectedRefreshToken,

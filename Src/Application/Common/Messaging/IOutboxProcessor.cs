@@ -1,6 +1,6 @@
-﻿namespace Application.Common.Messaging;
+namespace Application.Common.Messaging;
 
 public interface IOutboxProcessor
 {
-    Task ProcessOutboxMessagesAsync(CancellationToken cancellationToken = default);
+    public Task ProcessOutboxMessagesAsync(CancellationToken cancellationToken = default);
 }

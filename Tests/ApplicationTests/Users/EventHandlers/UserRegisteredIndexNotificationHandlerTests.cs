@@ -34,7 +34,7 @@ public class UserRegisteredIndexNotificationHandlerTests
         _userManager.FindByNameAsync(domainEvent.Name).Returns((ApplicationUser?)null);
 
         // Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(() => 
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
             _handler.Handle(domainEvent, CancellationToken.None));
     }
 
@@ -44,13 +44,13 @@ public class UserRegisteredIndexNotificationHandlerTests
         // Arrange
         var user = ApplicationUser.Create("testuser", "test@test.com", "en");
         var domainEvent = new UserRegistered("testuser", "test@test.com", "en");
-        
+
         _userManager.FindByNameAsync(domainEvent.Name).Returns(user);
         _elasticSearchService.IndexDocumentAsync(Arg.Any<ElasticUser>())
             .Returns(Task.FromResult(false));
 
         // Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(() => 
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
             _handler.Handle(domainEvent, CancellationToken.None));
     }
 
@@ -60,7 +60,7 @@ public class UserRegisteredIndexNotificationHandlerTests
         // Arrange
         var user = ApplicationUser.Create("testuser", "test@test.com", "en");
         var domainEvent = new UserRegistered("testuser", "test@test.com", "en");
-        
+
         _userManager.FindByNameAsync(domainEvent.Name).Returns(user);
         _elasticSearchService.IndexDocumentAsync(Arg.Any<ElasticUser>())
             .Returns(Task.FromResult(true));
@@ -71,8 +71,8 @@ public class UserRegisteredIndexNotificationHandlerTests
         // Assert
         Assert.True(result.IsSuccess);
         await _elasticSearchService.Received(1).IndexDocumentAsync(
-            Arg.Is<ElasticUser>(u => 
-                u.Name == domainEvent.Name && 
+            Arg.Is<ElasticUser>(u =>
+                u.Name == domainEvent.Name &&
                 u.Email == domainEvent.Email &&
                 u.Id == user.Id.ToString()));
     }
@@ -85,9 +85,9 @@ public class UserRegisteredIndexNotificationHandlerTests
         _userManager.FindByNameAsync(domainEvent.Name).Returns((ApplicationUser?)null);
 
         // Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(() => 
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
             _handler.Handle(domainEvent, CancellationToken.None));
-        
+
         _logger.Received(1).Log(
             LogLevel.Error,
             Arg.Any<EventId>(),
@@ -102,15 +102,15 @@ public class UserRegisteredIndexNotificationHandlerTests
         // Arrange
         var user = ApplicationUser.Create("testuser", "test@test.com", "en");
         var domainEvent = new UserRegistered("testuser", "test@test.com", "en");
-        
+
         _userManager.FindByNameAsync(domainEvent.Name).Returns(user);
         _elasticSearchService.IndexDocumentAsync(Arg.Any<ElasticUser>())
             .Returns(Task.FromResult(false));
 
         // Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(() => 
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
             _handler.Handle(domainEvent, CancellationToken.None));
-        
+
         _logger.Received(1).Log(
             LogLevel.Error,
             Arg.Any<EventId>(),

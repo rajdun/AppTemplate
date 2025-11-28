@@ -2,6 +2,6 @@ namespace Application.Common.Interfaces;
 
 public interface IDateTimeProvider
 {
-    DateTime UtcNow { get; }
-    DateTimeOffset OffsetNow { get; }
+    public DateTime UtcNow { get; }
+    public DateTimeOffset OffsetNow { get; }
 }

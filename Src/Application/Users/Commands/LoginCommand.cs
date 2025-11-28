@@ -1,4 +1,4 @@
-﻿using Application.Common.Interfaces;
+using Application.Common.Interfaces;
 using Application.Resources;
 using Application.Users.Dto;
 using Domain.Common;

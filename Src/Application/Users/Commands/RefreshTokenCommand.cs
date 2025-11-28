@@ -1,4 +1,4 @@
-﻿using Application.Common.Interfaces;
+using Application.Common.Interfaces;
 using Application.Common.Mediator;
 using Application.Resources;
 using Application.Users.Dto;
@@ -37,11 +37,16 @@ internal class RefreshTokenCommandHandler(
 
         var cachedToken = await cacheService.GetAsync<string>(refreshToken, cancellationToken);
         if (cachedToken == null || cachedToken != request.RefreshToken)
+        {
             return Result.Fail(UserTranslations.InvalidRefreshToken);
+        }
 
         var user = await userManager.FindByIdAsync(currentUser.UserId.ToString());
-        if (user == null) return Result.Fail(UserTranslations.InvalidRefreshToken);
-        
+        if (user == null)
+        {
+            return Result.Fail(UserTranslations.InvalidRefreshToken);
+        }
+
         if (user.DeactivatedAt is not null)
         {
             return Result.Fail(UserTranslations.UserNotActive);

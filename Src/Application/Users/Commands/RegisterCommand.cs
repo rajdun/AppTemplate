@@ -1,4 +1,4 @@
-﻿using Application.Common.Interfaces;
+using Application.Common.Interfaces;
 using Application.Resources;
 using Application.Users.Dto;
 using Domain.Common;
@@ -43,7 +43,10 @@ public class RegisterCommandHandler(
     public async Task<Result<TokenResult>> Handle(RegisterCommand request, CancellationToken cancellationToken = new())
     {
         var existingUser = await userManager.FindByNameAsync(request.Username);
-        if (existingUser != null) return Result.Fail<TokenResult>(UserTranslations.UsernameAlreadyExists);
+        if (existingUser != null)
+        {
+            return Result.Fail<TokenResult>(UserTranslations.UsernameAlreadyExists);
+        }
 
         var newUser = ApplicationUser.Create(request.Username, request.Email, user.Language.ToString());
 

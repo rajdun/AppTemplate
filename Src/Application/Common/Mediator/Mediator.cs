@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Application.Common.Errors;
 using Application.Common.Interfaces;
 using Application.Resources;
@@ -32,10 +32,14 @@ public class Mediator : IMediator
         logger.LogInformation("Handling {RequestType} with {HandlerType}", typeof(TRequest).Name,
             handler.GetType().Name);
         if (!Authorize<TRequest>(user))
+        {
             return new UnauthorizedError(UserTranslations.Unauthorized);
+        }
 
         if (RunValidations<TRequest, TResponse>(request, validators, logger, out var fail))
+        {
             return fail;
+        }
 
         var result = await handler.Handle(request, cancellationToken);
         logger.LogInformation("Handled {RequestType} with {HandlerType}", typeof(TRequest).Name,
@@ -54,14 +58,20 @@ public class Mediator : IMediator
         var stringLocalizer = _serviceProvider.GetRequiredService<IStringLocalizer<UserTranslations>>();
 
         if (!handlers.Any())
+        {
             // Change to string localizer
             return Result.Fail($"No handlers found for {typeof(TRequest).Name}");
+        }
 
         if (!Authorize<TRequest>(user))
+        {
             return new UnauthorizedError(stringLocalizer["Unauthorized"]);
+        }
 
         if (RunValidations(request, validators, logger, out var fail))
+        {
             return fail;
+        }
 
         foreach (var handler in handlers)
         {
@@ -71,7 +81,10 @@ public class Mediator : IMediator
             logger.LogInformation("Handled {RequestType} with {HandlerType}", typeof(TRequest).Name,
                 handler.GetType().Name);
 
-            if (result.IsFailed) return result;
+            if (result.IsFailed)
+            {
+                return result;
+            }
         }
 
         return Result.Ok();
@@ -81,7 +94,10 @@ public class Mediator : IMediator
     {
         var authorizeAttribute = typeof(T).GetCustomAttribute<AuthorizeAttribute>();
 
-        if (authorizeAttribute == null) return true;
+        if (authorizeAttribute == null)
+        {
+            return true;
+        }
 
         return authorizeAttribute.Authorize(user);
     }

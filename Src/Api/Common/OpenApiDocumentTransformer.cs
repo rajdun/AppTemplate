@@ -16,7 +16,7 @@ internal sealed class OpenApiDocumentTransformer(OpenApiSettings openApiSettings
             Description = x.Description,
             Url = x.Url
         }).ToList();
-        
+
         var authenticationSchemes = await authenticationSchemeProvider.GetAllSchemesAsync();
         if (authenticationSchemes.Any(authScheme => authScheme.Name == "Bearer"))
         {

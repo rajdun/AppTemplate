@@ -4,7 +4,7 @@ namespace Domain.Common;
 
 public interface IDomainEvent : IRequest
 {
-    
+
 }
 
 internal static class DomainEventExtensions

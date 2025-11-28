@@ -9,7 +9,7 @@ public class PagedUserRequest : PagedRequest
 
     public override string? GetActualSortField()
     {
-        return this.SortBy?.ToLowerInvariant() switch
+        return SortBy?.ToLowerInvariant() switch
         {
             "name" => "name.keyword",
             "email" => "email.keyword",

@@ -4,16 +4,16 @@ public class PagedRequest
 {
     public int PageNumber { get; set; } = 1;
     public int PageSize { get; set; } = 10;
-    
+
     public string? SortBy { get; set; }
     public SortDirection SortOrder { get; set; } = SortDirection.Asc;
-    
+
     public string? Query { get; set; }
     public ICollection<string> QueryColumns { get; set; } = [];
 
     public virtual string? GetActualSortField()
     {
-        return this.SortBy?.ToLowerInvariant();
+        return SortBy?.ToLowerInvariant();
     }
 }
 
@@ -37,7 +37,7 @@ public class RangeFilterField<T> where T : struct
     public T? IsLessThan { get; set; }
     public T? IsLessThanOrEqual { get; set; }
     public List<T>? InArray { get; set; }
-    
+
     public T? RangeStart { get; set; }
     public T? RangeEnd { get; set; }
 }

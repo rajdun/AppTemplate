@@ -12,7 +12,7 @@ namespace InfrastructureTests.Implementation;
 
 public class JwtTokenGeneratorTests
 {
-    private readonly IJwtTokenGenerator _sut; 
+    private readonly IJwtTokenGenerator _sut;
     private readonly JwtSettings _jwtSettings;
     private readonly DateTime _now;
     private readonly ICacheService _cacheService;
@@ -20,12 +20,12 @@ public class JwtTokenGeneratorTests
     public JwtTokenGeneratorTests()
     {
         _now = DateTime.UtcNow;
-        
+
         // 1. Arrange (Common Setup)
         _jwtSettings = new JwtSettings
         {
             // Use a key long enough for HmacSha256
-            Secret = "TestSecretKey12345678901234567890", 
+            Secret = "TestSecretKey12345678901234567890",
             Issuer = "TestIssuer",
             Audience = "TestAudience",
             ExpiryMinutes = 15
@@ -87,7 +87,7 @@ public class JwtTokenGeneratorTests
 
         Assert.Equal(_jwtSettings.Issuer, decodedToken.Issuer);
         Assert.Equal(_jwtSettings.Audience, decodedToken.Audiences.Single());
-        Assert.True(TimeSpan.FromSeconds(1) > expectedExpiry-decodedToken.ValidTo);
+        Assert.True(TimeSpan.FromSeconds(1) > expectedExpiry - decodedToken.ValidTo);
     }
 
     [Fact]
@@ -101,7 +101,7 @@ public class JwtTokenGeneratorTests
             Email = "Test@test.test"
         };
         var tokenString = await _sut.GenerateToken(user);
-        
+
         var validationParameters = new TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
@@ -117,7 +117,7 @@ public class JwtTokenGeneratorTests
         // Act
         var handler = new JwtSecurityTokenHandler();
         var tokenResult = await handler.ValidateTokenAsync(tokenString, validationParameters);
-        
+
 
         // Assert
         Assert.NotNull(tokenResult);
@@ -133,7 +133,7 @@ public class JwtTokenGeneratorTests
         // Assert
         Assert.NotNull(refreshToken);
         Assert.NotEmpty(refreshToken);
-        
+
         // Check if it's a valid Base64 string
         // ReSharper disable once ReturnValueOfPureMethodIsNotUsed
         Convert.FromBase64String(refreshToken);
@@ -150,7 +150,7 @@ public class JwtTokenGeneratorTests
         // The original random number was 64 bytes
         Assert.Equal(64, decodedBytes.Length);
     }
-    
+
     [Fact]
     public void GenerateRefreshToken_ShouldReturnDifferentTokensOnEachCall()
     {
@@ -161,7 +161,7 @@ public class JwtTokenGeneratorTests
         // Assert
         Assert.NotEqual(token1, token2);
     }
-    
+
     [Fact]
     public async Task GenerateToken_ShouldSaveJtiInCache()
     {
@@ -172,14 +172,14 @@ public class JwtTokenGeneratorTests
             UserName = "testuser",
             Email = "Test@test.test"
         };
-        
+
         // Act
         await _sut.GenerateToken(user);
-    
+
         // Assert
         await _cacheService.Received(1).SetAsync(
-            Arg.Any<string>(), 
-            Arg.Any<string>(), 
+            Arg.Any<string>(),
+            Arg.Any<string>(),
             Arg.Any<TimeSpan>());
     }
 }

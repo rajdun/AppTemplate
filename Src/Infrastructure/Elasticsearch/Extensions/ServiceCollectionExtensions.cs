@@ -14,21 +14,21 @@ internal static class ServiceCollectionExtensions
         services.Configure<ElasticsearchSettings>(
             configuration.GetSection(ElasticsearchSettings.SectionName)
         );
-        
+
         services.AddSingleton<ElasticsearchClient>(sp =>
         {
             var settings = sp.GetRequiredService<IOptions<ElasticsearchSettings>>().Value;
-            
+
             var clientSettings = new ElasticsearchClientSettings(new Uri(settings.Uri))
                 .DefaultIndex(settings.DefaultIndex);
-            
+
             if (!string.IsNullOrEmpty(settings.Username) && !string.IsNullOrEmpty(settings.Password))
             {
                 clientSettings.Authentication(
                     new BasicAuthentication(settings.Username, settings.Password)
                 );
             }
-            
+
 #if DEBUG
             clientSettings.DisableDirectStreaming()
                 .EnableDebugMode();
@@ -39,9 +39,9 @@ internal static class ServiceCollectionExtensions
         });
 
         services.AddScoped(typeof(IElasticSearchService<>), typeof(ElasticSearchService<>));
-        
+
         services.AddScoped<IUserSearchService, UserSearchService>();
-        
+
         return services;
     }
 }

@@ -26,7 +26,7 @@ public class UserDeactivatedRemoveIndexNotificationHandlerTests
         // Arrange
         var userId = Guid.NewGuid();
         var domainEvent = new UserDeactivated(userId);
-        
+
         _elasticSearchService.DeleteDocumentAsync(userId.ToString())
             .Returns(Task.FromResult(true));
 
@@ -44,7 +44,7 @@ public class UserDeactivatedRemoveIndexNotificationHandlerTests
         // Arrange
         var userId = Guid.NewGuid();
         var domainEvent = new UserDeactivated(userId);
-        
+
         _elasticSearchService.DeleteDocumentAsync(userId.ToString())
             .Returns(Task.FromResult(false));
 
@@ -62,7 +62,7 @@ public class UserDeactivatedRemoveIndexNotificationHandlerTests
         // Arrange
         var userId = Guid.NewGuid();
         var domainEvent = new UserDeactivated(userId);
-        
+
         _elasticSearchService.DeleteDocumentAsync(userId.ToString())
             .Returns(Task.FromResult(false));
 

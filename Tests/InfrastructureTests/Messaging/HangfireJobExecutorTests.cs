@@ -30,7 +30,7 @@ public class HangfireJobExecutorTests
         var eventType = "TestEvent";
         var eventPayload = "{\"data\":\"test\"}";
         var domainEvent = Substitute.For<IRequest>();
-        
+
         _deserializer.Deserialize(eventType, eventPayload)?.Returns(domainEvent);
         _mediator.PublishAsync(domainEvent, Arg.Any<CancellationToken>()).Returns(Result.Ok());
 
@@ -48,13 +48,13 @@ public class HangfireJobExecutorTests
         // Arrange
         var eventType = "UnknownEvent";
         var eventPayload = "{\"data\":\"test\"}";
-        
+
         _deserializer.Deserialize(eventType, eventPayload)?.Returns((IRequest?)null);
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(
             () => _sut.ProcessEventAsync(eventType, eventPayload, CancellationToken.None));
-        
+
         Assert.Contains("Could not deserialize event of type", exception.Message);
         await _mediator.DidNotReceive().PublishAsync(Arg.Any<IRequest>(), Arg.Any<CancellationToken>());
     }
@@ -67,14 +67,14 @@ public class HangfireJobExecutorTests
         var eventPayload = "{\"data\":\"test\"}";
         var domainEvent = Substitute.For<IRequest>();
         var failedResult = Result.Fail("Processing failed");
-        
+
         _deserializer.Deserialize(eventType, eventPayload)?.Returns(domainEvent);
         _mediator.PublishAsync(domainEvent, Arg.Any<CancellationToken>()).Returns(failedResult);
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(
             () => _sut.ProcessEventAsync(eventType, eventPayload, CancellationToken.None));
-        
+
         Assert.Contains("Processing of event type", exception.Message);
         Assert.Contains("failed", exception.Message);
     }
@@ -86,7 +86,7 @@ public class HangfireJobExecutorTests
         var eventType = "TestEvent";
         var eventPayload = "{\"data\":\"test\"}";
         var domainEvent = Substitute.For<IRequest>();
-        
+
         _deserializer.Deserialize(eventType, eventPayload)!.Returns(domainEvent);
         _mediator.PublishAsync(domainEvent, Arg.Any<CancellationToken>()).Returns(Result.Ok());
 

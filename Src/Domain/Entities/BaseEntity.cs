@@ -1,4 +1,4 @@
-﻿using Domain.Common;
+using Domain.Common;
 
 namespace Domain.Entities;
 
@@ -21,7 +21,7 @@ public abstract class BaseEntity : IEntity
     {
         _domainEvents.Clear();
     }
-    
+
     public void AddDomainNotification(IDomainNotification domainNotification)
     {
         _domainNotifications.Add(domainNotification);
@@ -35,7 +35,7 @@ public abstract class BaseEntity : IEntity
 
 public interface IEntity
 {
-    Guid Id { get; set; }
+    public Guid Id { get; set; }
     public IReadOnlyCollection<IDomainNotification> DomainNotifications { get; }
     public void AddDomainNotification(IDomainNotification domainNotification);
     public void ClearDomainNotifications();

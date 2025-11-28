@@ -1,4 +1,4 @@
-﻿using Application.Common.Errors;
+using Application.Common.Errors;
 using FluentResults;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
@@ -11,7 +11,11 @@ public static class ResultExtensions
     {
         if (result.IsSuccess)
         {
-            if (typeof(TValue) == typeof(bool) || typeof(TValue) == typeof(ValueTask)) return TypedResults.NoContent();
+            if (typeof(TValue) == typeof(bool) || typeof(TValue) == typeof(ValueTask))
+            {
+                return TypedResults.NoContent();
+            }
+
             return TypedResults.Ok(result.Value);
         }
 
@@ -20,7 +24,10 @@ public static class ResultExtensions
 
     public static IResult ToHttpResult(this Result result)
     {
-        if (result.IsSuccess) return TypedResults.NoContent();
+        if (result.IsSuccess)
+        {
+            return TypedResults.NoContent();
+        }
 
         return MapToProblemDetails(result);
     }

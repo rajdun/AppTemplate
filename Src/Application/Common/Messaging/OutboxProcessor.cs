@@ -1,4 +1,4 @@
-﻿using Application.Common.Interfaces;
+using Application.Common.Interfaces;
 using Domain.Entities;
 using Hangfire;
 using Microsoft.EntityFrameworkCore;
@@ -52,6 +52,7 @@ public class OutboxProcessor(
         var utcNow = dateTimeProvider.UtcNow;
 
         foreach (var message in messages)
+        {
             try
             {
                 logger.LogInformation("Enqueuing event {EventId} ({EventType}) to Hangfire", message.Id,
@@ -70,6 +71,7 @@ public class OutboxProcessor(
                     message.Id);
                 message.Error = $"Failed to enqueue: {ex.Message}";
             }
+        }
 
         await dbContext.SaveChangesAsync(cancellationToken);
         logger.LogInformation("Finished processing batch of {Count} outbox messages.", messages.Count);

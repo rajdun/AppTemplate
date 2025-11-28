@@ -1,4 +1,4 @@
-﻿using System.Text.Json;
+using System.Text.Json;
 using Application.Common.Interfaces;
 using StackExchange.Redis;
 
@@ -16,7 +16,11 @@ public class RedisCacheService : ICacheService
     public async Task<T?> GetAsync<T>(string key, CancellationToken cancellationToken = default) where T : class
     {
         var value = await _db.StringGetAsync(key);
-        if (value.IsNullOrEmpty) return null;
+        if (value.IsNullOrEmpty)
+        {
+            return null;
+        }
+
         return JsonSerializer.Deserialize<T>(value.ToString());
     }
 

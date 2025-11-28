@@ -65,7 +65,7 @@ public class DeactivateUserCommandHandlerTests
         var user = ApplicationUser.Create("testuser", "test@test.com", "en");
         var command = new DeactivateUserCommand(userId);
         var identityErrors = new[] { new IdentityError { Description = "Update failed" } };
-        
+
         _userManager.FindByIdAsync(userId.ToString()).Returns(user);
         _userManager.UpdateAsync(user).Returns(IdentityResult.Failed(identityErrors));
 
@@ -84,7 +84,7 @@ public class DeactivateUserCommandHandlerTests
         var userId = Guid.NewGuid();
         var user = ApplicationUser.Create("testuser", "test@test.com", "en");
         var command = new DeactivateUserCommand(userId);
-        
+
         _userManager.FindByIdAsync(userId.ToString()).Returns(user);
         _userManager.UpdateAsync(user).Returns(IdentityResult.Success);
 

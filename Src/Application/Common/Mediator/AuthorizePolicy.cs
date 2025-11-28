@@ -1,4 +1,4 @@
-﻿namespace Application.Common.Mediator;
+namespace Application.Common.Mediator;
 
 [Flags]
 public enum AuthorizePolicy

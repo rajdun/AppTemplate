@@ -1,4 +1,4 @@
-﻿using Application.Common.ExtensionMethods;
+using Application.Common.ExtensionMethods;
 using Application.Common.Mailing;
 using Application.Common.Mailing.Templates;
 using Domain.Common;
@@ -16,7 +16,7 @@ public class UserRegisteredSendEmailNotificationHandler(ILogger<UserRegisteredSe
         try
         {
             var emailLanguage = AppLanguageHelpers.FromString(request.Language);
-            
+
             await emailService.SendTemplatedEmailAsync(request.Email,
                 new UserRegisteredEmailTemplate(request.Name, "Api", emailLanguage),
                 cancellationToken);

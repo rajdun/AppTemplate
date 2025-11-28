@@ -1,4 +1,4 @@
-﻿using Application.Resources;
+using Application.Resources;
 using Application.Users.Dto;
 using Domain.Common;
 using Domain.Entities.Users;
@@ -37,17 +37,17 @@ internal class DeactivateUserCommandHandler(UserManager<ApplicationUser> userMan
             logger.LogWarning("User with ID {UserId} is already deactivated", request.UserId);
             return Result.Fail(UserTranslations.UserNotActive);
         }
-        
+
         user.DeactivatedAt = DateTimeOffset.UtcNow;
-        
+
         var result = await userManager.UpdateAsync(user);
-        
+
         if (!result.Succeeded)
         {
             logger.LogError("Failed to deactivate user with ID {UserId}. Errors: {Errors}", request.UserId, string.Join(", ", result.Errors.Select(e => e.Description)));
-            return Result.Fail(result.Errors.Select(x=>x.Description));
+            return Result.Fail(result.Errors.Select(x => x.Description));
         }
-        
+
         return Result.Ok(new DeactivateUserResult(user.Id, user.UserName, user.Email));
     }
 }

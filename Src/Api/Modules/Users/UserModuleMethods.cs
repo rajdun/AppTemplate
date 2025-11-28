@@ -1,4 +1,4 @@
-﻿using Api.Common;
+using Api.Common;
 using Api.Modules.Users.Requests;
 using Application.Common.Dto;
 using Application.Common.Elasticsearch;
@@ -43,7 +43,7 @@ public partial class UsersModule
 
         return response.ToHttpResult();
     }
-    
+
     private static async Task<IResult> SearchUsers([FromServices] IMediator mediator,
         [FromBody] PagedUserRequest request, CancellationToken cancellationToken = new())
     {
@@ -58,9 +58,9 @@ public partial class UsersModule
         CancellationToken cancellationToken = new())
     {
         var command = new DeactivateUserCommand(userId);
-        
+
         var response = await mediator.SendAsync<DeactivateUserCommand, DeactivateUserResult>(command, cancellationToken);
-        
+
         return response.ToHttpResult();
     }
 }

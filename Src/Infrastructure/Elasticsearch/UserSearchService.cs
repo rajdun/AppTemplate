@@ -21,7 +21,7 @@ public class UserSearchService : IUserSearchService
     {
         _client = client;
         _logger = logger;
-        
+
         _indexName = nameof(ElasticUser).ToLowerInvariant();
     }
 

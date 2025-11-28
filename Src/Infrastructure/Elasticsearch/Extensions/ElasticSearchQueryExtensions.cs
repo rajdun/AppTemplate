@@ -9,8 +9,11 @@ internal static class ElasticSearchQueryExtensions
 {
     internal static List<SortOptions> AddSortOptions(this List<SortOptions> sortOptions, PagedUserRequest request)
     {
-        if (string.IsNullOrEmpty(request.SortBy)) return sortOptions;
-        
+        if (string.IsNullOrEmpty(request.SortBy))
+        {
+            return sortOptions;
+        }
+
         var esSortOrder = request.SortOrder == SortDirection.Asc
             ? Elastic.Clients.Elasticsearch.SortOrder.Asc
             : Elastic.Clients.Elasticsearch.SortOrder.Desc;
@@ -23,14 +26,17 @@ internal static class ElasticSearchQueryExtensions
                 Order = esSortOrder
             }
         });
-        
+
         return sortOptions;
     }
-    
+
     internal static List<Query> AddQueryFilters(this List<Query> filters, PagedUserRequest request)
     {
-        if(string.IsNullOrWhiteSpace(request.Query)) return filters;
-        
+        if (string.IsNullOrWhiteSpace(request.Query))
+        {
+            return filters;
+        }
+
         if (request.QueryColumns.Count > 0)
         {
             filters.Add(new Query
@@ -54,10 +60,13 @@ internal static class ElasticSearchQueryExtensions
 
         return filters;
     }
-    
+
     internal static List<Query> AddStringFilter(this List<Query> filters, Field field, StringFilterField? filter)
     {
-        if (filter == null) return filters;
+        if (filter == null)
+        {
+            return filters;
+        }
 
         if (!string.IsNullOrWhiteSpace(filter.IsEqual))
         {

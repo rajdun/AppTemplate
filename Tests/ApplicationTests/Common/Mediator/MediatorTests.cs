@@ -29,7 +29,7 @@ public class MediatorTests
 
         var serviceScope = Substitute.For<IServiceScope>();
         var serviceScopeFactory = Substitute.For<IServiceScopeFactory>();
-        
+
         serviceScope.ServiceProvider.Returns(_serviceProvider);
         serviceScopeFactory.CreateScope().Returns(serviceScope);
 
@@ -92,7 +92,7 @@ public class MediatorTests
         var request = new TestRequest();
         var handler = Substitute.For<IRequestHandler<TestRequest, string>>();
         var validator = Substitute.For<IValidator<TestRequest>>();
-        
+
         var validationFailure = new ValidationFailure("Property", "Error message");
         var validationResult = new ValidationResult(new[] { validationFailure });
         validator.Validate(Arg.Any<ValidationContext<TestRequest>>()).Returns(validationResult);
@@ -141,7 +141,7 @@ public class MediatorTests
         var request = new TestNotification();
         var handler1 = Substitute.For<IRequestHandler<TestNotification>>();
         var handler2 = Substitute.For<IRequestHandler<TestNotification>>();
-        
+
         handler1.Handle(request, Arg.Any<CancellationToken>()).Returns(Result.Ok());
         handler2.Handle(request, Arg.Any<CancellationToken>()).Returns(Result.Ok());
 
@@ -169,7 +169,7 @@ public class MediatorTests
         var request = new TestNotification();
         var handler1 = Substitute.For<IRequestHandler<TestNotification>>();
         var handler2 = Substitute.For<IRequestHandler<TestNotification>>();
-        
+
         handler1.Handle(request, Arg.Any<CancellationToken>()).Returns(Result.Fail("Handler failed"));
         handler2.Handle(request, Arg.Any<CancellationToken>()).Returns(Result.Ok());
 

@@ -1,4 +1,4 @@
-﻿using Application.Common.Elasticsearch;
+using Application.Common.Elasticsearch;
 using Application.Common.Elasticsearch.Dto;
 using Elastic.Clients.Elasticsearch;
 using Elastic.Clients.Elasticsearch.Mapping;

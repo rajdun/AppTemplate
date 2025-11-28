@@ -1,4 +1,4 @@
-﻿using System.Data.Common;
+using System.Data.Common;
 using Application.Common;
 using Domain.Entities;
 using Domain.Entities.Users;

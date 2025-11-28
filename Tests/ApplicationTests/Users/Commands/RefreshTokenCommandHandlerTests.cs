@@ -73,7 +73,7 @@ public class RefreshTokenCommandHandlerTests
         var userId = Guid.NewGuid();
         var token = "valid-token";
         var command = new RefreshTokenCommand(token);
-        
+
         _currentUser.UserId.Returns(userId);
         _cacheService.GetAsync<string>(
             CacheKeys.GetRefreshTokenCacheKey(userId.ToString()),
@@ -97,7 +97,7 @@ public class RefreshTokenCommandHandlerTests
         var user = ApplicationUser.Create("testuser", "test@test.com", "en");
         user.DeactivatedAt = DateTimeOffset.UtcNow;
         var command = new RefreshTokenCommand(token);
-        
+
         _currentUser.UserId.Returns(userId);
         _cacheService.GetAsync<string>(
             CacheKeys.GetRefreshTokenCacheKey(userId.ToString()),
@@ -122,7 +122,7 @@ public class RefreshTokenCommandHandlerTests
         var newRefreshToken = "new-refresh-token";
         var user = ApplicationUser.Create("testuser", "test@test.com", "en");
         var command = new RefreshTokenCommand(oldToken);
-        
+
         _currentUser.UserId.Returns(userId);
         _cacheService.GetAsync<string>(
             CacheKeys.GetRefreshTokenCacheKey(userId.ToString()),
@@ -138,7 +138,7 @@ public class RefreshTokenCommandHandlerTests
         Assert.True(result.IsSuccess);
         Assert.Equal(newJwtToken, result.Value.Token);
         Assert.Equal(newRefreshToken, result.Value.RefreshToken);
-        
+
         await _cacheService.Received(1).SetAsync(
             CacheKeys.GetRefreshTokenCacheKey(userId.ToString()),
             newRefreshToken,

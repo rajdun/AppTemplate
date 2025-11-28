@@ -1,4 +1,4 @@
-﻿using Domain.Common;
+using Domain.Common;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Domain;
@@ -19,7 +19,7 @@ public static class DependencyInjection
 
         return services;
     }
-    
+
     private static IServiceCollection AddDomainNotifications(this IServiceCollection services)
     {
         var domainEventTypes = DomainNotificationDeserializer.ScanDomainNotificationsTypes(typeof(IDomainNotification).Assembly);

@@ -1,4 +1,4 @@
-﻿using Application.Common.Mailing;
+using Application.Common.Mailing;
 using Infrastructure.Mailing.Dto;
 using System.Net;
 using System.Net.Mail;
@@ -14,8 +14,8 @@ internal class SmtpEmailService(IOptions<SmtpSettings> settings)
     {
         using var smtpClient = new SmtpClient(settings.Value.Host, settings.Value.Port);
         smtpClient.EnableSsl = settings.Value.UseSsl;
-        smtpClient.Credentials = string.IsNullOrEmpty(settings.Value.Username) 
-            ? null 
+        smtpClient.Credentials = string.IsNullOrEmpty(settings.Value.Username)
+            ? null
             : new NetworkCredential(settings.Value.Username, settings.Value.Password);
 
         var mailMessage = new MailMessage
@@ -25,7 +25,7 @@ internal class SmtpEmailService(IOptions<SmtpSettings> settings)
             Body = htmlBody,
             IsBodyHtml = true
         };
-        
+
         mailMessage.To.Add(to);
 
         await smtpClient.SendMailAsync(mailMessage, cancellationToken);
@@ -34,10 +34,10 @@ internal class SmtpEmailService(IOptions<SmtpSettings> settings)
     public async Task SendTemplatedEmailAsync(string to, EmailTemplate template, CancellationToken cancellationToken = default)
     {
         var templatePath = Path.Combine(
-            AppContext.BaseDirectory, 
-            "Mailing", 
-            "Templates", 
-            template.Language.ToLanguageCode(), 
+            AppContext.BaseDirectory,
+            "Mailing",
+            "Templates",
+            template.Language.ToLanguageCode(),
             $"{template.TemplateName}.html"
         );
 
@@ -51,8 +51,8 @@ internal class SmtpEmailService(IOptions<SmtpSettings> settings)
 
         using var smtpClient = new SmtpClient(settings.Value.Host, settings.Value.Port);
         smtpClient.EnableSsl = settings.Value.UseSsl;
-        smtpClient.Credentials = string.IsNullOrEmpty(settings.Value.Username) 
-            ? null 
+        smtpClient.Credentials = string.IsNullOrEmpty(settings.Value.Username)
+            ? null
             : new NetworkCredential(settings.Value.Username, settings.Value.Password);
 
         var mailMessage = new MailMessage
@@ -62,27 +62,27 @@ internal class SmtpEmailService(IOptions<SmtpSettings> settings)
             Body = htmlBody,
             IsBodyHtml = true
         };
-        
+
         mailMessage.To.Add(to);
-        
+
         // Add CC recipients
         foreach (var cc in template.Cc)
         {
             mailMessage.CC.Add(cc);
         }
-        
+
         // Add BCC recipients
         foreach (var bcc in template.Bcc)
         {
             mailMessage.Bcc.Add(bcc);
         }
-        
+
         // Set ReplyTo if provided
         if (!string.IsNullOrEmpty(template.ReplyTo))
         {
             mailMessage.ReplyToList.Add(template.ReplyTo);
         }
-        
+
         // Add attachments
         foreach (var attachment in template.Attachments)
         {

@@ -1,4 +1,4 @@
-﻿namespace Infrastructure.Mailing.Dto;
+namespace Infrastructure.Mailing.Dto;
 
 public class SmtpSettings
 {

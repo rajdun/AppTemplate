@@ -27,7 +27,7 @@ public class OutboxProcessorTests
     {
         // Arrange
         var dbContext = Substitute.For<IApplicationDbContext>();
-        
+
         // Act
         var processor = new OutboxProcessor(_logger, dbContext, _backgroundJobClient, _dateTimeProvider);
 

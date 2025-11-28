@@ -81,7 +81,7 @@ public class EmailTemplateTests
     {
         // Arrange
         var attachment = new EmailAttachment("test.pdf", new byte[] { 1, 2, 3 }, "application/pdf");
-        
+
         // Act
         var template = new TestEmailTemplate
         {

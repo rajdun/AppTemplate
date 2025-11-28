@@ -35,7 +35,7 @@ public class UserRegisteredSendEmailNotificationHandlerTests
         Assert.True(result.IsSuccess);
         await _emailService.Received(1).SendTemplatedEmailAsync(
             domainEvent.Email,
-            Arg.Is<UserRegisteredEmailTemplate>(t => 
+            Arg.Is<UserRegisteredEmailTemplate>(t =>
                 t.Language == AppLanguage.En &&
                 t.TemplateName == "UserRegistered"),
             Arg.Any<CancellationToken>());
@@ -64,7 +64,7 @@ public class UserRegisteredSendEmailNotificationHandlerTests
         // Arrange
         var domainEvent = new UserRegistered("testuser", "test@test.com", "en");
         var exception = new Exception("SMTP connection failed");
-        
+
         _emailService.SendTemplatedEmailAsync(
             Arg.Any<string>(),
             Arg.Any<EmailTemplate>(),
@@ -85,7 +85,7 @@ public class UserRegisteredSendEmailNotificationHandlerTests
         // Arrange
         var domainEvent = new UserRegistered("testuser", "test@test.com", "en");
         var exception = new Exception("SMTP connection failed");
-        
+
         _emailService.SendTemplatedEmailAsync(
             Arg.Any<string>(),
             Arg.Any<EmailTemplate>(),

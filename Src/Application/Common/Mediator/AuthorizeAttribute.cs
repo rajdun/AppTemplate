@@ -1,4 +1,4 @@
-﻿using Application.Common.Interfaces;
+using Application.Common.Interfaces;
 
 namespace Application.Common.Mediator;
 
@@ -15,13 +15,19 @@ public class AuthorizeAttribute : Attribute
     public bool Authorize(IUser user)
     {
         if (!user.IsAuthenticated)
+        {
             return false;
+        }
 
         if (AuthorizeUserBehaviour == AuthorizePolicy.None)
+        {
             return true;
+        }
 
         if (AuthorizeUserBehaviour.HasFlag(AuthorizePolicy.Admin) && user.IsAdmin)
+        {
             return true;
+        }
 
         return false;
     }

@@ -6,5 +6,5 @@ namespace Application.Common.Elasticsearch;
 
 public interface IUserSearchService
 {
-    Task<PagedResult<ElasticUser>> SearchUsersAsync(PagedUserRequest request, CancellationToken cancellationToken = new());
+    public Task<PagedResult<ElasticUser>> SearchUsersAsync(PagedUserRequest request, CancellationToken cancellationToken = new());
 }

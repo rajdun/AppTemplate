@@ -1,14 +1,14 @@
-﻿using Domain.Common;
+using Domain.Common;
 using FluentResults;
 
 namespace Application.Common.Mediator;
 
 public interface IMediator
 {
-    Task<Result<TResponse>> SendAsync<TRequest, TResponse>(TRequest request,
+    public Task<Result<TResponse>> SendAsync<TRequest, TResponse>(TRequest request,
         CancellationToken cancellationToken = new())
         where TRequest : IRequest<TResponse>;
 
-    Task<Result> PublishAsync<TRequest>(TRequest request, CancellationToken cancellationToken = new())
+    public Task<Result> PublishAsync<TRequest>(TRequest request, CancellationToken cancellationToken = new())
         where TRequest : IRequest;
 }

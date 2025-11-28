@@ -35,7 +35,7 @@ public class RegisterCommandHandlerTests
         // Arrange
         var existingUser = ApplicationUser.Create("existinguser", "existing@test.com", "en");
         var command = new RegisterCommand("existinguser", "new@test.com", "Password123!", "Password123!");
-        
+
         _userManager.FindByNameAsync(command.Username).Returns(existingUser);
 
         // Act
@@ -52,7 +52,7 @@ public class RegisterCommandHandlerTests
         // Arrange
         var command = new RegisterCommand("newuser", "new@test.com", "Password123!", "Password123!");
         var identityErrors = new[] { new IdentityError { Description = "Password too weak" } };
-        
+
         _userManager.FindByNameAsync(command.Username).Returns((ApplicationUser?)null);
         _userManager.CreateAsync(Arg.Any<ApplicationUser>(), command.Password)
             .Returns(IdentityResult.Failed(identityErrors));
@@ -72,7 +72,7 @@ public class RegisterCommandHandlerTests
         var command = new RegisterCommand("newuser", "new@test.com", "Password123!", "Password123!");
         var expectedToken = "jwt-token";
         var expectedRefreshToken = "refresh-token";
-        
+
         _userManager.FindByNameAsync(command.Username).Returns((ApplicationUser?)null);
         _userManager.CreateAsync(Arg.Any<ApplicationUser>(), command.Password)
             .Returns(IdentityResult.Success);
@@ -87,11 +87,11 @@ public class RegisterCommandHandlerTests
         Assert.True(result.IsSuccess);
         Assert.Equal(expectedToken, result.Value.Token);
         Assert.Equal(expectedRefreshToken, result.Value.RefreshToken);
-        
+
         await _userManager.Received(1).CreateAsync(
             Arg.Is<ApplicationUser>(u => u.UserName == command.Username && u.Email == command.Email),
             command.Password);
-        
+
         await _cacheService.Received(1).SetAsync(
             Arg.Any<string>(),
             expectedRefreshToken,

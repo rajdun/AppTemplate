@@ -27,7 +27,7 @@ public class SearchUsersQueryValidator : AbstractValidator<SearchUsersQuery>
     }
 }
 
-internal class SearchUsersQueryHandler(IUserSearchService userSearchService) 
+internal class SearchUsersQueryHandler(IUserSearchService userSearchService)
     : IRequestHandler<SearchUsersQuery, PagedResult<ElasticUser>>
 {
     public async Task<Result<PagedResult<ElasticUser>>> Handle(SearchUsersQuery request, CancellationToken cancellationToken = new CancellationToken())

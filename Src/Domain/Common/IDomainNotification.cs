@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 
@@ -10,7 +10,7 @@ public interface IDomainNotification : IRequest
 
 public interface IDomainNotificationDeserializer
 {
-    dynamic? Deserialize(string eventType, string eventPayload);
+    public dynamic? Deserialize(string eventType, string eventPayload);
 }
 
 public class DomainNotificationDeserializer : IDomainNotificationDeserializer
