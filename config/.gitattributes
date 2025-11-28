@@ -1,0 +1,8 @@
+# Wymuszaj LF na repozytorium (wszyscy mają ten sam standard)
+* text=auto eol=lf
+
+# Pliki binarne (nie ruszaj ich)
+*.dll binary
+*.pfx binary
+*.png binary
+*.jpg binary
