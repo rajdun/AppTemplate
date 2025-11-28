@@ -51,6 +51,5 @@
     <PackageVersion Include="xunit" Version="2.9.3" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
     <PackageVersion Include="Newtonsoft.Json" Version="13.0.4" />
-    <PackageVersion Include="Microsoft.CodeAnalysis.Common" Version="5.0.0" />
   </ItemGroup>
 </Project>
