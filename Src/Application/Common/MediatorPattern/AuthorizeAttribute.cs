@@ -1,30 +1,32 @@
 using Application.Common.Interfaces;
 
-namespace Application.Common.Mediator;
+namespace Application.Common.MediatorPattern;
 
 [AttributeUsage(AttributeTargets.Class)]
-public class AuthorizeAttribute : Attribute
+public sealed class AuthorizeAttribute : Attribute
 {
     public AuthorizeAttribute(AuthorizePolicy policy)
     {
-        AuthorizeUserBehaviour = policy;
+        Policy = policy;
     }
 
-    public AuthorizePolicy AuthorizeUserBehaviour { get; }
+    public AuthorizePolicy Policy { get; }
 
     public bool Authorize(IUser user)
     {
+        ArgumentNullException.ThrowIfNull(user);
+
         if (!user.IsAuthenticated)
         {
             return false;
         }
 
-        if (AuthorizeUserBehaviour == AuthorizePolicy.None)
+        if (Policy == AuthorizePolicy.None)
         {
             return true;
         }
 
-        if (AuthorizeUserBehaviour.HasFlag(AuthorizePolicy.Admin) && user.IsAdmin)
+        if (Policy.HasFlag(AuthorizePolicy.Admin) && user.IsAdmin)
         {
             return true;
         }

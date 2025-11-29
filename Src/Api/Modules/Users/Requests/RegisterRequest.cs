@@ -1,3 +1,3 @@
 namespace Api.Modules.Users.Requests;
 
-public record RegisterRequest(string Username, string Password, string RepeatPassword, string? Email);
+internal sealed record RegisterRequest(string Username, string Password, string RepeatPassword, string? Email);

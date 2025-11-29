@@ -9,11 +9,19 @@ using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Elasticsearch;
 
-public class UserSearchService : IUserSearchService
+public partial class UserSearchService : IUserSearchService
 {
     private readonly ElasticsearchClient _client;
     private readonly ILogger<UserSearchService> _logger;
     private readonly string _indexName;
+
+    [LoggerMessage(LogLevel.Error, "An error has occured during executing elasticsearch query: {Error}")]
+    private static partial void LogElasticsearchQueryError(ILogger logger, string error);
+
+    [LoggerMessage(LogLevel.Error, "Critical error has occured during executing elasticsearch query on index: {IndexName}")]
+    private static partial void LogCriticalElasticsearchQueryError(ILogger logger, string indexName, Exception ex);
+
+
 
     public UserSearchService(
         ElasticsearchClient client,
@@ -22,11 +30,13 @@ public class UserSearchService : IUserSearchService
         _client = client;
         _logger = logger;
 
-        _indexName = nameof(ElasticUser).ToLowerInvariant();
+        _indexName = nameof(ElasticUser).ToUpperInvariant();
     }
 
     public async Task<PagedResult<ElasticUser>> SearchUsersAsync(PagedUserRequest request, CancellationToken cancellationToken = new())
     {
+        ArgumentNullException.ThrowIfNull(request);
+
         // 1. Pagination
         var from = (request.PageNumber - 1) * request.PageSize;
         var size = request.PageSize;
@@ -65,12 +75,12 @@ public class UserSearchService : IUserSearchService
                         .Filter(filterQueries)
                     )
                 )
-                .Sort(sortOptions), cancellationToken);
+                .Sort(sortOptions), cancellationToken).ConfigureAwait(false);
 
             if (!searchResponse.IsValidResponse)
             {
                 var error = searchResponse.ElasticsearchServerError?.ToString() ?? searchResponse.DebugInformation;
-                _logger.LogError("An error has occured during executing elasticsearch query: {Error}", error);
+                LogElasticsearchQueryError(_logger, error);
 
                 return new PagedResult<ElasticUser>
                 {
@@ -90,9 +100,11 @@ public class UserSearchService : IUserSearchService
                 PageSize = request.PageSize
             };
         }
+#pragma warning disable CA1031
         catch (Exception ex)
+#pragma warning restore CA1031
         {
-            _logger.LogError(ex, "Critical error has occured during executing elasticsearch query on index: {IndexName}", _indexName);
+            LogCriticalElasticsearchQueryError(_logger, _indexName, ex);
 
             return new PagedResult<ElasticUser>
             {

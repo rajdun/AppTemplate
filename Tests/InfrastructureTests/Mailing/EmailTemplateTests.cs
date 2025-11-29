@@ -167,7 +167,7 @@ public class EmailTemplateTests
 
         // Assert
         Assert.Single(template.Attachments);
-        Assert.Equal(attachment.FileName, template.Attachments[0].FileName);
+        Assert.Equal(attachment.FileName, template.Attachments.First().FileName);
     }
 }
 

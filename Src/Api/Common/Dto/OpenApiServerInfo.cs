@@ -1,7 +1,7 @@
 namespace Api.Common.Dto;
 
-public class OpenApiServerInfo
+internal sealed class OpenApiServerInfo
 {
-    public string Url { get; set; } = string.Empty;
+    public Uri Url { get; set; } = new Uri("http://localhost:8080");
     public string Description { get; set; } = string.Empty;
 }

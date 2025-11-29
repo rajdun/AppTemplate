@@ -19,32 +19,41 @@ public class DeactivateUserCommandValidator : AbstractValidator<DeactivateUserCo
     }
 }
 
-internal class DeactivateUserCommandHandler(UserManager<ApplicationUser> userManager, ILogger<DeactivateUserCommandHandler> logger)
+internal partial class DeactivateUserCommandHandler(UserManager<ApplicationUser> userManager, ILogger<DeactivateUserCommandHandler> logger)
     : IRequestHandler<DeactivateUserCommand, DeactivateUserResult>
 {
+    [LoggerMessage(Level = LogLevel.Error, Message = "User with ID {UserId} not found for deactivation")]
+    private static partial void LogUserNotFound(ILogger logger, Guid userId);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "User with ID {UserId} is already deactivated")]
+    private static partial void LogUserAlreadyDeactivated(ILogger logger, Guid userId);
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "Failed to deactivate user with ID {UserId}. Errors: {Errors}")]
+    private static partial void LogDeactivationFailed(ILogger logger, Guid userId, string errors);
+
     public async Task<Result<DeactivateUserResult>> Handle(DeactivateUserCommand request, CancellationToken cancellationToken = new CancellationToken())
     {
-        var user = await userManager.FindByIdAsync(request.UserId.ToString());
+        var user = await userManager.FindByIdAsync(request.UserId.ToString()).ConfigureAwait(false);
 
         if (user == null)
         {
-            logger.LogError("User with ID {UserId} not found for deactivation", request.UserId);
+            LogUserNotFound(logger, request.UserId);
             return Result.Fail(UserTranslations.UserNotFound);
         }
 
         if (user.DeactivatedAt is not null)
         {
-            logger.LogWarning("User with ID {UserId} is already deactivated", request.UserId);
+            LogUserAlreadyDeactivated(logger, request.UserId);
             return Result.Fail(UserTranslations.UserNotActive);
         }
 
         user.DeactivatedAt = DateTimeOffset.UtcNow;
 
-        var result = await userManager.UpdateAsync(user);
+        var result = await userManager.UpdateAsync(user).ConfigureAwait(false);
 
         if (!result.Succeeded)
         {
-            logger.LogError("Failed to deactivate user with ID {UserId}. Errors: {Errors}", request.UserId, string.Join(", ", result.Errors.Select(e => e.Description)));
+            LogDeactivationFailed(logger, request.UserId, string.Join(", ", result.Errors.Select(e => e.Description)));
             return Result.Fail(result.Errors.Select(x => x.Description));
         }
 

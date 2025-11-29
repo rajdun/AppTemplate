@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Text;
 using Application.Common;
 using Application.Common.Interfaces;
@@ -35,12 +36,14 @@ using StackExchange.Redis;
 
 namespace Infrastructure;
 
-public static class DependencyInjection
+public static class InfrastructureDependencyInjection
 {
     private const string RedisConnectionStringName = "Redis";
 
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
+        ArgumentNullException.ThrowIfNull(configuration);
+
         services.AddDatabase(configuration);
         services.AddIdentity(configuration);
         services.AddImplementation(configuration);
@@ -55,9 +58,11 @@ public static class DependencyInjection
 
     public static IHostApplicationBuilder AddTelemetry(this WebApplicationBuilder builder)
     {
+        ArgumentNullException.ThrowIfNull(builder);
+
         Log.Logger = new LoggerConfiguration()
             .Enrich.FromLogContext()
-            .WriteTo.Console()
+            .WriteTo.Console(formatProvider: CultureInfo.InvariantCulture)
             .WriteTo.OpenTelemetry(options =>
             {
                 options.Endpoint = builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"] ?? "http://localhost:4317";
@@ -163,10 +168,7 @@ public static class DependencyInjection
             {
                 var key = configuration["JwtSettings:Secret"];
 
-                if (string.IsNullOrWhiteSpace(key))
-                {
-                    throw new ArgumentNullException("JWTSettings:Secret", "JWT Secret is not configured.");
-                }
+                ArgumentException.ThrowIfNullOrWhiteSpace(key);
 
                 options.TokenValidationParameters = new TokenValidationParameters
                 {

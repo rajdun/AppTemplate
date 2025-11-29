@@ -11,13 +11,13 @@ internal sealed class OpenApiDocumentTransformer(OpenApiSettings openApiSettings
     public async Task TransformAsync(OpenApiDocument document, OpenApiDocumentTransformerContext context,
         CancellationToken cancellationToken)
     {
-        document.Servers = openApiSettings.Servers.Select(x => new OpenApiServer()
+        document.Servers = [.. openApiSettings.Servers.Select(x => new OpenApiServer()
         {
             Description = x.Description,
-            Url = x.Url
-        }).ToList();
+            Url = x.Url.ToString()
+        })];
 
-        var authenticationSchemes = await authenticationSchemeProvider.GetAllSchemesAsync();
+        var authenticationSchemes = await authenticationSchemeProvider.GetAllSchemesAsync().ConfigureAwait(false);
         if (authenticationSchemes.Any(authScheme => authScheme.Name == "Bearer"))
         {
             var securitySchemes = new Dictionary<string, IOpenApiSecurityScheme>
@@ -34,6 +34,6 @@ internal sealed class OpenApiDocumentTransformer(OpenApiSettings openApiSettings
             document.Components.SecuritySchemes = securitySchemes;
         }
 
-        await Task.CompletedTask;
+        await Task.CompletedTask.ConfigureAwait(false);
     }
 }

@@ -2,14 +2,13 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Common;
-
-/// <summary>
-///     Handles unhandled exceptions globally and returns a standardized ProblemDetails response.
-/// </summary>
-public class GlobalExceptionHandler : IExceptionHandler
+internal sealed partial class GlobalExceptionHandler : IExceptionHandler
 {
     private readonly IHostEnvironment _environment;
     private readonly ILogger<GlobalExceptionHandler> _logger;
+
+    [LoggerMessage(LogLevel.Error, "An unhandled exception has occurred: {Message}")]
+    private static partial void LogUnhandledException(ILogger logger, string message);
 
     public GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger, IHostEnvironment environment)
     {
@@ -22,7 +21,10 @@ public class GlobalExceptionHandler : IExceptionHandler
         Exception exception,
         CancellationToken cancellationToken)
     {
-        _logger.LogError(exception, "An unhandled exception has occurred: {Message}", exception.Message);
+        ArgumentNullException.ThrowIfNull(httpContext);
+        ArgumentNullException.ThrowIfNull(exception);
+
+        LogUnhandledException(_logger, exception.Message);
 
         var problemDetails = new ProblemDetails
         {
@@ -35,7 +37,7 @@ public class GlobalExceptionHandler : IExceptionHandler
 
         httpContext.Response.StatusCode = problemDetails.Status.Value;
 
-        await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
+        await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken).ConfigureAwait(false);
 
         // Return true to indicate the exception has been handled.
         return true;

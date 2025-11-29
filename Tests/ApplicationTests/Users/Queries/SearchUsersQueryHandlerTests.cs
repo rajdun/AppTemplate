@@ -87,7 +87,7 @@ public class SearchUsersQueryHandlerTests
 
         // Assert
         Assert.False(result.IsValid);
-        Assert.Contains(result.Errors, e => e.PropertyName.Contains("PageNumber"));
+        Assert.Contains(result.Errors, e => e.PropertyName.Contains("PageNumber", StringComparison.InvariantCulture));
     }
 
     [Fact]
@@ -102,7 +102,7 @@ public class SearchUsersQueryHandlerTests
 
         // Assert
         Assert.False(result.IsValid);
-        Assert.Contains(result.Errors, e => e.PropertyName.Contains("PageSize"));
+        Assert.Contains(result.Errors, e => e.PropertyName.Contains("PageSize", StringComparison.InvariantCulture));
     }
 
     [Fact]
@@ -117,7 +117,7 @@ public class SearchUsersQueryHandlerTests
 
         // Assert
         Assert.False(result.IsValid);
-        Assert.Contains(result.Errors, e => e.PropertyName.Contains("PageSize"));
+        Assert.Contains(result.Errors, e => e.PropertyName.Contains("PageSize", StringComparison.InvariantCulture));
     }
 
     [Fact]
@@ -137,7 +137,7 @@ public class SearchUsersQueryHandlerTests
 
         // Assert
         Assert.False(result.IsValid);
-        Assert.Contains(result.Errors, e => e.PropertyName.Contains("SortBy"));
+        Assert.Contains(result.Errors, e => e.PropertyName.Contains("SortBy", StringComparison.InvariantCulture));
     }
 
     [Fact]

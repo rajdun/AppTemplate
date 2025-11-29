@@ -9,16 +9,24 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.Users.NotificationHandlers;
 
-public class UserRegisteredIndexNotificationHandler(ILogger<UserRegisteredSendEmailNotificationHandler> logger, IElasticSearchService<ElasticUser> elasticSearchService, UserManager<ApplicationUser> userManager)
+public partial class UserRegisteredIndexNotificationHandler(ILogger<UserRegisteredSendEmailNotificationHandler> logger, IElasticSearchService<ElasticUser> elasticSearchService, UserManager<ApplicationUser> userManager)
     : IRequestHandler<UserRegistered>
 {
+    [LoggerMessage(LogLevel.Error, "User {Email} not found")]
+    private static partial void LogUserNotFound(ILogger logger, string email);
+
+    [LoggerMessage(LogLevel.Error, "Could not index user {Email}")]
+    private static partial void LogCouldNotIndexUser(ILogger logger, string email);
+
     public async Task<Result> Handle(UserRegistered request, CancellationToken cancellationToken = new())
     {
-        var user = await userManager.FindByNameAsync(request.Name);
+        ArgumentNullException.ThrowIfNull(request);
+
+        var user = await userManager.FindByNameAsync(request.Name).ConfigureAwait(false);
 
         if (user == null)
         {
-            logger.LogError("User {Email} not found", request.Email);
+            LogUserNotFound(logger, request.Email);
             throw new InvalidOperationException("User name not found");
         }
 
@@ -27,11 +35,11 @@ public class UserRegisteredIndexNotificationHandler(ILogger<UserRegisteredSendEm
             Email = request.Email,
             Name = request.Name,
             Id = user.Id.ToString()
-        });
+        }).ConfigureAwait(false);
 
         if (!result)
         {
-            logger.LogError("Could not index user {Email}", request.Email);
+            LogCouldNotIndexUser(logger, request.Email);
             throw new InvalidOperationException("User name not found");
         }
 

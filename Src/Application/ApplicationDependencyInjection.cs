@@ -1,5 +1,5 @@
-using System.Reflection;
-using Application.Common.Mediator;
+﻿using System.Reflection;
+using Application.Common.MediatorPattern;
 using Application.Common.Messaging;
 using Domain.Common;
 using FluentValidation;
@@ -7,12 +7,12 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Application;
 
-public static class DependencyInjection
+public static class ApplicationDependencyInjection
 {
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
-        services.AddMediator(typeof(DependencyInjection).Assembly);
-        services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
+        services.AddMediator(typeof(ApplicationDependencyInjection).Assembly);
+        services.AddValidatorsFromAssembly(typeof(ApplicationDependencyInjection).Assembly);
         services.AddScoped<IOutboxProcessor, OutboxProcessor>();
 
         return services;

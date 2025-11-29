@@ -1,3 +1,3 @@
 namespace Api.Modules.Users.Requests;
 
-public record RefreshTokenRequest(string RefreshToken);
+internal sealed record RefreshTokenRequest(string RefreshToken);

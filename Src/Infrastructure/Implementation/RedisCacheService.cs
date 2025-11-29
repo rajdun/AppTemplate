@@ -10,12 +10,13 @@ public class RedisCacheService : ICacheService
 
     public RedisCacheService(IConnectionMultiplexer redis)
     {
+        ArgumentNullException.ThrowIfNull(redis);
         _db = redis.GetDatabase();
     }
 
     public async Task<T?> GetAsync<T>(string key, CancellationToken cancellationToken = default) where T : class
     {
-        var value = await _db.StringGetAsync(key);
+        var value = await _db.StringGetAsync(key).ConfigureAwait(false);
         if (value.IsNullOrEmpty)
         {
             return null;
@@ -28,11 +29,11 @@ public class RedisCacheService : ICacheService
         CancellationToken cancellationToken = default) where T : class
     {
         var serializedValue = JsonSerializer.Serialize(value);
-        await _db.StringSetAsync(key, serializedValue, expiration);
+        await _db.StringSetAsync(key, serializedValue, expiration).ConfigureAwait(false);
     }
 
     public async Task RemoveAsync(string key, CancellationToken cancellationToken = default)
     {
-        await _db.KeyDeleteAsync(key);
+        await _db.KeyDeleteAsync(key).ConfigureAwait(false);
     }
 }

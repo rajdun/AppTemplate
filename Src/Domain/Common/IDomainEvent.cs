@@ -2,7 +2,9 @@ using System.Reflection;
 
 namespace Domain.Common;
 
+#pragma warning disable CA1040
 public interface IDomainEvent : IRequest
+#pragma warning restore CA1040
 {
 
 }

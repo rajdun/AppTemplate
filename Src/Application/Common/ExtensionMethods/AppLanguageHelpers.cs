@@ -8,18 +8,18 @@ public static class AppLanguageHelpers
     {
         return language switch
         {
-            ValueObjects.AppLanguage.Pl => "pl",
-            ValueObjects.AppLanguage.En => "en",
-            _ => "en"
+            ValueObjects.AppLanguage.Pl => "PL",
+            ValueObjects.AppLanguage.En => "EN",
+            _ => "EN"
         };
     }
 
     public static ValueObjects.AppLanguage FromString(string languageCode)
     {
-        return languageCode.ToLower(CultureInfo.InvariantCulture) switch
+        return languageCode?.ToUpperInvariant() switch
         {
-            "pl" => ValueObjects.AppLanguage.Pl,
-            "en" => ValueObjects.AppLanguage.En,
+            "PL" => ValueObjects.AppLanguage.Pl,
+            "EN" => ValueObjects.AppLanguage.En,
             _ => ValueObjects.AppLanguage.En
         };
     }

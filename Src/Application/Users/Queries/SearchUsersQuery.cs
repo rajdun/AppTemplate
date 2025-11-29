@@ -32,6 +32,6 @@ internal class SearchUsersQueryHandler(IUserSearchService userSearchService)
 {
     public async Task<Result<PagedResult<ElasticUser>>> Handle(SearchUsersQuery request, CancellationToken cancellationToken = new CancellationToken())
     {
-        return await userSearchService.SearchUsersAsync(request.Request, cancellationToken);
+        return await userSearchService.SearchUsersAsync(request.Request, cancellationToken).ConfigureAwait(false);
     }
 }

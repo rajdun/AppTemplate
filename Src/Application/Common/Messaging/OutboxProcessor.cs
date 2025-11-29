@@ -19,15 +19,51 @@ public class OutboxProcessor(
 {
     private const string RawSql = @"
         SELECT * FROM ""Messaging"".""OutboxMessages""
-        WHERE ""ProcessedAt"" IS NULL 
+        WHERE ""ProcessedAt"" IS NULL
         AND (""NextAttemptAt"" IS NULL OR ""NextAttemptAt"" <= NOW())
         ORDER BY ""CreatedAt""
         LIMIT 20
         FOR UPDATE SKIP LOCKED";
 
+    private static readonly Action<ILogger, Exception?> _logProcessingOutbox =
+        LoggerMessage.Define(
+            LogLevel.Information,
+            new EventId(1, nameof(ProcessOutboxMessagesAsync)),
+            "Processing outbox messages...");
+
+    private static readonly Action<ILogger, Exception?> _logDatabaseError =
+        LoggerMessage.Define(
+            LogLevel.Error,
+            new EventId(2, nameof(ProcessOutboxMessagesAsync)),
+            "Database error while fetching outbox messages. Will retry on next run.");
+
+    private static readonly Action<ILogger, Exception?> _logNoMessages =
+        LoggerMessage.Define(
+            LogLevel.Debug,
+            new EventId(3, nameof(ProcessOutboxMessagesAsync)),
+            "No new outbox messages to process.");
+
+    private static readonly Action<ILogger, Guid, string, Exception?> _logEnqueuing =
+        LoggerMessage.Define<Guid, string>(
+            LogLevel.Information,
+            new EventId(4, nameof(ProcessOutboxMessagesAsync)),
+            "Enqueuing event {EventId} ({EventType}) to Hangfire");
+
+    private static readonly Action<ILogger, Guid, Exception?> _logEnqueueError =
+        LoggerMessage.Define<Guid>(
+            LogLevel.Error,
+            new EventId(5, nameof(ProcessOutboxMessagesAsync)),
+            "Failed to enqueue message {MessageId} to Hangfire. Will retry on next run.");
+
+    private static readonly Action<ILogger, int, Exception?> _logFinished =
+        LoggerMessage.Define<int>(
+            LogLevel.Information,
+            new EventId(6, nameof(ProcessOutboxMessagesAsync)),
+            "Finished processing batch of {Count} outbox messages.");
+
     public async Task ProcessOutboxMessagesAsync(CancellationToken cancellationToken = default)
     {
-        logger.LogInformation("Processing outbox messages...");
+        _logProcessingOutbox(logger, null);
 
         List<OutboxMessage> messages;
         try
@@ -35,17 +71,19 @@ public class OutboxProcessor(
             messages = await dbContext.OutboxMessages
                 .FromSqlRaw(RawSql)
                 .AsTracking()
-                .ToListAsync(cancellationToken);
+                .ToListAsync(cancellationToken).ConfigureAwait(false);
         }
+#pragma warning disable CA1031 // Do not catch general exception types - Infrastructure code needs to handle all errors
         catch (Exception ex)
+#pragma warning restore CA1031 // Do not catch general exception types
         {
-            logger.LogError(ex, "Database error while fetching outbox messages. Will retry on next run.");
+            _logDatabaseError(logger, ex);
             return;
         }
 
         if (messages.Count == 0)
         {
-            logger.LogDebug("No new outbox messages to process.");
+            _logNoMessages(logger, null);
             return;
         }
 
@@ -55,8 +93,7 @@ public class OutboxProcessor(
         {
             try
             {
-                logger.LogInformation("Enqueuing event {EventId} ({EventType}) to Hangfire", message.Id,
-                    message.EventType);
+                _logEnqueuing(logger, message.Id, message.EventType, null);
 
                 backgroundJobClient.Enqueue<IHangfireJobExecutor>(executor =>
                     executor.ProcessEventAsync(message.EventType, message.EventPayload, CancellationToken.None)
@@ -65,15 +102,17 @@ public class OutboxProcessor(
                 message.ProcessedAt = utcNow;
                 message.Error = null;
             }
+#pragma warning disable CA1031 // Do not catch general exception types - Infrastructure code needs to handle all errors
             catch (Exception ex)
+#pragma warning restore CA1031 // Do not catch general exception types
             {
-                logger.LogError(ex, "Failed to enqueue message {MessageId} to Hangfire. Will retry on next run.",
-                    message.Id);
+                _logEnqueueError(logger, message.Id, ex);
                 message.Error = $"Failed to enqueue: {ex.Message}";
             }
         }
 
-        await dbContext.SaveChangesAsync(cancellationToken);
-        logger.LogInformation("Finished processing batch of {Count} outbox messages.", messages.Count);
+        await dbContext.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
+        _logFinished(logger, messages.Count, null);
     }
 }
+

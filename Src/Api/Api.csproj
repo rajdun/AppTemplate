@@ -13,6 +13,8 @@
         <WarningLevel>4</WarningLevel>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <OpenApiDocumentsDirectory>.</OpenApiDocumentsDirectory>
+
+        <NoWarn>$(NoWarn);CA1812</NoWarn>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -51,6 +53,21 @@
         <ProjectReference Include="..\Application\Application.csproj"/>
         <ProjectReference Include="..\Domain\Domain.csproj"/>
         <ProjectReference Include="..\Infrastructure\Infrastructure.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Update="Resources\ApiResources.resx">
+        <Generator>ResXFileCodeGenerator</Generator>
+        <LastGenOutput>ApiResources.Designer.cs</LastGenOutput>
+      </EmbeddedResource>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Compile Update="Resources\ApiResources.Designer.cs">
+        <DesignTime>True</DesignTime>
+        <AutoGen>True</AutoGen>
+        <DependentUpon>ApiResources.resx</DependentUpon>
+      </Compile>
     </ItemGroup>
 
 </Project>

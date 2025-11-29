@@ -30,7 +30,7 @@ public class DomainEventToOutboxInterceptorTests
             .AddInterceptors(_interceptor)
             .Options;
 
-        await using var context = new TestDbContext(options);
+        using var context = new TestDbContext(options);
 
         var entity = new TestEntity();
         entity.AddDomainNotification(new TestDomainNotification { Message = "Test Event" });
@@ -43,8 +43,8 @@ public class DomainEventToOutboxInterceptorTests
         // Assert
         var outboxMessages = await context.OutboxMessages.ToListAsync();
         Assert.Single(outboxMessages);
-        Assert.Contains("InfrastructureTests.Data.DomainEventToOutboxInterceptorTests+TestDomainNotification, InfrastructureTests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", outboxMessages[0].EventType);
-        Assert.Contains("Test Event", outboxMessages[0].EventPayload);
+        Assert.Contains("InfrastructureTests.Data.DomainEventToOutboxInterceptorTests+TestDomainNotification, InfrastructureTests, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null", outboxMessages[0].EventType, StringComparison.InvariantCulture);
+        Assert.Contains("Test Event", outboxMessages[0].EventPayload, StringComparison.InvariantCulture);
         Assert.Empty(entity.DomainNotifications);
     }
 
@@ -57,7 +57,7 @@ public class DomainEventToOutboxInterceptorTests
             .AddInterceptors(_interceptor)
             .Options;
 
-        await using var context = new TestDbContext(options);
+        using var context = new TestDbContext(options);
 
         var entity = new TestEntity();
         entity.AddDomainNotification(new TestDomainNotification { Message = "Event 1" });
@@ -84,7 +84,7 @@ public class DomainEventToOutboxInterceptorTests
             .AddInterceptors(_interceptor)
             .Options;
 
-        await using var context = new TestDbContext(options);
+        using var context = new TestDbContext(options);
 
         var entity = new TestEntity();
         context.TestEntities.Add(entity);
@@ -106,7 +106,7 @@ public class DomainEventToOutboxInterceptorTests
             .AddInterceptors(_interceptor)
             .Options;
 
-        await using var context = new TestDbContext(options);
+        using var context = new TestDbContext(options);
 
         var entity1 = new TestEntity();
         entity1.AddDomainNotification(new TestDomainNotification { Message = "Entity 1 Event" });
@@ -136,7 +136,7 @@ public class DomainEventToOutboxInterceptorTests
             .AddInterceptors(_interceptor)
             .Options;
 
-        await using var context = new TestDbContext(options);
+        using var context = new TestDbContext(options);
 
         var entity = new TestEntity();
         entity.AddDomainNotification(new TestDomainNotification { Message = "Test" });

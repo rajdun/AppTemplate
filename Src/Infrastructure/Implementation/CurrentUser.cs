@@ -50,14 +50,17 @@ internal class CurrentUser : IUser
         }
 
         // Asynchronously check if the token has been revoked.
-        var revokedJti = await cacheService.GetAsync<string>(CacheKeys.GetJtiCacheKey(jti));
+        var revokedJti = await cacheService.GetAsync<string>(CacheKeys.GetJtiCacheKey(jti)).ConfigureAwait(false);
         if (revokedJti != "valid")
         {
             return currentUser;
         }
 
         // If all checks pass, populate the user properties.
-        Guid.TryParse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var userId);
+        if (!Guid.TryParse(user.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var userId))
+        {
+            return currentUser;
+        }
 
         return new CurrentUser
         {

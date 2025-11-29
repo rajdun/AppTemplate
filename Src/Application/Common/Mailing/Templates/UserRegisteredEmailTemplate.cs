@@ -12,7 +12,7 @@ public sealed class UserRegisteredEmailTemplate : EmailTemplate
     {
         AppLanguage.En => $"Welcome to {ApplicationName}!",
         AppLanguage.Pl => $"Witamy w {ApplicationName}!",
-        _ => throw new NotImplementedException("Subject not implemented for the specified language.")
+        _ => throw new NotSupportedException($"Subject not implemented for the specified language: {Language}.")
     };
 
     public UserRegisteredEmailTemplate(string userName, string applicationName, AppLanguage language = AppLanguage.Pl)

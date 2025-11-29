@@ -9,11 +9,20 @@ using SortOrder = Elastic.Clients.Elasticsearch.SortOrder;
 
 namespace Infrastructure.Elasticsearch;
 
-internal class ElasticSearchService<T> : IElasticSearchService<T> where T : class, IElasticDocument
+internal partial class ElasticSearchService<T> : IElasticSearchService<T> where T : class, IElasticDocument
 {
     private readonly ElasticsearchClient _client;
     private readonly ILogger<ElasticSearchService<T>> _logger;
     private readonly string _indexName;
+
+    [LoggerMessage(LogLevel.Error, "An error has occured while indexing document {Id} in index {Index}: {Error}")]
+    private static partial void LogIndexingError(ILogger logger, string id, string index, string error);
+
+    [LoggerMessage(LogLevel.Warning, "Could not retrieve document {Id} from index {Index}: {Error}")]
+    private static partial void LogRetrievalWarning(ILogger logger, string id, string index, string error);
+
+    [LoggerMessage(LogLevel.Error, "An error has occured while deleting document {Id} from index {Index}: {Error}")]
+    private static partial void LogDeletionError(ILogger logger, string id, string index, string error);
 
     public ElasticSearchService(
         ElasticsearchClient client,
@@ -22,7 +31,7 @@ internal class ElasticSearchService<T> : IElasticSearchService<T> where T : clas
         _client = client;
         _logger = logger;
 
-        _indexName = typeof(T).Name.ToLowerInvariant();
+        _indexName = typeof(T).Name.ToUpperInvariant();
     }
 
 
@@ -31,12 +40,11 @@ internal class ElasticSearchService<T> : IElasticSearchService<T> where T : clas
         var response = await _client.IndexAsync(document, req => req
             .Index(_indexName)
             .Id(document.Id)
-        );
+        ).ConfigureAwait(false);
 
         if (!response.IsSuccess())
         {
-            _logger.LogError("An error has occured while indexing document {Id} in index {Index}: {Error}", document.Id,
-                _indexName, response.DebugInformation);
+            LogIndexingError(_logger, document.Id, _indexName, response.DebugInformation);
             return false;
         }
 
@@ -45,11 +53,10 @@ internal class ElasticSearchService<T> : IElasticSearchService<T> where T : clas
 
     public async Task<T?> GetDocumentAsync(string id)
     {
-        var response = await _client.GetAsync<T>(id, cfg => cfg.Index(_indexName));
+        var response = await _client.GetAsync<T>(id, cfg => cfg.Index(_indexName)).ConfigureAwait(false);
         if (!response.IsSuccess())
         {
-            _logger.LogWarning("Could not retrieve document {Id} from index {Index}: {Error}", id, _indexName,
-                response.DebugInformation);
+            LogRetrievalWarning(_logger, id, _indexName, response.DebugInformation);
             return null;
         }
 
@@ -58,11 +65,10 @@ internal class ElasticSearchService<T> : IElasticSearchService<T> where T : clas
 
     public async Task<bool> DeleteDocumentAsync(string id)
     {
-        var response = await _client.DeleteAsync(_indexName, id);
+        var response = await _client.DeleteAsync(_indexName, id).ConfigureAwait(false);
         if (!response.IsSuccess())
         {
-            _logger.LogError("An error has occured while deleting document {Id} from index {Index}: {Error}", id,
-                _indexName, response.DebugInformation);
+            LogDeletionError(_logger, id, _indexName, response.DebugInformation);
             return false;
         }
 

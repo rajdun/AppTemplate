@@ -1,5 +1,5 @@
 using Application.Common.Interfaces;
-using Application.Common.Mediator;
+using Application.Common.MediatorPattern;
 using Application.Resources;
 using Application.Users.Dto;
 using Domain.Common;
@@ -35,13 +35,13 @@ internal class RefreshTokenCommandHandler(
     {
         var refreshToken = CacheKeys.GetRefreshTokenCacheKey(currentUser.UserId.ToString());
 
-        var cachedToken = await cacheService.GetAsync<string>(refreshToken, cancellationToken);
+        var cachedToken = await cacheService.GetAsync<string>(refreshToken, cancellationToken).ConfigureAwait(false);
         if (cachedToken == null || cachedToken != request.RefreshToken)
         {
             return Result.Fail(UserTranslations.InvalidRefreshToken);
         }
 
-        var user = await userManager.FindByIdAsync(currentUser.UserId.ToString());
+        var user = await userManager.FindByIdAsync(currentUser.UserId.ToString()).ConfigureAwait(false);
         if (user == null)
         {
             return Result.Fail(UserTranslations.InvalidRefreshToken);
@@ -52,10 +52,10 @@ internal class RefreshTokenCommandHandler(
             return Result.Fail(UserTranslations.UserNotActive);
         }
 
-        var newJwtToken = await jwtTokenGenerator.GenerateToken(user);
+        var newJwtToken = await jwtTokenGenerator.GenerateToken(user).ConfigureAwait(false);
         var newRefreshToken = jwtTokenGenerator.GenerateRefreshToken();
 
-        await cacheService.SetAsync(refreshToken, newRefreshToken, TimeSpan.FromDays(7), cancellationToken);
+        await cacheService.SetAsync(refreshToken, newRefreshToken, TimeSpan.FromDays(7), cancellationToken).ConfigureAwait(false);
 
         return Result.Ok(new TokenResult(newJwtToken, newRefreshToken));
     }

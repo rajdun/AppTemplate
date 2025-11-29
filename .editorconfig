@@ -10,47 +10,28 @@ insert_final_newline = true
 indent_style = space
 indent_size = 4
 
-# Ustawienia specyficzne dla C#
+# ==========================================
+# Ustawienia specyficzne dla C# (STRICT GLOBAL)
+# ==========================================
 [*.cs]
 
-# ==========================================
 # 1. STRICT: Jawność i kolejność
-# ==========================================
-
-# Wymagaj jawnych modyfikatorów dostępu (np. 'private void', a nie samo 'void')
-# Ustawione na WARNING - będzie krzyczeć, jak ktoś zapomni.
 dotnet_style_require_accessibility_modifiers = always:warning
-
-# Kolejność: public static async void... (standardowa, nie zmieniaj jej dla czytelności)
 csharp_preferred_modifier_order = public, private, protected, internal, file, new, static, abstract, virtual, sealed, readonly, override, extern, unsafe, volatile, async, required:warning
 
-# ==========================================
 # 2. STRICT: Czystość kodu (Unikanie 'this.')
-# ==========================================
-
-# Nie używaj 'this.', chyba że to absolutnie konieczne.
 dotnet_style_qualification_for_field = false:warning
 dotnet_style_qualification_for_property = false:warning
 dotnet_style_qualification_for_method = false:warning
 dotnet_style_qualification_for_event = false:warning
 
-# ==========================================
 # 3. STRICT: Nowoczesne funkcje języka
-# ==========================================
-
-# Wymuszaj 'var', gdy typ jest oczywisty (np. var x = new List<int>())
 csharp_style_var_when_type_is_apparent = true:warning
 csharp_style_var_for_built_in_types = true:warning
 csharp_style_var_elsewhere = true:suggestion
-
-# Wymuszaj klamry {} nawet dla jednolinijkowych if-ów (bardzo ważne dla bezpieczeństwa!)
 csharp_prefer_braces = true:warning
 
-# ==========================================
-# 4. Nazewnictwo (Naming Conventions)
-# ==========================================
-
-# Interfejsy muszą zaczynać się od 'I' (np. ISerwis)
+# 4. Nazewnictwo (Interfejsy 'I', Async na końcu)
 dotnet_naming_rule.interface_should_be_pascal_case.severity = warning
 dotnet_naming_rule.interface_should_be_pascal_case.symbols = interface
 dotnet_naming_rule.interface_should_be_pascal_case.style = pascal_case_interface
@@ -60,7 +41,6 @@ dotnet_naming_symbols.interface.applicable_accessibilities = *
 dotnet_naming_style.pascal_case_interface.required_prefix = I
 dotnet_naming_style.pascal_case_interface.capitalization = pascal_case
 
-# Pola asynchroniczne powinny kończyć się na 'Async' (dobra praktyka, choć opcjonalna)
 dotnet_naming_rule.async_methods_must_end_with_async.severity = suggestion
 dotnet_naming_rule.async_methods_must_end_with_async.symbols = async_methods
 dotnet_naming_rule.async_methods_must_end_with_async.style = async_suffix
@@ -68,6 +48,78 @@ dotnet_naming_rule.async_methods_must_end_with_async.style = async_suffix
 dotnet_naming_symbols.async_methods.applicable_kinds = method
 dotnet_naming_symbols.async_methods.applicable_accessibilities = *
 dotnet_naming_symbols.async_methods.required_modifiers = async
-
 dotnet_naming_style.async_suffix.required_suffix = Async
 dotnet_naming_style.async_suffix.capitalization = pascal_case
+
+# ==============================================================================
+# NADPISANIE: MIGRACJE I TESTY (Wyłącz restrykcje)
+# ==============================================================================
+
+# Grupa 1: Migracje (traktowane jako kod generowany)
+[{**/Migrations/*.cs,**/*ModelSnapshot.cs}]
+generated_code = true
+
+# Grupa 2: Testy
+[{**/{test,tests,Test,Tests}/**/*.cs,*Tests.cs,*Specs.cs}]
+
+# ==============================================================================
+# ZASADY RESETUJĄCE (Dla obu grup powyżej)
+# Te sekcje poniżej aplikują się do plików pasujących do powyższych wzorców
+# Musimy powtórzyć wzorzec, aby zastosować reguły
+# ==============================================================================
+
+[{**/Migrations/*.cs,**/*ModelSnapshot.cs,**/{test,tests,Test,Tests}/**/*.cs,*Tests.cs,*Specs.cs}]
+
+# --------------------------------------------------------
+# 1. WYŁĄCZANIE STYLI (Formatowanie)
+# --------------------------------------------------------
+# Tutaj używamy :silent, aby wyciszyć wymogi stylowe "hurtowo"
+
+# Nie wymuszaj modyfikatorów (public/private)
+dotnet_style_require_accessibility_modifiers = always:silent
+
+# Pozwól na 'this.' wszędzie
+dotnet_style_qualification_for_field = false:silent
+dotnet_style_qualification_for_property = false:silent
+dotnet_style_qualification_for_method = false:silent
+dotnet_style_qualification_for_event = false:silent
+
+# Pozwól na brak klamer if (opcjonalne, ale w testach czasem się przydaje)
+csharp_prefer_braces = true:silent
+
+# Pozwól na jawne typy (int x = 5) zamiast var
+csharp_style_var_when_type_is_apparent = true:silent
+csharp_style_var_for_built_in_types = true:silent
+csharp_style_var_elsewhere = true:silent
+
+# --------------------------------------------------------
+# 2. WYŁĄCZANIE REGUŁ JAKOŚCI (Code Analysis) GRUPAMI
+# --------------------------------------------------------
+# Zamiast wpisywać CA1707, CA1307 itd., wyłączamy całe kategorie.
+
+# Wyłącz całą kategorię NAZEWNICTWO (Naming)
+# To załatwia błędy o podkreślnikach (CA1707) i inne problemy z nazwami
+dotnet_analyzer_diagnostic.category-Naming.severity = none
+
+# Wyłącz całą kategorię GLOBALIZACJA (Globalization)
+# To załatwia błędy o StringComparison, CultureInfo itp. (CA1307, CA1305)
+dotnet_analyzer_diagnostic.category-Globalization.severity = none
+
+# Wyłącz całą kategorię WYDAJNOŚĆ (Performance)
+# To załatwia błędy o CA1812 (nieużywane klasy), CA1822 (static) itp.
+dotnet_analyzer_diagnostic.category-Performance.severity = none
+
+# Wyłącz całą kategorię UTRZYMANIE (Maintainability)
+# To załatwia błędy o zbyt dużych metodach czy zagnieżdżeniach (CA1505)
+dotnet_analyzer_diagnostic.category-Maintainability.severity = none
+
+# Wyłącz całą kategorię NIEZAWODNOŚĆ (Reliability)
+# Np. CA2007 (ConfigureAwait)
+dotnet_analyzer_diagnostic.category-Reliability.severity = none
+
+# Wyłącz całą kategorię PROJEKTOWANIE (Design)
+# Np. CA1062 (walidacja nulli), CA1054 (parametry ref)
+dotnet_analyzer_diagnostic.category-Design.severity = none
+
+# Opcjonalnie: Wyłącz błędy dokumentacji (brak XML comments)
+dotnet_diagnostic.CS1591.severity = none

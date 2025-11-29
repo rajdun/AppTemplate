@@ -90,9 +90,9 @@ public class EmailTemplateTests
 
         // Assert
         Assert.Single(template.Attachments);
-        Assert.Equal("test.pdf", template.Attachments[0].FileName);
-        Assert.Equal(new byte[] { 1, 2, 3 }, template.Attachments[0].Content);
-        Assert.Equal("application/pdf", template.Attachments[0].ContentType);
+        Assert.Equal("test.pdf", template.Attachments.First().FileName);
+        Assert.Equal(new byte[] { 1, 2, 3 }, template.Attachments.First().Content);
+        Assert.Equal("application/pdf", template.Attachments.First().ContentType);
     }
 
     [Fact]

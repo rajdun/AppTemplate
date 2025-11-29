@@ -32,9 +32,9 @@ internal sealed class LoginCommandHandler(
 {
     public async Task<Result<TokenResult>> Handle(LoginCommand request, CancellationToken cancellationToken = new())
     {
-        var user = await userManager.FindByNameAsync(request.Username);
+        var user = await userManager.FindByNameAsync(request.Username).ConfigureAwait(false);
 
-        if (user == null || !await userManager.CheckPasswordAsync(user, request.Password))
+        if (user == null || !await userManager.CheckPasswordAsync(user, request.Password).ConfigureAwait(false))
         {
             return Result.Fail<TokenResult>(UserTranslations.InvalidPasswordOrUsername);
         }
@@ -44,12 +44,12 @@ internal sealed class LoginCommandHandler(
             return Result.Fail(UserTranslations.UserNotActive);
         }
 
-        var token = await jwtTokenGenerator.GenerateToken(user);
+        var token = await jwtTokenGenerator.GenerateToken(user).ConfigureAwait(false);
         var refreshToken = jwtTokenGenerator.GenerateRefreshToken();
 
         var refreshTokenKey = CacheKeys.GetRefreshTokenCacheKey(user.Id.ToString());
 
-        await cacheService.SetAsync(refreshTokenKey, refreshToken, TimeSpan.FromDays(7), cancellationToken);
+        await cacheService.SetAsync(refreshTokenKey, refreshToken, TimeSpan.FromDays(7), cancellationToken).ConfigureAwait(false);
 
         return Result.Ok(new TokenResult(token, refreshToken));
     }

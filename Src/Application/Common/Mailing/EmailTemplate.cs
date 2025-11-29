@@ -9,10 +9,12 @@ public abstract class EmailTemplate
     public abstract string Subject { get; }
     public abstract object[] GetParameters();
 
-    public List<EmailAttachment> Attachments { get; init; } = new();
+    public ICollection<EmailAttachment> Attachments { get; init; } = [];
     public string? ReplyTo { get; init; }
-    public List<string> Cc { get; init; } = new();
-    public List<string> Bcc { get; init; } = new();
+    public ICollection<string> Cc { get; init; } = [];
+    public ICollection<string> Bcc { get; init; } = [];
 }
 
+#pragma warning disable CA1819
 public record EmailAttachment(string FileName, byte[] Content, string ContentType);
+#pragma warning restore CA1819

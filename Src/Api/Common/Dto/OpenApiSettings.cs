@@ -1,6 +1,6 @@
 namespace Api.Common.Dto;
 
-public class OpenApiSettings
+internal sealed class OpenApiSettings
 {
-    public List<OpenApiServerInfo> Servers { get; set; } = new();
+    internal List<OpenApiServerInfo> Servers { get; set; } = [];
 }

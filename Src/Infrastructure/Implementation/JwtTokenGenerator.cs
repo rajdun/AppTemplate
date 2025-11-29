@@ -45,7 +45,7 @@ internal class JwtTokenGenerator : IJwtTokenGenerator
             expires: _dateTimeProvider.UtcNow.AddMinutes(_jwtSettings.Value.ExpiryMinutes),
             signingCredentials: credentials);
 
-        await _cacheService.SetAsync(CacheKeys.GetJtiCacheKey(jti.ToString()), "valid", TimeSpan.FromMinutes(_jwtSettings.Value.ExpiryMinutes));
+        await _cacheService.SetAsync(CacheKeys.GetJtiCacheKey(jti.ToString()), "valid", TimeSpan.FromMinutes(_jwtSettings.Value.ExpiryMinutes)).ConfigureAwait(false);
 
         return new JwtSecurityTokenHandler().WriteToken(token);
     }

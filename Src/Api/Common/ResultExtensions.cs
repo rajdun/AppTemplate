@@ -5,7 +5,7 @@ using System.Collections.Generic;
 
 namespace Api.Common;
 
-public static class ResultExtensions
+internal static class ResultExtensions
 {
     public static IResult ToHttpResult<TValue>(this Result<TValue> result)
     {
@@ -34,7 +34,9 @@ public static class ResultExtensions
 
     private static IResult MapToProblemDetails(ResultBase result)
     {
+#pragma warning disable CA1826
         var firstError = result.Errors.FirstOrDefault();
+#pragma warning restore CA1826
 
         var errorsDict = result.Errors
             .GroupBy(e => (string?)e.Metadata.GetValueOrDefault("PropertyName", "GeneralErrors"))
@@ -92,7 +94,8 @@ public static class ResultExtensions
         }
     }
 
-    private static IResult CreateProblemResult(int statusCode, string title, string detail, IDictionary<string, string[]>? errors = null)
+    private static IResult CreateProblemResult(int statusCode, string title, string detail,
+        Dictionary<string, string[]>? errors = null)
     {
         var problemDetails = new ProblemDetails
         {

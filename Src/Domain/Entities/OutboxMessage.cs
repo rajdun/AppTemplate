@@ -15,6 +15,6 @@ public class OutboxMessage
 
 
     public string? Error { get; set; }
-    public int RetryCount { get; set; } = 0;
+    public int RetryCount { get; set; }
     public DateTime? NextAttemptAt { get; set; }
 }

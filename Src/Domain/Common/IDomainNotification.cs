@@ -4,7 +4,9 @@ using Microsoft.Extensions.Logging;
 
 namespace Domain.Common;
 
+#pragma warning disable CA1040
 public interface IDomainNotification : IRequest
+#pragma warning restore CA1040
 {
 }
 
@@ -13,7 +15,7 @@ public interface IDomainNotificationDeserializer
     public dynamic? Deserialize(string eventType, string eventPayload);
 }
 
-public class DomainNotificationDeserializer : IDomainNotificationDeserializer
+public partial class DomainNotificationDeserializer : IDomainNotificationDeserializer
 {
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
@@ -35,7 +37,7 @@ public class DomainNotificationDeserializer : IDomainNotificationDeserializer
     {
         if (!_eventTypes.TryGetValue(eventType, out var type))
         {
-            Console.WriteLine($"Error: Event type '{eventType}' not found.");
+            LogEventTypeNotFound(eventType);
             return null;
         }
 
@@ -45,14 +47,26 @@ public class DomainNotificationDeserializer : IDomainNotificationDeserializer
         }
         catch (JsonException ex)
         {
-            _logger.LogError(ex, "JSON deserialization error for event type {EventType}", eventType);
+            LogJsonError(ex, eventType);
             return null;
         }
     }
 
     public static IEnumerable<Type> ScanDomainNotificationsTypes(Assembly assembly)
     {
+        ArgumentNullException.ThrowIfNull(assembly);
+
         return assembly.GetTypes()
             .Where(t => t.IsClass && !t.IsAbstract && typeof(IDomainNotification).IsAssignableFrom(t));
     }
+
+    [LoggerMessage(
+        Level = LogLevel.Error,
+        Message = "JSON deserialization error for event type {EventType}")]
+    private partial void LogJsonError(Exception ex, string eventType);
+
+    [LoggerMessage(
+        Level = LogLevel.Warning,
+        Message = "Event type '{EventType}' not found.")]
+    private partial void LogEventTypeNotFound(string eventType);
 }

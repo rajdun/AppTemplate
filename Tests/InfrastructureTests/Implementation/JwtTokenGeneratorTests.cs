@@ -12,7 +12,7 @@ namespace InfrastructureTests.Implementation;
 
 public class JwtTokenGeneratorTests
 {
-    private readonly IJwtTokenGenerator _sut;
+    private readonly JwtTokenGenerator _sut;
     private readonly JwtSettings _jwtSettings;
     private readonly DateTime _now;
     private readonly ICacheService _cacheService;

@@ -42,7 +42,9 @@ public class RegisterCommandHandler(
 {
     public async Task<Result<TokenResult>> Handle(RegisterCommand request, CancellationToken cancellationToken = new())
     {
-        var existingUser = await userManager.FindByNameAsync(request.Username);
+        ArgumentNullException.ThrowIfNull(request);
+
+        var existingUser = await userManager.FindByNameAsync(request.Username).ConfigureAwait(false);
         if (existingUser != null)
         {
             return Result.Fail<TokenResult>(UserTranslations.UsernameAlreadyExists);
@@ -50,18 +52,18 @@ public class RegisterCommandHandler(
 
         var newUser = ApplicationUser.Create(request.Username, request.Email, user.Language.ToString());
 
-        var createResult = await userManager.CreateAsync(newUser, request.Password);
+        var createResult = await userManager.CreateAsync(newUser, request.Password).ConfigureAwait(false);
         if (!createResult.Succeeded)
         {
             var errors = createResult.Errors.Select(e => e.Description).ToList();
             return Result.Fail<TokenResult>(errors);
         }
 
-        var token = await jwtTokenGenerator.GenerateToken(newUser);
+        var token = await jwtTokenGenerator.GenerateToken(newUser).ConfigureAwait(false);
         var refreshToken = jwtTokenGenerator.GenerateRefreshToken();
 
         var refreshTokenKey = CacheKeys.GetRefreshTokenCacheKey(newUser.Id.ToString());
-        await cacheService.SetAsync(refreshTokenKey, refreshToken, TimeSpan.FromDays(7), cancellationToken);
+        await cacheService.SetAsync(refreshTokenKey, refreshToken, TimeSpan.FromDays(7), cancellationToken).ConfigureAwait(false);
 
         return Result.Ok(new TokenResult(token, refreshToken));
     }

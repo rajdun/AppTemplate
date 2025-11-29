@@ -26,4 +26,4 @@ using (var scope = host.Services.CreateScope())
     );
 }
 
-await host.RunAsync();
+await host.RunAsync().ConfigureAwait(false);

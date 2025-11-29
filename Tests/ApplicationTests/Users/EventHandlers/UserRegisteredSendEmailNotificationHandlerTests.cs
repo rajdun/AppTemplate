@@ -63,7 +63,9 @@ public class UserRegisteredSendEmailNotificationHandlerTests
     {
         // Arrange
         var domainEvent = new UserRegistered("testuser", "test@test.com", "en");
+#pragma warning disable CA2201
         var exception = new Exception("SMTP connection failed");
+#pragma warning restore CA2201
 
         _emailService.SendTemplatedEmailAsync(
             Arg.Any<string>(),
@@ -84,7 +86,9 @@ public class UserRegisteredSendEmailNotificationHandlerTests
     {
         // Arrange
         var domainEvent = new UserRegistered("testuser", "test@test.com", "en");
+#pragma warning disable CA2201
         var exception = new Exception("SMTP connection failed");
+#pragma warning restore CA2201
 
         _emailService.SendTemplatedEmailAsync(
             Arg.Any<string>(),

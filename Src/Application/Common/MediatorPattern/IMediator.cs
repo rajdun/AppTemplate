@@ -1,7 +1,7 @@
 using Domain.Common;
 using FluentResults;
 
-namespace Application.Common.Mediator;
+namespace Application.Common.MediatorPattern;
 
 public interface IMediator
 {

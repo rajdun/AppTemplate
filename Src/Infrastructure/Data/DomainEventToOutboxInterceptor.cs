@@ -11,6 +11,7 @@ public class DomainEventToOutboxInterceptor(IDateTimeProvider dateTimeProvider)
 {
     public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
     {
+        ArgumentNullException.ThrowIfNull(eventData);
         ConvertDomainEventsToOutboxMessages(eventData.Context);
         return base.SavingChanges(eventData, result);
     }
@@ -19,6 +20,7 @@ public class DomainEventToOutboxInterceptor(IDateTimeProvider dateTimeProvider)
         InterceptionResult<int> result,
         CancellationToken cancellationToken = new())
     {
+        ArgumentNullException.ThrowIfNull(eventData);
         ConvertDomainEventsToOutboxMessages(eventData.Context);
         return base.SavingChangesAsync(eventData, result, cancellationToken);
     }

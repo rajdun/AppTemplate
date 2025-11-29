@@ -26,17 +26,17 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser, A
 
     public async Task<IDbContextTransaction> BeginTransactionAsync()
     {
-        return await Database.BeginTransactionAsync();
+        return await Database.BeginTransactionAsync().ConfigureAwait(false);
     }
 
     public async Task CommitTransactionAsync()
     {
-        await Database.CommitTransactionAsync();
+        await Database.CommitTransactionAsync().ConfigureAwait(false);
     }
 
     public async Task RollbackTransactionAsync()
     {
-        await Database.RollbackTransactionAsync();
+        await Database.RollbackTransactionAsync().ConfigureAwait(false);
     }
 
     public IQueryable<T> Query<T>(FormattableString query)
@@ -46,6 +46,8 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser, A
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
+        ArgumentNullException.ThrowIfNull(builder);
+
         base.OnModelCreating(builder);
 
         builder.Entity<ApplicationUser>(b => { b.Property(u => u.Id).HasDefaultValueSql("uuidv7()"); });

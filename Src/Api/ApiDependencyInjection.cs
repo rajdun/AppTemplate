@@ -3,7 +3,7 @@ using Api.Common.Dto;
 using Carter;
 namespace Api;
 
-public static class DependencyInjection
+internal static class ApiDependencyInjection
 {
     public static IServiceCollection AddPresentation(this IServiceCollection services, IConfiguration configuration)
     {

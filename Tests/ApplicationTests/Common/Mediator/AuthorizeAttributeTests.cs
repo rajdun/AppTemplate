@@ -1,5 +1,5 @@
 using Application.Common.Interfaces;
-using Application.Common.Mediator;
+using Application.Common.MediatorPattern;
 using NSubstitute;
 
 namespace ApplicationTests.Common.Mediator;
@@ -13,7 +13,7 @@ public class AuthorizeAttributeTests
         var attribute = new AuthorizeAttribute(AuthorizePolicy.Admin);
 
         // Assert
-        Assert.Equal(AuthorizePolicy.Admin, attribute.AuthorizeUserBehaviour);
+        Assert.Equal(AuthorizePolicy.Admin, attribute.Policy);
     }
 
     [Fact]

@@ -35,14 +35,14 @@ var app = builder.Build();
 
 if (args.Contains("migrate"))
 {
-    Console.WriteLine("Applying database migrations...");
+    Console.WriteLine(ApiResources.Applying_database_migrations___);
     using (var scope = app.Services.CreateScope())
     {
         var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-        await dbContext.Database.MigrateAsync();
+        await dbContext.Database.MigrateAsync().ConfigureAwait(false);
     }
 
-    Console.WriteLine("Migrations applied successfully. Exiting.");
+    Console.WriteLine(ApiResources.Migrations_applied_successfully__Exiting_);
     return;
 }
 
@@ -79,13 +79,15 @@ app.MapCarter();
 
 try
 {
-    await app.RunAsync();
+    await app.RunAsync().ConfigureAwait(false);
 }
+#pragma warning disable CA1031
 catch (Exception ex)
+#pragma warning restore CA1031
 {
     Log.Fatal(ex, "Host terminated unexpectedly");
 }
 finally
 {
-    await Log.CloseAndFlushAsync();
+    await Log.CloseAndFlushAsync().ConfigureAwait(false);
 }

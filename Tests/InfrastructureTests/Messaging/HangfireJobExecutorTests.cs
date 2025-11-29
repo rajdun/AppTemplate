@@ -11,14 +11,14 @@ namespace InfrastructureTests.Messaging;
 public class HangfireJobExecutorTests
 {
     private readonly ILogger<HangfireJobExecutor> _logger;
-    private readonly Application.Common.Mediator.IMediator _mediator;
+    private readonly Application.Common.MediatorPattern.IMediator _mediator;
     private readonly IDomainNotificationDeserializer _deserializer;
     private readonly HangfireJobExecutor _sut;
 
     public HangfireJobExecutorTests()
     {
         _logger = Substitute.For<ILogger<HangfireJobExecutor>>();
-        _mediator = Substitute.For<Application.Common.Mediator.IMediator>();
+        _mediator = Substitute.For<Application.Common.MediatorPattern.IMediator>();
         _deserializer = Substitute.For<IDomainNotificationDeserializer>();
         _sut = new HangfireJobExecutor(_logger, _mediator, _deserializer);
     }
@@ -55,7 +55,7 @@ public class HangfireJobExecutorTests
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(
             () => _sut.ProcessEventAsync(eventType, eventPayload, CancellationToken.None));
 
-        Assert.Contains("Could not deserialize event of type", exception.Message);
+        Assert.Contains("Could not deserialize event of type", exception.Message, StringComparison.InvariantCulture);
         await _mediator.DidNotReceive().PublishAsync(Arg.Any<IRequest>(), Arg.Any<CancellationToken>());
     }
 
@@ -75,8 +75,8 @@ public class HangfireJobExecutorTests
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(
             () => _sut.ProcessEventAsync(eventType, eventPayload, CancellationToken.None));
 
-        Assert.Contains("Processing of event type", exception.Message);
-        Assert.Contains("failed", exception.Message);
+        Assert.Contains("Processing of event type", exception.Message, StringComparison.InvariantCulture);
+        Assert.Contains("failed", exception.Message, StringComparison.InvariantCulture);
     }
 
     [Fact]

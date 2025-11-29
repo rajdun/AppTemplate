@@ -2,7 +2,7 @@ using Hangfire.Dashboard;
 
 namespace Api.Common;
 
-public class HangfireAuthorizationFilter(IConfiguration configuration)
+internal sealed class HangfireAuthorizationFilter(IConfiguration configuration)
     : IDashboardAuthorizationFilter
 {
     public bool Authorize(DashboardContext context)

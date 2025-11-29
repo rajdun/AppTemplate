@@ -1,4 +1,4 @@
-using Application.Common.Mediator;
+using Application.Common.MediatorPattern;
 using Application.Common.Messaging;
 using Domain.Common;
 using FluentResults;
@@ -6,22 +6,32 @@ using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Messaging;
 
-public class HangfireJobExecutor(
+public partial class HangfireJobExecutor(
     ILogger<HangfireJobExecutor> logger,
     IMediator mediator,
     IDomainNotificationDeserializer domainNotificationDeserializer) : IHangfireJobExecutor
 {
+    [LoggerMessage(LogLevel.Warning, "Failed to deserialize event of type {EventType}. The event might be unknown or the payload invalid. Hangfire will retry.")]
+    private static partial void LogDeserializationWarning(ILogger logger, string eventType);
+
+    [LoggerMessage(LogLevel.Warning, "Processing of event type {EventType} failed. See logs for details. Hangfire will retry.")]
+    private static partial void LogProcessingFailureWarning(ILogger logger, string eventType);
+
+    [LoggerMessage(LogLevel.Information, "Hangfire job started for event type {EventType}")]
+    private static partial void LogJobStartedInformation(ILogger logger, string eventType);
+
+    [LoggerMessage(LogLevel.Information, "Hangfire job successfully completed for event type {EventType}")]
+    private static partial void LogJobCompletedInformation(ILogger logger, string eventType);
+
     public async Task ProcessEventAsync(string eventType, string eventPayload, CancellationToken cancellationToken)
     {
-        logger.LogInformation("Hangfire job started for event type {EventType}", eventType);
+        LogJobStartedInformation(logger, eventType);
 
         var domainEvent = domainNotificationDeserializer.Deserialize(eventType, eventPayload);
 
         if (domainEvent is null)
         {
-            logger.LogWarning(
-                "Failed to deserialize event of type {EventType}. The event might be unknown or the payload invalid. Hangfire will retry.",
-                eventType);
+            LogDeserializationWarning(logger, eventType);
             throw new InvalidOperationException($"Could not deserialize event of type '{eventType}'.");
         }
 
@@ -29,12 +39,11 @@ public class HangfireJobExecutor(
 
         if (result != null && !result.IsSuccess)
         {
-            logger.LogWarning("Processing of event type {EventType} failed. See logs for details. Hangfire will retry.",
-                eventType);
+            LogProcessingFailureWarning(logger, eventType);
             throw new InvalidOperationException(
                 $"Processing of event type '{eventType}' failed: {string.Join(", ", result.Errors.Select(e => e.Message))}");
         }
 
-        logger.LogInformation("Hangfire job successfully completed for event type {EventType}", eventType);
+        LogJobCompletedInformation(logger, eventType);
     }
 }

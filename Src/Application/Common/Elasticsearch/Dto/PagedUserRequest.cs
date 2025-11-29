@@ -9,7 +9,9 @@ public class PagedUserRequest : PagedRequest
 
     public override string? GetActualSortField()
     {
+#pragma warning disable CA1308
         return SortBy?.ToLowerInvariant() switch
+#pragma warning restore CA1308
         {
             "name" => "name.keyword",
             "email" => "email.keyword",

@@ -9,11 +9,13 @@ public class PagedRequest
     public SortDirection SortOrder { get; set; } = SortDirection.Asc;
 
     public string? Query { get; set; }
-    public ICollection<string> QueryColumns { get; set; } = [];
+    public ICollection<string> QueryColumns { get; } = [];
 
     public virtual string? GetActualSortField()
     {
+#pragma warning disable CA1308
         return SortBy?.ToLowerInvariant();
+#pragma warning restore CA1308
     }
 }
 
@@ -23,8 +25,8 @@ public class StringFilterField
     public string? IsNotEqual { get; set; }
     public string? Contains { get; set; }
     public string? StartsWith { get; set; }
-    public List<string>? InArray { get; set; }
-    public List<string>? NotInArray { get; set; }
+    public ICollection<string>? InArray { get; } = [];
+    public ICollection<string>? NotInArray { get; } = [];
     public bool? IsNull { get; set; }
 }
 
@@ -36,7 +38,7 @@ public class RangeFilterField<T> where T : struct
     public T? IsGreaterThanOrEqual { get; set; }
     public T? IsLessThan { get; set; }
     public T? IsLessThanOrEqual { get; set; }
-    public List<T>? InArray { get; set; }
+    public ICollection<T>? InArray { get; } = [];
 
     public T? RangeStart { get; set; }
     public T? RangeEnd { get; set; }

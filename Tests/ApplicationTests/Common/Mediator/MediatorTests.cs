@@ -1,6 +1,6 @@
 using Application.Common.Errors;
 using Application.Common.Interfaces;
-using Application.Common.Mediator;
+using Application.Common.MediatorPattern;
 using Application.Resources;
 using Domain.Common;
 using FluentResults;
@@ -16,14 +16,14 @@ namespace ApplicationTests.Common.Mediator;
 public class MediatorTests
 {
     private readonly IServiceProvider _serviceProvider;
-    private readonly ILogger<Application.Common.Mediator.Mediator> _logger;
+    private readonly ILogger<Application.Common.MediatorPattern.Mediator> _logger;
     private readonly IUser _user;
     private readonly IStringLocalizer<UserTranslations> _localizer;
 
     public MediatorTests()
     {
         _serviceProvider = Substitute.For<IServiceProvider>();
-        _logger = Substitute.For<ILogger<Application.Common.Mediator.Mediator>>();
+        _logger = Substitute.For<ILogger<Application.Common.MediatorPattern.Mediator>>();
         _user = Substitute.For<IUser>();
         _localizer = Substitute.For<IStringLocalizer<UserTranslations>>();
 
@@ -33,7 +33,7 @@ public class MediatorTests
         serviceScope.ServiceProvider.Returns(_serviceProvider);
         serviceScopeFactory.CreateScope().Returns(serviceScope);
 
-        _serviceProvider.GetService(typeof(ILogger<Application.Common.Mediator.Mediator>)).Returns(_logger);
+        _serviceProvider.GetService(typeof(ILogger<Application.Common.MediatorPattern.Mediator>)).Returns(_logger);
         _serviceProvider.GetService(typeof(IUser)).Returns(_user);
         _serviceProvider.GetService(typeof(IStringLocalizer<UserTranslations>)).Returns(_localizer);
     }
@@ -51,7 +51,7 @@ public class MediatorTests
             .Returns(Enumerable.Empty<IValidator<TestRequest>>());
         _user.IsAuthenticated.Returns(true);
 
-        var mediator = new Application.Common.Mediator.Mediator(_serviceProvider);
+        var mediator = new Application.Common.MediatorPattern.Mediator(_serviceProvider);
 
         // Act
         var result = await mediator.SendAsync<TestRequest, string>(request);
@@ -74,7 +74,7 @@ public class MediatorTests
             .Returns(Enumerable.Empty<IValidator<AuthorizedRequest>>());
         _user.IsAuthenticated.Returns(false);
 
-        var mediator = new Application.Common.Mediator.Mediator(_serviceProvider);
+        var mediator = new Application.Common.MediatorPattern.Mediator(_serviceProvider);
 
         // Act
         var result = await mediator.SendAsync<AuthorizedRequest, string>(request);
@@ -95,21 +95,21 @@ public class MediatorTests
 
         var validationFailure = new ValidationFailure("Property", "Error message");
         var validationResult = new ValidationResult(new[] { validationFailure });
-        validator.Validate(Arg.Any<ValidationContext<TestRequest>>()).Returns(validationResult);
+        validator.ValidateAsync(Arg.Any<ValidationContext<TestRequest>>()).Returns(validationResult);
 
         _serviceProvider.GetService(typeof(IRequestHandler<TestRequest, string>)).Returns(handler);
         _serviceProvider.GetService(typeof(IEnumerable<IValidator<TestRequest>>))
             .Returns(new[] { validator });
         _user.IsAuthenticated.Returns(true);
 
-        var mediator = new Application.Common.Mediator.Mediator(_serviceProvider);
+        var mediator = new Application.Common.MediatorPattern.Mediator(_serviceProvider);
 
         // Act
         var result = await mediator.SendAsync<TestRequest, string>(request);
 
         // Assert
         Assert.True(result.IsFailed);
-        Assert.Contains("Error message", result.Errors[0].Message);
+        Assert.Contains("Error message", result.Errors[0].Message, StringComparison.InvariantCulture);
         await handler.DidNotReceive().Handle(Arg.Any<TestRequest>(), Arg.Any<CancellationToken>());
     }
 
@@ -125,7 +125,7 @@ public class MediatorTests
             .Returns(Enumerable.Empty<IValidator<TestNotification>>());
         _user.IsAuthenticated.Returns(true);
 
-        var mediator = new Application.Common.Mediator.Mediator(_serviceProvider);
+        var mediator = new Application.Common.MediatorPattern.Mediator(_serviceProvider);
 
         // Act
         var result = await mediator.PublishAsync(request);
@@ -151,7 +151,7 @@ public class MediatorTests
             .Returns(Enumerable.Empty<IValidator<TestNotification>>());
         _user.IsAuthenticated.Returns(true);
 
-        var mediator = new Application.Common.Mediator.Mediator(_serviceProvider);
+        var mediator = new Application.Common.MediatorPattern.Mediator(_serviceProvider);
 
         // Act
         var result = await mediator.PublishAsync(request);
@@ -179,7 +179,7 @@ public class MediatorTests
             .Returns(Enumerable.Empty<IValidator<TestNotification>>());
         _user.IsAuthenticated.Returns(true);
 
-        var mediator = new Application.Common.Mediator.Mediator(_serviceProvider);
+        var mediator = new Application.Common.MediatorPattern.Mediator(_serviceProvider);
 
         // Act
         var result = await mediator.PublishAsync(request);
@@ -190,11 +190,11 @@ public class MediatorTests
         await handler2.DidNotReceive().Handle(request, Arg.Any<CancellationToken>());
     }
 
-    public class TestRequest : IRequest<string> { }
+    private sealed class TestRequest : IRequest<string> { }
 
     [Authorize(AuthorizePolicy.Admin)]
-    public class AuthorizedRequest : IRequest<string> { }
+    private sealed class AuthorizedRequest : IRequest<string> { }
 
-    public class TestNotification : IRequest { }
+    private sealed class TestNotification : IRequest { }
 }
 
