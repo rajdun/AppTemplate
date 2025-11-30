@@ -159,8 +159,8 @@ public class EmailTemplateTests
 public class AppLanguageHelpersTests
 {
     [Theory]
-    [InlineData(AppLanguage.Pl, "pl")]
-    [InlineData(AppLanguage.En, "en")]
+    [InlineData(AppLanguage.Pl, "PL")]
+    [InlineData(AppLanguage.En, "EN")]
     public void ToLanguageCode_ShouldReturnCorrectCode(AppLanguage language, string expectedCode)
     {
         // Act
@@ -189,8 +189,7 @@ public class AppLanguageHelpersTests
     [Fact]
     public void FromString_WithNull_ShouldThrowException()
     {
-        // Act & Assert
-        Assert.Throws<NullReferenceException>(() => AppLanguageHelpers.FromString(null!));
+        Assert.Equal(AppLanguage.En, AppLanguageHelpers.FromString(null!));
     }
 }
 

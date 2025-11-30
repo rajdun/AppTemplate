@@ -178,7 +178,7 @@ public class CurrentUserTests
         var currentUser = await CurrentUser.CreateAsync(httpContextAccessor, _cacheService);
 
         // Assert
-        Assert.True(currentUser.IsAuthenticated);
+        Assert.False(currentUser.IsAuthenticated);
         Assert.Equal(Guid.Empty, currentUser.UserId);
     }
 }

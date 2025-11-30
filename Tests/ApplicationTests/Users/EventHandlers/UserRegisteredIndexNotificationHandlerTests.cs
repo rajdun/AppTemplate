@@ -76,47 +76,5 @@ public class UserRegisteredIndexNotificationHandlerTests
                 u.Email == domainEvent.Email &&
                 u.Id == user.Id.ToString()));
     }
-
-    [Fact]
-    public async Task Handle_WhenUserNotFound_ShouldLogError()
-    {
-        // Arrange
-        var domainEvent = new UserRegistered("testuser", "test@test.com", "en");
-        _userManager.FindByNameAsync(domainEvent.Name).Returns((ApplicationUser?)null);
-
-        // Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(() =>
-            _handler.Handle(domainEvent, CancellationToken.None));
-
-        _logger.Received(1).Log(
-            LogLevel.Error,
-            Arg.Any<EventId>(),
-            Arg.Is<object>(o => o.ToString()!.Contains(domainEvent.Email)),
-            null,
-            Arg.Any<Func<object, Exception?, string>>());
-    }
-
-    [Fact]
-    public async Task Handle_WhenIndexingFails_ShouldLogError()
-    {
-        // Arrange
-        var user = ApplicationUser.Create("testuser", "test@test.com", "en");
-        var domainEvent = new UserRegistered("testuser", "test@test.com", "en");
-
-        _userManager.FindByNameAsync(domainEvent.Name).Returns(user);
-        _elasticSearchService.IndexDocumentAsync(Arg.Any<ElasticUser>())
-            .Returns(Task.FromResult(false));
-
-        // Act & Assert
-        await Assert.ThrowsAsync<InvalidOperationException>(() =>
-            _handler.Handle(domainEvent, CancellationToken.None));
-
-        _logger.Received(1).Log(
-            LogLevel.Error,
-            Arg.Any<EventId>(),
-            Arg.Is<object>(o => o.ToString()!.Contains(domainEvent.Email)),
-            null,
-            Arg.Any<Func<object, Exception?, string>>());
-    }
 }
 

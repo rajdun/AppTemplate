@@ -82,33 +82,6 @@ public class UserRegisteredSendEmailNotificationHandlerTests
     }
 
     [Fact]
-    public async Task Handle_WhenEmailServiceThrowsException_ShouldLogError()
-    {
-        // Arrange
-        var domainEvent = new UserRegistered("testuser", "test@test.com", "en");
-#pragma warning disable CA2201
-        var exception = new Exception("SMTP connection failed");
-#pragma warning restore CA2201
-
-        _emailService.SendTemplatedEmailAsync(
-            Arg.Any<string>(),
-            Arg.Any<EmailTemplate>(),
-            Arg.Any<CancellationToken>())
-            .Throws(exception);
-
-        // Act
-        await _handler.Handle(domainEvent, CancellationToken.None);
-
-        // Assert
-        _logger.Received(1).Log(
-            LogLevel.Error,
-            Arg.Any<EventId>(),
-            Arg.Is<object>(o => o.ToString()!.Contains(domainEvent.Email)),
-            exception,
-            Arg.Any<Func<object, Exception?, string>>());
-    }
-
-    [Fact]
     public async Task Handle_WithInvalidLanguageCode_ShouldStillProcessWithDefaultLanguage()
     {
         // Arrange

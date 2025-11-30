@@ -43,22 +43,25 @@ public class Mediator : IMediator
         where TRequest : IRequest<TResponse>
     {
         var handler = _serviceProvider.GetRequiredService<IRequestHandler<TRequest, TResponse>>();
-        var validators = _serviceProvider.GetServices<IValidator<TRequest>>().ToList();
         var logger = _serviceProvider.GetRequiredService<ILogger<Mediator>>();
         var user = _serviceProvider.GetRequiredService<IUser>();
 
         _logHandling(logger, typeof(TRequest).Name, handler.GetType().Name, null);
 
+        // 1. Authorization
         if (!Authorize<TRequest>(user))
         {
             return new UnauthorizedError(UserTranslations.Unauthorized);
         }
 
-        if (RunValidations<TRequest, TResponse>(request, validators, logger, out var fail))
+        // 2. Async Validation
+        var validationError = await RunValidationAndGetErrorAsync(request, logger).ConfigureAwait(false);
+        if (validationError != null)
         {
-            return fail;
+            return Result.Fail<TResponse>(validationError);
         }
 
+        // 3. Handling
         var result = await handler.Handle(request, cancellationToken).ConfigureAwait(false);
         _logHandled(logger, typeof(TRequest).Name, handler.GetType().Name, null);
 
@@ -69,30 +72,35 @@ public class Mediator : IMediator
         where TRequest : IRequest
     {
         var handlersList = _serviceProvider.GetServices<IRequestHandler<TRequest>>().ToList();
-        var validators = _serviceProvider.GetServices<IValidator<TRequest>>().ToList();
         var logger = _serviceProvider.GetRequiredService<ILogger<Mediator>>();
         var user = _serviceProvider.GetRequiredService<IUser>();
         var stringLocalizer = _serviceProvider.GetRequiredService<IStringLocalizer<UserTranslations>>();
 
         if (handlersList.Count == 0)
         {
-            throw new InvalidOperationException("No handlers found");
+            throw new InvalidOperationException($"No handlers found for {typeof(TRequest).Name}");
         }
 
+        // 1. Authorization
         if (!Authorize<TRequest>(user))
         {
             return new UnauthorizedError(stringLocalizer["Unauthorized"]);
         }
 
-        if (RunValidations(request, validators, logger, out var fail))
+        // 2. Async Validation
+        var validationError = await RunValidationAndGetErrorAsync(request, logger).ConfigureAwait(false);
+        if (validationError != null)
         {
-            return fail;
+            return Result.Fail(validationError);
         }
 
+        // 3. Handling (Iterate all handlers)
         foreach (var handler in handlersList)
         {
             _logHandling(logger, typeof(TRequest).Name, handler.GetType().Name, null);
+
             var result = await handler.Handle(request, cancellationToken).ConfigureAwait(false);
+
             _logHandled(logger, typeof(TRequest).Name, handler.GetType().Name, null);
 
             if (result.IsFailed)
@@ -116,59 +124,37 @@ public class Mediator : IMediator
         return authorizeAttribute.Authorize(user);
     }
 
-    private static bool RunValidations<TRequest, TResponse>(TRequest request,
-        IEnumerable<IValidator<TRequest>> validators, ILogger<Mediator> logger,
-        out Result<TResponse> fail) where TRequest : IRequest<TResponse>
+    /// <summary>
+    /// Uruchamia walidatory asynchronicznie. Zwraca string z błędami lub null, jeśli wszystko jest OK.
+    /// </summary>
+    private async Task<string?> RunValidationAndGetErrorAsync<TRequest>(TRequest request, ILogger logger)
     {
-        var validatorList = validators.ToList();
-        if (validatorList.Count > 0)
+        // Pobieramy walidatory tutaj, żeby nie przekazywać ich jako parametr
+        var validators = _serviceProvider.GetServices<IValidator<TRequest>>().ToList();
+
+        if (validators.Count == 0)
         {
-            var context = new ValidationContext<TRequest>(request);
-
-            var validatorFailures = validatorList
-                .Select(x => x.Validate(context))
-                .SelectMany(x => x.Errors)
-                .Where(x => x != null)
-                .ToList();
-
-            if (validatorFailures.Count > 0)
-            {
-                var errors = string.Join(", ", validatorFailures.Select(f => f.ErrorMessage));
-                _logValidationFailed(logger, typeof(TRequest).Name, errors, null);
-                fail = Result.Fail<TResponse>(errors);
-                return true;
-            }
+            return null; // Brak walidatorów = sukces
         }
 
-        fail = new Result<TResponse>();
-        return false;
-    }
+        var context = new ValidationContext<TRequest>(request);
 
-    private static bool RunValidations<TRequest>(TRequest request, IEnumerable<IValidator<TRequest>> validators,
-        ILogger<Mediator> logger,
-        out Result fail) where TRequest : IRequest
-    {
-        var validatorList = validators.ToList();
-        if (validatorList.Count > 0)
+        // Uruchamiamy wszystkie walidacje równolegle (Task.WhenAll)
+        var validationTasks = validators.Select(v => v.ValidateAsync(context));
+        var validationResults = await Task.WhenAll(validationTasks).ConfigureAwait(false);
+
+        var failures = validationResults
+            .SelectMany(result => result.Errors)
+            .Where(f => f != null)
+            .ToList();
+
+        if (failures.Count > 0)
         {
-            var context = new ValidationContext<TRequest>(request);
-
-            var validatorFailures = validatorList
-                .Select(x => x.Validate(context))
-                .SelectMany(x => x.Errors)
-                .Where(x => x != null)
-                .ToList();
-
-            if (validatorFailures.Count > 0)
-            {
-                var errors = string.Join(", ", validatorFailures.Select(f => f.ErrorMessage));
-                _logValidationFailed(logger, typeof(TRequest).Name, errors, null);
-                fail = Result.Fail(errors);
-                return true;
-            }
+            var errorsString = string.Join(", ", failures.Select(f => f.ErrorMessage));
+            _logValidationFailed(logger, typeof(TRequest).Name, errorsString, null);
+            return errorsString;
         }
 
-        fail = new Result();
-        return false;
+        return null;
     }
 }

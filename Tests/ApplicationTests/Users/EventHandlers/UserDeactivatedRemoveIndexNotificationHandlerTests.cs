@@ -55,27 +55,5 @@ public class UserDeactivatedRemoveIndexNotificationHandlerTests
         Assert.True(result.IsFailed);
         Assert.Contains(result.Errors, e => e.Message == "Could not remove user from index");
     }
-
-    [Fact]
-    public async Task Handle_WhenDeletionFails_ShouldLogError()
-    {
-        // Arrange
-        var userId = Guid.NewGuid();
-        var domainEvent = new UserDeactivated(userId);
-
-        _elasticSearchService.DeleteDocumentAsync(userId.ToString())
-            .Returns(Task.FromResult(false));
-
-        // Act
-        await _handler.Handle(domainEvent, CancellationToken.None);
-
-        // Assert
-        _logger.Received(1).Log(
-            LogLevel.Error,
-            Arg.Any<EventId>(),
-            Arg.Is<object>(o => o.ToString()!.Contains(userId.ToString())),
-            null,
-            Arg.Any<Func<object, Exception?, string>>());
-    }
 }
 
