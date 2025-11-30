@@ -7,7 +7,7 @@ internal sealed class HangfireAuthorizationFilter(IConfiguration configuration)
 {
     public bool Authorize(DashboardContext context)
     {
-        if (configuration.GetValue<bool>("Hangfire:AllowAnonymousDashboardAccess"))
+        if (configuration.GetValue<bool>("HangfireSettings:AllowAnonymousDashboardAccess"))
         {
             return true;
         }

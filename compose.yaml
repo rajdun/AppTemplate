@@ -26,28 +26,29 @@ services:
       # Connection strings
       - ConnectionStrings__DefaultConnection=${DB_CONNECTION_STRING:-Server=database;Port=5432;Database=dev_db;User Id=dev_user;Password=dev_password;}
       - ConnectionStrings__Redis=${CACHE_CONNECTION_STRING:-cache:6379}
-      
+
       # OpenTelemetry configuration
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://otel-collector:4318
       - OTEL_SERVICE_NAME=api
       - OTEL_SERVICE_VERSION=1.0.0
-      
+
       # ASP.NET Core settings
       - ASPNETCORE_URLS=http://+:80
-      
+
       # Jwt settings
       - JwtSettings__Secret=${JWT_SECRET:-SUPER_SECRET_AND_SECURE_AND_VERY_LONG_KEY_USED_FOR_ENCRYPTION_SUPER_SECRET_AND_SECURE_AND_VERY_LONG_KEY_USED_FOR_ENCRYPTION}
       - JwtSettings__Issuer=${JWT_ISSUER:-Api}
       - JwtSettings__Audience=${JWT_AUDIENCE:-ApiUsers}
       - JwtSettings__ExpirationMinutes=${JWT_EXPIRATION_MINUTES:-15}
-      
+
       # Cors settings
       - Cors__AllowedOrigins=${CORS_ALLOWED_ORIGINS:-http://localhost:80}
       - Cors__PolicyName=${CORS_POLICY_NAME:-DefaultCorsPolicy}
-      
+
       # Hangfire settings
       - HangfireSettings__Url=${HANGFIRE_URL:-http://background_service:8080}
-      
+      - HangfireSettings__AllowAnonymousDashboardAccess=false
+
       # SMTP settings
       - SmtpSettings__Host=${SMTP_HOST:-mailhog}
       - SmtpSettings__Port=${SMTP_PORT:-1025}
@@ -55,13 +56,13 @@ services:
       - SmtpSettings__Password=${SMTP_PASSWORD:-}
       - SmtpSettings__From=${SMTP_FROM:-noreply@api.local}
       - SmtpSettings__UseSsl=${SMTP_USE_SSL:-false}
-      
+
       # Openapi settings
       - OpenApiSettings__Servers__0__Url=${OPENAPI_SERVER_URL:-http://localhost:8080}
       - OpenApiSettings__Servers__0__Description=${OPENAPI_SERVER_DESCRIPTION:-Local docker}
       - OpenApiSettings__Servers__1__Url=${OPENAPI_SERVER_URL_2:-https://localhost:5045}
       - OpenApiSettings__Servers__1__Description=${OPENAPI_SERVER_DESCRIPTION_2:-Local kestrel}
-        
+
       # Elasticsearch settings
       - ElasticsearchSettings__Uri=http://elasticsearch:9200
       - ElasticsearchSettings__DefaultIndex=my-default-index
@@ -70,7 +71,7 @@ services:
     restart: unless-stopped
     networks:
       - monitoring
-  
+
   background_service:
     image: background_service:latest
     build:
@@ -86,7 +87,7 @@ services:
       # Connection strings
       - ConnectionStrings__DefaultConnection=${DB_CONNECTION_STRING:-Server=database;Port=5432;Database=dev_db;User Id=dev_user;Password=dev_password;}
       - ConnectionStrings__Redis=${CACHE_CONNECTION_STRING:-cache:6379}
-      
+
       # SMTP settings
       - SmtpSettings__Host=${SMTP_HOST:-mailhog}
       - SmtpSettings__Port=${SMTP_PORT:-1025}
@@ -94,7 +95,7 @@ services:
       - SmtpSettings__Password=${SMTP_PASSWORD:-}
       - SmtpSettings__From=${SMTP_FROM:-noreply@api.local}
       - SmtpSettings__UseSsl=${SMTP_USE_SSL:-false}
-        
+
       # Elasticsearch settings
       - ElasticsearchSettings__Uri=http://elasticsearch:9200
       - ElasticsearchSettings__DefaultIndex=my-default-index
@@ -103,7 +104,7 @@ services:
     restart: unless-stopped
     networks:
       - monitoring
-  
+
   database:
     image: postgres:18.0-alpine3.22
     ports:
@@ -190,7 +191,7 @@ services:
     restart: unless-stopped
     networks:
       - monitoring
-        
+
   elasticsearch:
     image: elasticsearch:9.1.5
     environment:
@@ -210,8 +211,8 @@ services:
     restart: unless-stopped
     networks:
       - monitoring
-  
-  # Development services  
+
+  # Development services
   mailhog:
     image: mailhog/mailhog:v1.0.1
     ports:

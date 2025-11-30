@@ -30,7 +30,9 @@ public partial class UserSearchService : IUserSearchService
         _client = client;
         _logger = logger;
 
-        _indexName = nameof(ElasticUser).ToUpperInvariant();
+#pragma warning disable CA1308
+        _indexName = nameof(ElasticUser).ToLowerInvariant();
+#pragma warning restore CA1308
     }
 
     public async Task<PagedResult<ElasticUser>> SearchUsersAsync(PagedUserRequest request, CancellationToken cancellationToken = new())

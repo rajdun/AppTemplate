@@ -14,7 +14,9 @@ using RegisterRequest = Api.Modules.Users.Requests.RegisterRequest;
 
 namespace Api.Modules.Users;
 
-internal sealed partial class UsersModule
+#pragma warning disable CA1515
+public sealed partial class UsersModule
+#pragma warning restore CA1515
 {
     private static async Task<IResult> Login([FromServices] IMediator mediator, [FromBody] LoginRequest request)
     {

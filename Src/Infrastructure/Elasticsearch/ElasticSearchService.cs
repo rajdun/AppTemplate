@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Application.Common.Elasticsearch;
 using Application.Common.Elasticsearch.Dto;
 using Elastic.Clients.Elasticsearch;
@@ -9,6 +10,7 @@ using SortOrder = Elastic.Clients.Elasticsearch.SortOrder;
 
 namespace Infrastructure.Elasticsearch;
 
+[SuppressMessage("Globalization", "CA1308:Normalize strings to uppercase")]
 internal partial class ElasticSearchService<T> : IElasticSearchService<T> where T : class, IElasticDocument
 {
     private readonly ElasticsearchClient _client;
@@ -31,7 +33,7 @@ internal partial class ElasticSearchService<T> : IElasticSearchService<T> where 
         _client = client;
         _logger = logger;
 
-        _indexName = typeof(T).Name.ToUpperInvariant();
+        _indexName = typeof(T).Name.ToLowerInvariant();
     }
 
 

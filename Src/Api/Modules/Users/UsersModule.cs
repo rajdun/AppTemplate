@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Modules.Users;
 
-internal partial class UsersModule : ICarterModule
+public partial class UsersModule : ICarterModule
 {
     private const string JsonContentType = "application/json";
 
