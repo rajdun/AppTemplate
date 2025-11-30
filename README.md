@@ -63,6 +63,37 @@ Detailed documentation for each component can be found in the `docs/` directory:
 4.  **Access the API**:
     The API will be available at `https://localhost:5001` (or the configured port).
 
+## Use as template
+
+### Quick Setup (One-liner)
+
+Clone and configure this template for your new project using a single command:
+
+```bash
+wget -qO- https://raw.githubusercontent.com/rajdun/AppTemplate/master/scripts/fork.sh | sh -s -- <YOUR_NEW_REPO_URL>
+```
+
+Replace `<YOUR_NEW_REPO_URL>` with your new repository URL (SSH or HTTPS format).
+
+**Example:**
+```bash
+# SSH
+wget -qO- https://raw.githubusercontent.com/rajdun/AppTemplate/master/scripts/fork.sh | sh -s -- git@github.com:yourusername/your-new-project.git
+
+# HTTPS
+wget -qO- https://raw.githubusercontent.com/rajdun/AppTemplate/master/scripts/fork.sh | sh -s -- https://github.com/yourusername/your-new-project.git
+```
+
+### Manual Setup
+
+Alternatively, download the script and run it manually:
+
+```bash
+wget https://raw.githubusercontent.com/rajdun/AppTemplate/master/scripts/fork.sh
+chmod +x fork.sh
+./fork.sh <YOUR_NEW_REPO_URL>
+```
+
 ## 🤝 Contributing
 
 This is a personal template, but suggestions and improvements are welcome!
