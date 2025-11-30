@@ -7,6 +7,7 @@ using WorkerService;
 
 
 var builder = Host.CreateApplicationBuilder(args);
+builder.AddTelemetry();
 builder.Services.AddDomain();
 builder.Services.AddInfrastructure(builder.Configuration);
 builder.Services.AddApplication();
