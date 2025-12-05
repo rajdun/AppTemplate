@@ -13,5 +13,5 @@
 The **Outbox Pattern** is implemented to ensure data consistency between the database and external systems (like message brokers or search indexes).
 
 1. When a state change occurs, an "Outbox Message" is saved to the database in the same transaction.
-2. A background worker (powered by Hangfire or a hosted service) picks up these messages and processes them (e.g., publishing events, updating Elasticsearch).
+2. A background worker (powered by Hangfire or a hosted service) picks up these messages and processes them (e.g., publishing events, updating Meilisearch).
 3. This guarantees at-least-once delivery.

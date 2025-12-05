@@ -1,11 +1,11 @@
 # Search & Caching
 
-## Elasticsearch
+## Meilisearch
 
-**Elasticsearch** is integrated for advanced query search capabilities. It allows for full-text search and complex querying that goes beyond standard SQL capabilities.
+**Meilisearch** is integrated for advanced query search capabilities. It allows for full-text search and complex querying that goes beyond standard SQL capabilities.
 
 - Used for: High-performance search queries.
-- Integration: The `Infrastructure` layer handles the synchronization and querying of Elasticsearch.
+- Integration: The `Infrastructure` layer handles the synchronization and querying of Meilisearch.
 
 ## Valkey Cache
 
