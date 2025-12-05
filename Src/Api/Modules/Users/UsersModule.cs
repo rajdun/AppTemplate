@@ -1,9 +1,7 @@
 using Application.Common.Dto;
-using Application.Common.Elasticsearch.Dto;
-using Application.Common.Elasticsearch.Models;
+using Application.Common.Search.Dto;
 using Application.Users.Dto;
 using Carter;
-using Microsoft.AspNetCore.Mvc;
 
 namespace Api.Modules.Users;
 
@@ -52,7 +50,7 @@ public partial class UsersModule : ICarterModule
         group.MapPost("search", SearchUsers)
             .WithName("SearchUsers")
             .RequireAuthorization()
-            .Produces<PagedResult<ElasticUser>>(StatusCodes.Status200OK, JsonContentType)
+            .Produces<PagedResult<UserSearchDocumentDto>>(StatusCodes.Status200OK, JsonContentType)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .WithDisplayName("Search Users")
             .WithDescription("Wyszukuje użytkowników na podstawie podanych kryteriów. Zwraca paginowaną listę użytkowników spełniających kryteria wyszukiwania.")

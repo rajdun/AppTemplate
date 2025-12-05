@@ -1,29 +1,27 @@
 using Application.Common.Dto;
-using Application.Common.Elasticsearch;
-using Application.Common.Elasticsearch.Dto;
-using Application.Common.Elasticsearch.Models;
+using Application.Common.Search;
+using Application.Common.Search.Dto;
 using Application.Users.Queries;
-using FluentResults;
 using NSubstitute;
 
 namespace ApplicationTests.Users.Queries;
 
 public class SearchUsersQueryHandlerTests
 {
-    private readonly IUserSearchService _userSearchService;
+    private readonly ISearch<UserSearchDocumentDto> _search;
     private readonly SearchUsersQueryHandler _handler;
 
     public SearchUsersQueryHandlerTests()
     {
-        _userSearchService = Substitute.For<IUserSearchService>();
-        _handler = new SearchUsersQueryHandler(_userSearchService);
+        _search = Substitute.For<ISearch<UserSearchDocumentDto>>();
+        _handler = new SearchUsersQueryHandler(_search);
     }
 
     [Fact]
     public async Task Handle_ShouldCallSearchService()
     {
         // Arrange
-        var request = new PagedUserRequest
+        var request = new PagedRequest
         {
             PageNumber = 1,
             PageSize = 10,
@@ -31,15 +29,15 @@ public class SearchUsersQueryHandlerTests
             SortOrder = SortDirection.Asc
         };
         var query = new SearchUsersQuery(request);
-        var expectedResult = new PagedResult<ElasticUser>
+        var expectedResult = new PagedResult<UserSearchDocumentDto>
         {
-            Items = new List<ElasticUser>(),
+            Items = new List<UserSearchDocumentDto>(),
             TotalCount = 0,
             PageNumber = 1,
             PageSize = 10
         };
 
-        _userSearchService.SearchUsersAsync(request, Arg.Any<CancellationToken>())
+        _search.SearchAsync(query, Arg.Any<CancellationToken>())
             .Returns(expectedResult);
 
         // Act
@@ -48,20 +46,20 @@ public class SearchUsersQueryHandlerTests
         // Assert
         Assert.True(result.IsSuccess);
         Assert.Equal(expectedResult, result.Value);
-        await _userSearchService.Received(1).SearchUsersAsync(request, Arg.Any<CancellationToken>());
+        await _search.Received(1).SearchAsync(query, Arg.Any<CancellationToken>());
     }
 
     [Fact]
     public async Task Handle_WhenSearchFails_ShouldReturnFailure()
     {
         // Arrange
-        var request = new PagedUserRequest { PageNumber = 1, PageSize = 10 };
+        var request = new PagedRequest { PageNumber = 1, PageSize = 10 };
         var query = new SearchUsersQuery(request);
 
-        _userSearchService.SearchUsersAsync(request, Arg.Any<CancellationToken>())
-            .Returns(new PagedResult<ElasticUser>
+        _search.SearchAsync(query, Arg.Any<CancellationToken>())
+            .Returns(new PagedResult<UserSearchDocumentDto>
             {
-                Items = new List<ElasticUser>(),
+                Items = new List<UserSearchDocumentDto>(),
                 TotalCount = 0,
                 PageNumber = request.PageNumber,
                 PageSize = request.PageSize
@@ -80,7 +78,7 @@ public class SearchUsersQueryHandlerTests
     {
         // Arrange
         var validator = new SearchUsersQueryValidator();
-        var query = new SearchUsersQuery(new PagedUserRequest { PageNumber = 0, PageSize = 10 });
+        var query = new SearchUsersQuery(new PagedRequest { PageNumber = 0, PageSize = 10 });
 
         // Act
         var result = validator.Validate(query);
@@ -95,7 +93,7 @@ public class SearchUsersQueryHandlerTests
     {
         // Arrange
         var validator = new SearchUsersQueryValidator();
-        var query = new SearchUsersQuery(new PagedUserRequest { PageNumber = 1, PageSize = 0 });
+        var query = new SearchUsersQuery(new PagedRequest { PageNumber = 1, PageSize = 0 });
 
         // Act
         var result = validator.Validate(query);
@@ -110,7 +108,7 @@ public class SearchUsersQueryHandlerTests
     {
         // Arrange
         var validator = new SearchUsersQueryValidator();
-        var query = new SearchUsersQuery(new PagedUserRequest { PageNumber = 1, PageSize = 101 });
+        var query = new SearchUsersQuery(new PagedRequest { PageNumber = 1, PageSize = 101 });
 
         // Act
         var result = validator.Validate(query);
@@ -125,7 +123,7 @@ public class SearchUsersQueryHandlerTests
     {
         // Arrange
         var validator = new SearchUsersQueryValidator();
-        var query = new SearchUsersQuery(new PagedUserRequest
+        var query = new SearchUsersQuery(new PagedRequest
         {
             PageNumber = 1,
             PageSize = 10,
@@ -145,7 +143,7 @@ public class SearchUsersQueryHandlerTests
     {
         // Arrange
         var validator = new SearchUsersQueryValidator();
-        var query = new SearchUsersQuery(new PagedUserRequest
+        var query = new SearchUsersQuery(new PagedRequest
         {
             PageNumber = 1,
             PageSize = 10,
@@ -164,7 +162,7 @@ public class SearchUsersQueryHandlerTests
     {
         // Arrange
         var validator = new SearchUsersQueryValidator();
-        var query = new SearchUsersQuery(new PagedUserRequest { PageNumber = 1, PageSize = 10 });
+        var query = new SearchUsersQuery(new PagedRequest { PageNumber = 1, PageSize = 10 });
 
         // Act
         var result = validator.Validate(query);

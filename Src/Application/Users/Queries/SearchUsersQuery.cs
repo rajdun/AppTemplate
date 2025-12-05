@@ -1,17 +1,18 @@
 using Application.Common.Dto;
-using Application.Common.Elasticsearch;
-using Application.Common.Elasticsearch.Dto;
-using Application.Common.Elasticsearch.Models;
+using Application.Common.Search;
+using Application.Common.Search.Dto;
 using Domain.Common;
 using FluentResults;
 using FluentValidation;
 
 namespace Application.Users.Queries;
 
-public record SearchUsersQuery(PagedUserRequest Request) : IRequest<PagedResult<ElasticUser>>;
+public record SearchUsersQuery(PagedRequest Request) : IRequest<PagedResult<UserSearchDocumentDto>>;
 
 public class SearchUsersQueryValidator : AbstractValidator<SearchUsersQuery>
 {
+    private static readonly string[] SortableFields = ["Id", "Name", "Email"];
+
     public SearchUsersQueryValidator()
     {
         RuleFor(x => x.Request.PageNumber)
@@ -23,15 +24,16 @@ public class SearchUsersQueryValidator : AbstractValidator<SearchUsersQuery>
 
         RuleFor(x => x.Request.SortBy)
             .Must(sortBy =>
-                sortBy == null || ElasticUser.SortableFields.Contains(sortBy, StringComparer.OrdinalIgnoreCase));
+                sortBy == null || SortableFields.Contains(sortBy, StringComparer.OrdinalIgnoreCase))
+            .WithMessage($"SortBy must be one of: {string.Join(", ", SortableFields)}");
     }
 }
 
-internal class SearchUsersQueryHandler(IUserSearchService userSearchService)
-    : IRequestHandler<SearchUsersQuery, PagedResult<ElasticUser>>
+internal class SearchUsersQueryHandler(ISearch<UserSearchDocumentDto> search)
+    : IRequestHandler<SearchUsersQuery, PagedResult<UserSearchDocumentDto>>
 {
-    public async Task<Result<PagedResult<ElasticUser>>> Handle(SearchUsersQuery request, CancellationToken cancellationToken = new CancellationToken())
+    public async Task<Result<PagedResult<UserSearchDocumentDto>>> Handle(SearchUsersQuery request, CancellationToken cancellationToken = new CancellationToken())
     {
-        return await userSearchService.SearchUsersAsync(request.Request, cancellationToken).ConfigureAwait(false);
+        return await search.SearchAsync(request, cancellationToken).ConfigureAwait(false);
     }
 }

@@ -26,11 +26,10 @@
 
     <ItemGroup>
         <PackageReference Include="AspNetCore.HealthChecks.Redis"/>
-        <PackageReference Include="Elastic.Clients.Elasticsearch" />
-        <PackageReference Include="Eonix.Microsoft.Extensions.Diagnostics.HealthChecks.Elasticsearch"/>
         <PackageReference Include="FluentResults"/>
         <PackageReference Include="Hangfire.AspNetCore"/>
         <PackageReference Include="Hangfire.Redis.StackExchange"/>
+        <PackageReference Include="MeiliSearch" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer"/>
         <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore"/>
         <PackageReference Include="Microsoft.Extensions.DependencyInjection"/>

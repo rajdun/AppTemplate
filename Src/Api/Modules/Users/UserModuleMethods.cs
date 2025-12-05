@@ -1,10 +1,8 @@
 using Api.Common;
 using Api.Modules.Users.Requests;
 using Application.Common.Dto;
-using Application.Common.Elasticsearch;
-using Application.Common.Elasticsearch.Dto;
-using Application.Common.Elasticsearch.Models;
 using Application.Common.MediatorPattern;
+using Application.Common.Search.Dto;
 using Application.Users.Commands;
 using Application.Users.Dto;
 using Application.Users.Queries;
@@ -47,11 +45,11 @@ public sealed partial class UsersModule
     }
 
     private static async Task<IResult> SearchUsers([FromServices] IMediator mediator,
-        [FromBody] PagedUserRequest request, CancellationToken cancellationToken = new())
+        [FromBody] PagedRequest request, CancellationToken cancellationToken = new())
     {
         var query = new SearchUsersQuery(request);
 
-        var response = await mediator.SendAsync<SearchUsersQuery, PagedResult<ElasticUser>>(query, cancellationToken).ConfigureAwait(false);
+        var response = await mediator.SendAsync<SearchUsersQuery, PagedResult<UserSearchDocumentDto>>(query, cancellationToken).ConfigureAwait(false);
 
         return response.ToHttpResult();
     }

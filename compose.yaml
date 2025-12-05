@@ -8,7 +8,7 @@ volumes:
   prometheus_data: { }
   loki_data: { }
   grafana_data: { }
-  es_data: { }
+  meilisearch_data: { }
 
 services:
   api:
@@ -21,7 +21,7 @@ services:
     depends_on:
       - database
       - cache
-      - elasticsearch
+      - meilisearch
     environment:
       # Connection strings
       - ConnectionStrings__DefaultConnection=${DB_CONNECTION_STRING:-Server=database;Port=5432;Database=dev_db;User Id=dev_user;Password=dev_password;}
@@ -63,11 +63,9 @@ services:
       - OpenApiSettings__Servers__1__Url=${OPENAPI_SERVER_URL_2:-https://localhost:5045}
       - OpenApiSettings__Servers__1__Description=${OPENAPI_SERVER_DESCRIPTION_2:-Local kestrel}
 
-      # Elasticsearch settings
-      - ElasticsearchSettings__Uri=http://elasticsearch:9200
-      - ElasticsearchSettings__DefaultIndex=my-default-index
-      - ElasticsearchSettings__Username=elastic
-      - ElasticsearchSettings__Password=changeme
+      # Meilisearch settings
+      - MeilisearchSettings__Uri=http://meilisearch:7700
+      - MeilisearchSettings__MasterKey=${MEILI_MASTER_KEY:-masterKey}
     restart: unless-stopped
     networks:
       - monitoring
@@ -82,7 +80,7 @@ services:
     depends_on:
       - database
       - cache
-      - elasticsearch
+      - meilisearch
     environment:
       # Connection strings
       - ConnectionStrings__DefaultConnection=${DB_CONNECTION_STRING:-Server=database;Port=5432;Database=dev_db;User Id=dev_user;Password=dev_password;}
@@ -101,11 +99,9 @@ services:
       - SmtpSettings__From=${SMTP_FROM:-noreply@api.local}
       - SmtpSettings__UseSsl=${SMTP_USE_SSL:-false}
 
-      # Elasticsearch settings
-      - ElasticsearchSettings__Uri=http://elasticsearch:9200
-      - ElasticsearchSettings__DefaultIndex=my-default-index
-      - ElasticsearchSettings__Username=elastic
-      - ElasticsearchSettings__Password=changeme
+      # Meilisearch settings
+      - MeilisearchSettings__Uri=http://meilisearch:7700
+      - MeilisearchSettings__MasterKey=${MEILI_MASTER_KEY:-masterKey}
     restart: unless-stopped
     networks:
       - monitoring
@@ -197,22 +193,15 @@ services:
     networks:
       - monitoring
 
-  elasticsearch:
-    image: elasticsearch:9.1.5
+  meilisearch:
+    image: getmeili/meilisearch:v1.28.2
     environment:
-      - discovery.type=single-node
-      - xpack.security.enabled=false
-      - xpack.monitoring.collection.enabled=true
-      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD:-changeme}
-      - ES_JAVA_OPTS=-Xms1024m -Xmx1024m
-    ulimits:
-      memlock:
-        soft: -1
-        hard: -1
+      - MEILI_MASTER_KEY=${MEILI_MASTER_KEY:-masterKey}
+      - MEILI_ENV=${MEILI_ENV:-development}
     volumes:
-      - es_data:/usr/share/elasticsearch/data
+      - meilisearch_data:/meili_data
     ports:
-      - "9200:9200"
+      - "7700:7700"
     restart: unless-stopped
     networks:
       - monitoring

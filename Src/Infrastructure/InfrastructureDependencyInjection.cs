@@ -8,8 +8,6 @@ using Domain.Entities.Users;
 using Hangfire;
 using Hangfire.Redis.StackExchange;
 using Infrastructure.Data;
-using Infrastructure.Elasticsearch;
-using Infrastructure.Elasticsearch.Extensions;
 using Infrastructure.Implementation;
 using Infrastructure.Implementation.Dto;
 using Infrastructure.Mailing;
@@ -33,6 +31,7 @@ using OpenTelemetry.Trace;
 using Serilog;
 using Serilog.Sinks.OpenTelemetry;
 using StackExchange.Redis;
+using Infrastructure.Search;
 
 namespace Infrastructure;
 
@@ -51,7 +50,7 @@ public static class InfrastructureDependencyInjection
         services.AddHealthChecks(configuration);
         services.AddHangfire(configuration);
         services.AddMailing(configuration);
-        services.AddElasticsearch(configuration);
+        services.AddMeilisearch(configuration);
 
         return services;
     }
