@@ -11,7 +11,7 @@ namespace Application.Users.NotificationHandlers;
 public partial class UserRegisteredSendEmailNotificationHandler(ILogger<UserRegisteredSendEmailNotificationHandler> logger, IEmailService emailService)
     : IRequestHandler<UserRegistered>
 {
-    [LoggerMessage(0, LogLevel.Error, "Failed to send UserRegistered email to {Email}")]
+    [LoggerMessage(0, LogLevel.Error, "[UserRegisteredEmail] Failed to send registration email to {Email}")]
     private static partial void LogEmailSendError(ILogger logger, string email, Exception ex);
 
     public async Task<Result> Handle(UserRegistered request, CancellationToken cancellationToken = new())

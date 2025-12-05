@@ -62,11 +62,11 @@ public partial class DomainNotificationDeserializer : IDomainNotificationDeseria
 
     [LoggerMessage(
         Level = LogLevel.Error,
-        Message = "JSON deserialization error for event type {EventType}")]
+        Message = "[DomainNotificationDeserializer] JSON deserialization failed for event type {EventType}")]
     private partial void LogJsonError(Exception ex, string eventType);
 
     [LoggerMessage(
         Level = LogLevel.Warning,
-        Message = "Event type '{EventType}' not found.")]
+        Message = "[DomainNotificationDeserializer] Event type '{EventType}' not found in registry")]
     private partial void LogEventTypeNotFound(string eventType);
 }

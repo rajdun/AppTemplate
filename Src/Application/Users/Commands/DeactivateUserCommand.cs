@@ -22,13 +22,13 @@ public class DeactivateUserCommandValidator : AbstractValidator<DeactivateUserCo
 internal partial class DeactivateUserCommandHandler(UserManager<ApplicationUser> userManager, ILogger<DeactivateUserCommandHandler> logger)
     : IRequestHandler<DeactivateUserCommand, DeactivateUserResult>
 {
-    [LoggerMessage(Level = LogLevel.Error, Message = "User with ID {UserId} not found for deactivation")]
+    [LoggerMessage(Level = LogLevel.Error, Message = "[DeactivateUser] User with ID {UserId} not found for deactivation")]
     private static partial void LogUserNotFound(ILogger logger, Guid userId);
 
-    [LoggerMessage(Level = LogLevel.Warning, Message = "User with ID {UserId} is already deactivated")]
+    [LoggerMessage(Level = LogLevel.Warning, Message = "[DeactivateUser] User with ID {UserId} is already deactivated")]
     private static partial void LogUserAlreadyDeactivated(ILogger logger, Guid userId);
 
-    [LoggerMessage(Level = LogLevel.Error, Message = "Failed to deactivate user with ID {UserId}. Errors: {Errors}")]
+    [LoggerMessage(Level = LogLevel.Error, Message = "[DeactivateUser] Failed to deactivate user with ID {UserId}. Errors: {Errors}")]
     private static partial void LogDeactivationFailed(ILogger logger, Guid userId, string errors);
 
     public async Task<Result<DeactivateUserResult>> Handle(DeactivateUserCommand request, CancellationToken cancellationToken = new CancellationToken())

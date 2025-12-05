@@ -25,8 +25,17 @@ public class StringFilterField
     public string? IsNotEqual { get; set; }
     public string? Contains { get; set; }
     public string? StartsWith { get; set; }
-    public ICollection<string>? InArray { get; } = [];
-    public ICollection<string>? NotInArray { get; } = [];
+
+    // Disable warnings about mutable collections for filter fields as they may be set during deserialization
+#pragma warning disable CA2227
+    // ReSharper disable once CollectionNeverUpdated.Global
+    public ICollection<string>? InArray { get; set; }
+#pragma warning restore CA2227
+    // Disable warnings about mutable collections for filter fields as they may be set during deserialization
+#pragma warning disable CA2227
+    // ReSharper disable once CollectionNeverUpdated.Global
+    public ICollection<string>? NotInArray { get; set; }
+#pragma warning restore CA2227
     public bool? IsNull { get; set; }
 }
 
@@ -38,7 +47,11 @@ public class RangeFilterField<T> where T : struct
     public T? IsGreaterThanOrEqual { get; set; }
     public T? IsLessThan { get; set; }
     public T? IsLessThanOrEqual { get; set; }
-    public ICollection<T>? InArray { get; } = [];
+    // Disable warnings about mutable collections for filter fields as they may be set during deserialization
+#pragma warning disable CA2227
+    // ReSharper disable once UnusedMember.Global
+    public ICollection<T>? InArray { get; set; }
+#pragma warning restore CA2227
 
     public T? RangeStart { get; set; }
     public T? RangeEnd { get; set; }

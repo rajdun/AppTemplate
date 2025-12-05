@@ -19,19 +19,19 @@ public class Mediator : IMediator
         LoggerMessage.Define<string, string>(
             LogLevel.Information,
             new EventId(1, nameof(SendAsync)),
-            "Handling {RequestType} with {HandlerType}");
+            "[Mediator] Handling request {RequestType} with handler {HandlerType}");
 
     private static readonly Action<ILogger, string, string, Exception?> _logHandled =
         LoggerMessage.Define<string, string>(
             LogLevel.Information,
             new EventId(2, nameof(SendAsync)),
-            "Handled {RequestType} with {HandlerType}");
+            "[Mediator] Handled request {RequestType} with handler {HandlerType}");
 
     private static readonly Action<ILogger, string, string, Exception?> _logValidationFailed =
         LoggerMessage.Define<string, string>(
             LogLevel.Warning,
             new EventId(3, "ValidationFailed"),
-            "Validation failed for {RequestType}: {Errors}");
+            "[Mediator] Validation failed for request {RequestType}: {Errors}");
 
     public Mediator(IServiceProvider serviceProvider)
     {

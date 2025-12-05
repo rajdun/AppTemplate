@@ -8,12 +8,12 @@ namespace ApplicationTests.Users.Queries;
 
 public class SearchUsersQueryHandlerTests
 {
-    private readonly ISearch<UserSearchDocumentDto> _search;
+    private readonly IUserSearch _search;
     private readonly SearchUsersQueryHandler _handler;
 
     public SearchUsersQueryHandlerTests()
     {
-        _search = Substitute.For<ISearch<UserSearchDocumentDto>>();
+        _search = Substitute.For<IUserSearch>();
         _handler = new SearchUsersQueryHandler(_search);
     }
 
@@ -21,7 +21,7 @@ public class SearchUsersQueryHandlerTests
     public async Task Handle_ShouldCallSearchService()
     {
         // Arrange
-        var request = new PagedRequest
+        var request = new PagedUserRequest
         {
             PageNumber = 1,
             PageSize = 10,
@@ -37,7 +37,7 @@ public class SearchUsersQueryHandlerTests
             PageSize = 10
         };
 
-        _search.SearchAsync(query, Arg.Any<CancellationToken>())
+        _search.SearchUsersAsync(request, Arg.Any<CancellationToken>())
             .Returns(expectedResult);
 
         // Act
@@ -46,17 +46,17 @@ public class SearchUsersQueryHandlerTests
         // Assert
         Assert.True(result.IsSuccess);
         Assert.Equal(expectedResult, result.Value);
-        await _search.Received(1).SearchAsync(query, Arg.Any<CancellationToken>());
+        await _search.Received(1).SearchUsersAsync(request, Arg.Any<CancellationToken>());
     }
 
     [Fact]
     public async Task Handle_WhenSearchFails_ShouldReturnFailure()
     {
         // Arrange
-        var request = new PagedRequest { PageNumber = 1, PageSize = 10 };
+        var request = new PagedUserRequest { PageNumber = 1, PageSize = 10 };
         var query = new SearchUsersQuery(request);
 
-        _search.SearchAsync(query, Arg.Any<CancellationToken>())
+        _search.SearchUsersAsync(request, Arg.Any<CancellationToken>())
             .Returns(new PagedResult<UserSearchDocumentDto>
             {
                 Items = new List<UserSearchDocumentDto>(),
@@ -78,7 +78,7 @@ public class SearchUsersQueryHandlerTests
     {
         // Arrange
         var validator = new SearchUsersQueryValidator();
-        var query = new SearchUsersQuery(new PagedRequest { PageNumber = 0, PageSize = 10 });
+        var query = new SearchUsersQuery(new PagedUserRequest { PageNumber = 0, PageSize = 10 });
 
         // Act
         var result = validator.Validate(query);
@@ -93,7 +93,7 @@ public class SearchUsersQueryHandlerTests
     {
         // Arrange
         var validator = new SearchUsersQueryValidator();
-        var query = new SearchUsersQuery(new PagedRequest { PageNumber = 1, PageSize = 0 });
+        var query = new SearchUsersQuery(new PagedUserRequest { PageNumber = 1, PageSize = 0 });
 
         // Act
         var result = validator.Validate(query);
@@ -108,7 +108,7 @@ public class SearchUsersQueryHandlerTests
     {
         // Arrange
         var validator = new SearchUsersQueryValidator();
-        var query = new SearchUsersQuery(new PagedRequest { PageNumber = 1, PageSize = 101 });
+        var query = new SearchUsersQuery(new PagedUserRequest { PageNumber = 1, PageSize = 101 });
 
         // Act
         var result = validator.Validate(query);
@@ -123,7 +123,7 @@ public class SearchUsersQueryHandlerTests
     {
         // Arrange
         var validator = new SearchUsersQueryValidator();
-        var query = new SearchUsersQuery(new PagedRequest
+        var query = new SearchUsersQuery(new PagedUserRequest
         {
             PageNumber = 1,
             PageSize = 10,
@@ -143,7 +143,7 @@ public class SearchUsersQueryHandlerTests
     {
         // Arrange
         var validator = new SearchUsersQueryValidator();
-        var query = new SearchUsersQuery(new PagedRequest
+        var query = new SearchUsersQuery(new PagedUserRequest
         {
             PageNumber = 1,
             PageSize = 10,
@@ -162,7 +162,7 @@ public class SearchUsersQueryHandlerTests
     {
         // Arrange
         var validator = new SearchUsersQueryValidator();
-        var query = new SearchUsersQuery(new PagedRequest { PageNumber = 1, PageSize = 10 });
+        var query = new SearchUsersQuery(new PagedUserRequest { PageNumber = 1, PageSize = 10 });
 
         // Act
         var result = validator.Validate(query);

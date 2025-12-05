@@ -12,7 +12,7 @@ namespace Application.Users.NotificationHandlers;
 public partial class UserRegisteredIndexNotificationHandler(ILogger<UserRegisteredIndexNotificationHandler> logger, ISearch<UserSearchDocumentDto> search, UserManager<ApplicationUser> userManager)
     : IRequestHandler<UserRegistered>
 {
-    [LoggerMessage(LogLevel.Error, "User {Email} not found")]
+    [LoggerMessage(LogLevel.Error, "[UserRegisteredIndex] User {Email} not found in identity store")]
     private static partial void LogUserNotFound(ILogger logger, string email);
 
     public async Task<Result> Handle(UserRegistered request, CancellationToken cancellationToken = new())

@@ -45,7 +45,7 @@ public sealed partial class UsersModule
     }
 
     private static async Task<IResult> SearchUsers([FromServices] IMediator mediator,
-        [FromBody] PagedRequest request, CancellationToken cancellationToken = new())
+        [FromBody] PagedUserRequest request, CancellationToken cancellationToken = default)
     {
         var query = new SearchUsersQuery(request);
 

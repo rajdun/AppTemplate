@@ -11,16 +11,16 @@ public partial class HangfireJobExecutor(
     IMediator mediator,
     IDomainNotificationDeserializer domainNotificationDeserializer) : IHangfireJobExecutor
 {
-    [LoggerMessage(LogLevel.Warning, "Failed to deserialize event of type {EventType}. The event might be unknown or the payload invalid. Hangfire will retry.")]
+    [LoggerMessage(LogLevel.Warning, "[HangfireJobExecutor] Failed to deserialize event type {EventType}; payload might be unknown or invalid. Hangfire will retry.")]
     private static partial void LogDeserializationWarning(ILogger logger, string eventType);
 
-    [LoggerMessage(LogLevel.Warning, "Processing of event type {EventType} failed. See logs for details. Hangfire will retry.")]
+    [LoggerMessage(LogLevel.Warning, "[HangfireJobExecutor] Processing for event type {EventType} failed. See previous logs. Hangfire will retry.")]
     private static partial void LogProcessingFailureWarning(ILogger logger, string eventType);
 
-    [LoggerMessage(LogLevel.Information, "Hangfire job started for event type {EventType}")]
+    [LoggerMessage(LogLevel.Information, "[HangfireJobExecutor] Hangfire job started for event type {EventType}")]
     private static partial void LogJobStartedInformation(ILogger logger, string eventType);
 
-    [LoggerMessage(LogLevel.Information, "Hangfire job successfully completed for event type {EventType}")]
+    [LoggerMessage(LogLevel.Information, "[HangfireJobExecutor] Hangfire job completed successfully for event type {EventType}")]
     private static partial void LogJobCompletedInformation(ILogger logger, string eventType);
 
     public async Task ProcessEventAsync(string eventType, string eventPayload, CancellationToken cancellationToken)

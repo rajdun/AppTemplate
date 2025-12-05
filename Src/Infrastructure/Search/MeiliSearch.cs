@@ -17,7 +17,7 @@ internal partial class MeiliSearch<T>(MeilisearchClient client, ILogger<MeiliSea
 {
     private readonly MeilisearchClient _client = client;
 
-    public string IndexName { get; } = typeof(T).Name;
+    public string IndexName { get; } = typeof(T).Name.ToUpperInvariant();
 
     public async Task IndexAsync(IEnumerable<T> documents, CancellationToken cancellationToken = default)
     {
@@ -25,12 +25,16 @@ internal partial class MeiliSearch<T>(MeilisearchClient client, ILogger<MeiliSea
         var list = documents as IReadOnlyCollection<T> ?? documents.ToList();
         if (list.Count == 0)
         {
+            LogNoDocumentsToIndex(IndexName);
             return;
         }
 
+        LogIndexingDocuments(IndexName, list.Count);
         var index = _client.Index(IndexName);
         var taskInfo = await index.AddDocumentsAsync(list, cancellationToken: cancellationToken).ConfigureAwait(false);
+        LogWaitingForIndexTask(taskInfo.TaskUid);
         await _client.WaitForTaskAsync(taskInfo.TaskUid, cancellationToken: cancellationToken).ConfigureAwait(false);
+        LogIndexingCompleted(IndexName, list.Count, taskInfo.TaskUid);
     }
 
     public async Task DeleteAsync(IEnumerable<Guid> documentIds, CancellationToken cancellationToken = default)
@@ -39,70 +43,39 @@ internal partial class MeiliSearch<T>(MeilisearchClient client, ILogger<MeiliSea
         var ids = documentIds.Select(x => x.ToString()).ToList();
         if (ids.Count == 0)
         {
+            LogNoDocumentsToDelete(IndexName);
             return;
         }
 
+        LogDeletingDocuments(IndexName, ids.Count);
         var index = _client.Index(IndexName);
         var taskInfo = await index.DeleteDocumentsAsync(ids, cancellationToken).ConfigureAwait(false);
+        LogWaitingForDeleteTask(taskInfo.TaskUid);
         await _client.WaitForTaskAsync(taskInfo.TaskUid, cancellationToken: cancellationToken).ConfigureAwait(false);
+        LogDeletionCompleted(IndexName, ids.Count, taskInfo.TaskUid);
     }
 
-    // Note: Generic search is not ideal for user-specific query shapes. Prefer a dedicated service.
-    public async Task<PagedResult<T>> SearchAsync(SearchUsersQuery request, CancellationToken cancellationToken = default)
-    {
-        // Best-effort implementation using only term + pagination + simple sort if present.
-        var index = _client.Index(IndexName);
+    [LoggerMessage(LogLevel.Debug, "[MeiliSearch] No documents to index for index '{IndexName}'")]
+    partial void LogNoDocumentsToIndex(string indexName);
 
-        // Derive offset/limit from request if available; otherwise apply defaults.
-        var pageNumber = request.Request.PageNumber < 1 ? 1 : request.Request.PageNumber;
-        var pageSize = request.Request.PageSize < 1 ? 1 : request.Request.PageSize;
-        var offset = (pageNumber - 1) * pageSize;
-        var limit = pageSize;
+    [LoggerMessage(LogLevel.Debug, "[MeiliSearch] Indexing {Count} document(s) to index '{IndexName}'")]
+    partial void LogIndexingDocuments(string indexName, int count);
 
-        var sort = new List<string>();
-        if (!string.IsNullOrWhiteSpace(request.Request.SortBy))
-        {
-            var dir = request.Request.SortOrder.ToString().Equals("Asc", StringComparison.OrdinalIgnoreCase)
-                ? "asc"
-                : "desc";
-            sort.Add(request.Request.SortBy + ":" + dir);
-        }
+    [LoggerMessage(LogLevel.Debug, "[MeiliSearch] Waiting for index task {TaskUid} to complete")]
+    partial void LogWaitingForIndexTask(int taskUid);
 
-        var q = request.Request.Query ?? string.Empty;
+    [LoggerMessage(LogLevel.Debug, "[MeiliSearch] Indexed {Count} document(s) to index '{IndexName}' (TaskUid: {TaskUid})")]
+    partial void LogIndexingCompleted(string indexName, int count, int taskUid);
 
-        var options = new Meilisearch.SearchQuery
-        {
-            Offset = offset,
-            Limit = limit,
-            Sort = sort.Count > 0 ? sort : null
-        };
+    [LoggerMessage(LogLevel.Debug, "[MeiliSearch] No documents to delete from index '{IndexName}'")]
+    partial void LogNoDocumentsToDelete(string indexName);
 
-        try
-        {
-            var res = await index.SearchAsync<T>(q, options, cancellationToken).ConfigureAwait(false);
-            var items = res.Hits?.ToList() ?? new List<T>();
-            var total = items.Count;
-            return new PagedResult<T>
-            {
-                Items = items,
-                TotalCount = total,
-                PageNumber = pageNumber,
-                PageSize = pageSize
-            };
-        }
-        catch (MeilisearchApiError)
-        {
-            LogMeilisearchQueryFailedForIndexIndex(IndexName);
-            return new PagedResult<T>
-            {
-                Items = Array.Empty<T>(),
-                TotalCount = 0,
-                PageNumber = pageNumber,
-                PageSize = pageSize
-            };
-        }
-    }
+    [LoggerMessage(LogLevel.Debug, "[MeiliSearch] Deleting {Count} document(s) from index '{IndexName}'")]
+    partial void LogDeletingDocuments(string indexName, int count);
 
-    [LoggerMessage(LogLevel.Error, "Meilisearch query failed for index {Index}")]
-    partial void LogMeilisearchQueryFailedForIndexIndex(string Index);
+    [LoggerMessage(LogLevel.Debug, "[MeiliSearch] Waiting for delete task {TaskUid} to complete")]
+    partial void LogWaitingForDeleteTask(int taskUid);
+
+    [LoggerMessage(LogLevel.Debug, "[MeiliSearch] Deleted {Count} document(s) from index '{IndexName}' (TaskUid: {TaskUid})")]
+    partial void LogDeletionCompleted(string indexName, int count, int taskUid);
 }

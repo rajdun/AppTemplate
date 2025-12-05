@@ -10,7 +10,5 @@ public interface ISearch<T> where T : SearchDocumentDto
 
     public Task DeleteAsync(IEnumerable<Guid> documentIds, CancellationToken cancellationToken = default);
 
-    public Task<PagedResult<T>> SearchAsync(SearchUsersQuery request, CancellationToken cancellationToken = default);
-
     public string IndexName { get; }
 }

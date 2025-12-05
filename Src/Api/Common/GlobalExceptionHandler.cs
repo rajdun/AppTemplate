@@ -7,7 +7,7 @@ internal sealed partial class GlobalExceptionHandler : IExceptionHandler
     private readonly IHostEnvironment _environment;
     private readonly ILogger<GlobalExceptionHandler> _logger;
 
-    [LoggerMessage(LogLevel.Error, "An unhandled exception has occurred: {Message}")]
+    [LoggerMessage(LogLevel.Error, "[GlobalExceptionHandler] Unhandled exception: {Message}")]
     private static partial void LogUnhandledException(ILogger logger, string message);
 
     public GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logger, IHostEnvironment environment)

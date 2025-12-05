@@ -65,7 +65,13 @@ services:
 
       # Meilisearch settings
       - MeilisearchSettings__Uri=http://meilisearch:7700
-      - MeilisearchSettings__MasterKey=${MEILI_MASTER_KEY:-masterKey}
+      - MeilisearchSettings__ApiKey=${MEILI_MASTER_KEY:-masterKey}
+      - MeilisearchSettings__Indexes__0__Name=USERSEARCHDOCUMENTDTO
+      - MeilisearchSettings__Indexes__0__PrimaryKey=id
+      - MeilisearchSettings__Indexes__0__SortableAttributes__0=name
+      - MeilisearchSettings__Indexes__0__SortableAttributes__1=email
+      - MeilisearchSettings__Indexes__0__FilterableAttributes__0=name
+      - MeilisearchSettings__Indexes__0__FilterableAttributes__1=email
     restart: unless-stopped
     networks:
       - monitoring
@@ -101,7 +107,13 @@ services:
 
       # Meilisearch settings
       - MeilisearchSettings__Uri=http://meilisearch:7700
-      - MeilisearchSettings__MasterKey=${MEILI_MASTER_KEY:-masterKey}
+      - MeilisearchSettings__ApiKey=${MEILI_MASTER_KEY:-masterKey}
+      - MeilisearchSettings__Indexes__0__Name=USERSEARCHDOCUMENTDTO
+      - MeilisearchSettings__Indexes__0__PrimaryKey=id
+      - MeilisearchSettings__Indexes__0__SortableAttributes__0=name
+      - MeilisearchSettings__Indexes__0__SortableAttributes__1=email
+      - MeilisearchSettings__Indexes__0__FilterableAttributes__0=name
+      - MeilisearchSettings__Indexes__0__FilterableAttributes__1=email
     restart: unless-stopped
     networks:
       - monitoring

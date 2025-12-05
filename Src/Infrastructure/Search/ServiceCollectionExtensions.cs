@@ -20,6 +20,12 @@ internal static class ServiceCollectionExtensions
         // Register generic search implementation for application-level ISearch<>
         services.AddScoped(typeof(Application.Common.Search.ISearch<>), typeof(MeiliSearch<>));
 
+        // Register specific user search service
+        services.AddScoped<Application.Common.Search.IUserSearch, UserSearch>();
+
+        // Initialize Meilisearch index settings (e.g., sortable attributes) at startup
+        services.AddHostedService<MeilisearchInitializer>();
+
         return services;
     }
 }

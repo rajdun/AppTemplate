@@ -29,37 +29,37 @@ public class OutboxProcessor(
         LoggerMessage.Define(
             LogLevel.Information,
             new EventId(1, nameof(ProcessOutboxMessagesAsync)),
-            "Processing outbox messages...");
+            "[OutboxProcessor] Processing pending outbox messages");
 
     private static readonly Action<ILogger, Exception?> _logDatabaseError =
         LoggerMessage.Define(
             LogLevel.Error,
             new EventId(2, nameof(ProcessOutboxMessagesAsync)),
-            "Database error while fetching outbox messages. Will retry on next run.");
+            "[OutboxProcessor] Database error while fetching outbox messages. Will retry on next run.");
 
     private static readonly Action<ILogger, Exception?> _logNoMessages =
         LoggerMessage.Define(
             LogLevel.Debug,
             new EventId(3, nameof(ProcessOutboxMessagesAsync)),
-            "No new outbox messages to process.");
+            "[OutboxProcessor] No new outbox messages to process");
 
     private static readonly Action<ILogger, Guid, string, Exception?> _logEnqueuing =
         LoggerMessage.Define<Guid, string>(
             LogLevel.Information,
             new EventId(4, nameof(ProcessOutboxMessagesAsync)),
-            "Enqueuing event {EventId} ({EventType}) to Hangfire");
+            "[OutboxProcessor] Enqueuing event {EventId} ({EventType}) to Hangfire");
 
     private static readonly Action<ILogger, Guid, Exception?> _logEnqueueError =
         LoggerMessage.Define<Guid>(
             LogLevel.Error,
             new EventId(5, nameof(ProcessOutboxMessagesAsync)),
-            "Failed to enqueue message {MessageId} to Hangfire. Will retry on next run.");
+            "[OutboxProcessor] Failed to enqueue message {MessageId} to Hangfire. Will retry on next run.");
 
     private static readonly Action<ILogger, int, Exception?> _logFinished =
         LoggerMessage.Define<int>(
             LogLevel.Information,
             new EventId(6, nameof(ProcessOutboxMessagesAsync)),
-            "Finished processing batch of {Count} outbox messages.");
+            "[OutboxProcessor] Finished processing batch of {Count} outbox messages");
 
     public async Task ProcessOutboxMessagesAsync(CancellationToken cancellationToken = default)
     {

@@ -7,7 +7,7 @@ using FluentValidation;
 
 namespace Application.Users.Queries;
 
-public record SearchUsersQuery(PagedRequest Request) : IRequest<PagedResult<UserSearchDocumentDto>>;
+public record SearchUsersQuery(PagedUserRequest Request) : IRequest<PagedResult<UserSearchDocumentDto>>;
 
 public class SearchUsersQueryValidator : AbstractValidator<SearchUsersQuery>
 {
@@ -29,11 +29,12 @@ public class SearchUsersQueryValidator : AbstractValidator<SearchUsersQuery>
     }
 }
 
-internal class SearchUsersQueryHandler(ISearch<UserSearchDocumentDto> search)
+internal class SearchUsersQueryHandler(IUserSearch search)
     : IRequestHandler<SearchUsersQuery, PagedResult<UserSearchDocumentDto>>
 {
-    public async Task<Result<PagedResult<UserSearchDocumentDto>>> Handle(SearchUsersQuery request, CancellationToken cancellationToken = new CancellationToken())
+    public async Task<Result<PagedResult<UserSearchDocumentDto>>> Handle(SearchUsersQuery request, CancellationToken cancellationToken = default)
     {
-        return await search.SearchAsync(request, cancellationToken).ConfigureAwait(false);
+        var result = await search.SearchUsersAsync(request.Request, cancellationToken).ConfigureAwait(false);
+        return Result.Ok(result);
     }
 }
