@@ -1,7 +1,8 @@
 using Application.Resources;
 using Application.Users.Dto;
+using Domain.Aggregates.Identity;
 using Domain.Common;
-using Domain.Entities.Users;
+using Domain.Common.Interfaces;
 using FluentResults;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
@@ -19,7 +20,7 @@ public class DeactivateUserCommandValidator : AbstractValidator<DeactivateUserCo
     }
 }
 
-internal partial class DeactivateUserCommandHandler(UserManager<ApplicationUser> userManager, ILogger<DeactivateUserCommandHandler> logger)
+internal partial class DeactivateUserCommandHandler(UserManager<User> userManager, ILogger<DeactivateUserCommandHandler> logger)
     : IRequestHandler<DeactivateUserCommand, DeactivateUserResult>
 {
     [LoggerMessage(Level = LogLevel.Error, Message = "[DeactivateUser] User with ID {UserId} not found for deactivation")]

@@ -3,7 +3,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 using Application.Common.Interfaces;
-using Domain.Entities.Users;
+using Domain.Aggregates.Identity;
 using Infrastructure.Implementation.Dto;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -23,7 +23,7 @@ internal class JwtTokenGenerator : IJwtTokenGenerator
         _cacheService = cacheService;
     }
 
-    public async Task<string> GenerateToken(ApplicationUser user)
+    public async Task<string> GenerateToken(User user)
     {
         var jti = Guid.NewGuid();
         var claims = new List<Claim>

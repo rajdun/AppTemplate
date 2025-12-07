@@ -1,8 +1,9 @@
 using Application.Common.Interfaces;
 using Application.Resources;
 using Application.Users.Dto;
+using Domain.Aggregates.Identity;
 using Domain.Common;
-using Domain.Entities.Users;
+using Domain.Common.Interfaces;
 using FluentResults;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
@@ -25,7 +26,7 @@ public class LoginCommandValidator : AbstractValidator<LoginCommand>
 }
 
 internal sealed class LoginCommandHandler(
-    UserManager<ApplicationUser> userManager,
+    UserManager<User> userManager,
     IJwtTokenGenerator jwtTokenGenerator,
     ICacheService cacheService)
     : IRequestHandler<LoginCommand, TokenResult>

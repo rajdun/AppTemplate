@@ -1,15 +1,17 @@
 using Application.Common.Search;
 using Application.Common.Search.Dto;
+using Application.Common.Search.Dto.User;
+using Domain.Aggregates.Identity;
+using Domain.Aggregates.Identity.DomainNotifications;
 using Domain.Common;
-using Domain.DomainNotifications.User;
-using Domain.Entities.Users;
+using Domain.Common.Interfaces;
 using FluentResults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
 namespace Application.Users.NotificationHandlers;
 
-public partial class UserRegisteredIndexNotificationHandler(ILogger<UserRegisteredIndexNotificationHandler> logger, ISearch<UserSearchDocumentDto> search, UserManager<ApplicationUser> userManager)
+public partial class UserRegisteredIndexNotificationHandler(ILogger<UserRegisteredIndexNotificationHandler> logger, ISearch<UserSearchDocumentDto> search, UserManager<User> userManager)
     : IRequestHandler<UserRegistered>
 {
     [LoggerMessage(LogLevel.Error, "[UserRegisteredIndex] User {Email} not found in identity store")]

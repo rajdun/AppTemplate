@@ -1,19 +1,16 @@
 using Application.Common.Interfaces;
-using Domain.Entities;
+using Application.Common.Messaging;
 using Hangfire;
+using Infrastructure.Data;
+using Infrastructure.Messaging.Dto;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-// Assuming IApplicationDbContext is here
-// Assuming IMediator is here
-// Assuming OutboxMessage is here
 
-// Use built-in System.Text.Json
-
-namespace Application.Common.Messaging;
+namespace Infrastructure.Messaging;
 
 public class OutboxProcessor(
     ILogger<OutboxProcessor> logger,
-    IApplicationDbContext dbContext,
+    ApplicationDbContext dbContext,
     IBackgroundJobClient backgroundJobClient,
     IDateTimeProvider dateTimeProvider) : IOutboxProcessor
 {

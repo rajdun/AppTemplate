@@ -1,7 +1,7 @@
 using Application.Resources;
 using Application.Users.Commands;
 using Application.Users.Dto;
-using Domain.Entities.Users;
+using Domain.Aggregates.Identity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
@@ -10,14 +10,14 @@ namespace ApplicationTests.Users.Commands;
 
 public class DeactivateUserCommandHandlerTests
 {
-    private readonly UserManager<ApplicationUser> _userManager;
+    private readonly UserManager<User> _userManager;
     private readonly ILogger<DeactivateUserCommandHandler> _logger;
     private readonly DeactivateUserCommandHandler _handler;
 
     public DeactivateUserCommandHandlerTests()
     {
-        var userStore = Substitute.For<IUserStore<ApplicationUser>>();
-        _userManager = Substitute.For<UserManager<ApplicationUser>>(
+        var userStore = Substitute.For<IUserStore<User>>();
+        _userManager = Substitute.For<UserManager<User>>(
             userStore, null, null, null, null, null, null, null, null);
         _logger = Substitute.For<ILogger<DeactivateUserCommandHandler>>();
         _handler = new DeactivateUserCommandHandler(_userManager, _logger);
@@ -29,7 +29,7 @@ public class DeactivateUserCommandHandlerTests
         // Arrange
         var userId = Guid.NewGuid();
         var command = new DeactivateUserCommand(userId);
-        _userManager.FindByIdAsync(userId.ToString()).Returns((ApplicationUser?)null);
+        _userManager.FindByIdAsync(userId.ToString()).Returns((User?)null);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -44,7 +44,7 @@ public class DeactivateUserCommandHandlerTests
     {
         // Arrange
         var userId = Guid.NewGuid();
-        var user = ApplicationUser.Create("testuser", "test@test.com", "en");
+        var user = new User("testuser", "test@test.com", "en");
         user.DeactivatedAt = DateTimeOffset.UtcNow;
         var command = new DeactivateUserCommand(userId);
         _userManager.FindByIdAsync(userId.ToString()).Returns(user);
@@ -62,7 +62,7 @@ public class DeactivateUserCommandHandlerTests
     {
         // Arrange
         var userId = Guid.NewGuid();
-        var user = ApplicationUser.Create("testuser", "test@test.com", "en");
+        var user = new User("testuser", "test@test.com", "en");
         var command = new DeactivateUserCommand(userId);
         var identityErrors = new[] { new IdentityError { Description = "Update failed" } };
 
@@ -82,7 +82,7 @@ public class DeactivateUserCommandHandlerTests
     {
         // Arrange
         var userId = Guid.NewGuid();
-        var user = ApplicationUser.Create("testuser", "test@test.com", "en");
+        var user = new User("testuser", "test@test.com", "en");
         var command = new DeactivateUserCommand(userId);
 
         _userManager.FindByIdAsync(userId.ToString()).Returns(user);

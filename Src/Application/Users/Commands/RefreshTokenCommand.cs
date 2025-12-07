@@ -2,8 +2,9 @@ using Application.Common.Interfaces;
 using Application.Common.MediatorPattern;
 using Application.Resources;
 using Application.Users.Dto;
+using Domain.Aggregates.Identity;
 using Domain.Common;
-using Domain.Entities.Users;
+using Domain.Common.Interfaces;
 using FluentResults;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
@@ -26,7 +27,7 @@ public class RefreshTokenCommandValidator : AbstractValidator<RefreshTokenComman
 internal class RefreshTokenCommandHandler(
     ICacheService cacheService,
     IJwtTokenGenerator jwtTokenGenerator,
-    UserManager<ApplicationUser> userManager,
+    UserManager<User> userManager,
     IUser currentUser)
     : IRequestHandler<RefreshTokenCommand, TokenResult>
 {

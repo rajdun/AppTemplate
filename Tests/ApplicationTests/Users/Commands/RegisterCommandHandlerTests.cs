@@ -2,8 +2,8 @@ using Application.Common.Interfaces;
 using Application.Common.ValueObjects;
 using Application.Resources;
 using Application.Users.Commands;
+using Domain.Aggregates.Identity;
 using Domain.Common;
-using Domain.Entities.Users;
 using Microsoft.AspNetCore.Identity;
 using NSubstitute;
 
@@ -11,7 +11,7 @@ namespace ApplicationTests.Users.Commands;
 
 public class RegisterCommandHandlerTests
 {
-    private readonly UserManager<ApplicationUser> _userManager;
+    private readonly UserManager<User> _userManager;
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
     private readonly ICacheService _cacheService;
     private readonly IUser _user;
@@ -19,8 +19,8 @@ public class RegisterCommandHandlerTests
 
     public RegisterCommandHandlerTests()
     {
-        var userStore = Substitute.For<IUserStore<ApplicationUser>>();
-        _userManager = Substitute.For<UserManager<ApplicationUser>>(
+        var userStore = Substitute.For<IUserStore<User>>();
+        _userManager = Substitute.For<UserManager<User>>(
             userStore, null, null, null, null, null, null, null, null);
         _jwtTokenGenerator = Substitute.For<IJwtTokenGenerator>();
         _cacheService = Substitute.For<ICacheService>();
@@ -33,7 +33,7 @@ public class RegisterCommandHandlerTests
     public async Task Handle_WhenUsernameExists_ShouldReturnFailure()
     {
         // Arrange
-        var existingUser = ApplicationUser.Create("existinguser", "existing@test.com", "en");
+        var existingUser = new User("existinguser", "existing@test.com", "en");
         var command = new RegisterCommand("existinguser", "new@test.com", "Password123!", "Password123!");
 
         _userManager.FindByNameAsync(command.Username).Returns(existingUser);
@@ -53,8 +53,8 @@ public class RegisterCommandHandlerTests
         var command = new RegisterCommand("newuser", "new@test.com", "Password123!", "Password123!");
         var identityErrors = new[] { new IdentityError { Description = "Password too weak" } };
 
-        _userManager.FindByNameAsync(command.Username).Returns((ApplicationUser?)null);
-        _userManager.CreateAsync(Arg.Any<ApplicationUser>(), command.Password)
+        _userManager.FindByNameAsync(command.Username).Returns((User?)null);
+        _userManager.CreateAsync(Arg.Any<User>(), command.Password)
             .Returns(IdentityResult.Failed(identityErrors));
 
         // Act
@@ -73,10 +73,10 @@ public class RegisterCommandHandlerTests
         var expectedToken = "jwt-token";
         var expectedRefreshToken = "refresh-token";
 
-        _userManager.FindByNameAsync(command.Username).Returns((ApplicationUser?)null);
-        _userManager.CreateAsync(Arg.Any<ApplicationUser>(), command.Password)
+        _userManager.FindByNameAsync(command.Username).Returns((User?)null);
+        _userManager.CreateAsync(Arg.Any<User>(), command.Password)
             .Returns(IdentityResult.Success);
-        _jwtTokenGenerator.GenerateToken(Arg.Any<ApplicationUser>())
+        _jwtTokenGenerator.GenerateToken(Arg.Any<User>())
             .Returns(Task.FromResult(expectedToken));
         _jwtTokenGenerator.GenerateRefreshToken().Returns(expectedRefreshToken);
 
@@ -89,7 +89,7 @@ public class RegisterCommandHandlerTests
         Assert.Equal(expectedRefreshToken, result.Value.RefreshToken);
 
         await _userManager.Received(1).CreateAsync(
-            Arg.Is<ApplicationUser>(u => u.UserName == command.Username && u.Email == command.Email),
+            Arg.Is<User>(u => u.UserName == command.Username && u.Email == command.Email),
             command.Password);
 
         await _cacheService.Received(1).SetAsync(

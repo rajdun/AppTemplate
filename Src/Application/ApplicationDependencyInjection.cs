@@ -2,6 +2,7 @@
 using Application.Common.MediatorPattern;
 using Application.Common.Messaging;
 using Domain.Common;
+using Domain.Common.Interfaces;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -13,7 +14,7 @@ public static class ApplicationDependencyInjection
     {
         services.AddMediator(typeof(ApplicationDependencyInjection).Assembly);
         services.AddValidatorsFromAssembly(typeof(ApplicationDependencyInjection).Assembly);
-        services.AddScoped<IOutboxProcessor, OutboxProcessor>();
+
 
         return services;
     }

@@ -1,6 +1,7 @@
 using Application.Common.Dto;
 using Application.Common.Search;
 using Application.Common.Search.Dto;
+using Application.Common.Search.Dto.User;
 using Meilisearch;
 using Microsoft.Extensions.Logging;
 
@@ -24,93 +25,11 @@ internal partial class UserSearch(ILogger<UserSearch> logger, MeilisearchClient 
         // Only support equality and IN filters for Meilisearch filter syntax; others will be ignored.
         if (request.Name is not null)
         {
-            if (!string.IsNullOrWhiteSpace(request.Name.IsEqual))
-            {
-                filters.Add($"name = '{EscapeFilterValue(request.Name.IsEqual)}'");
-            }
-
-            if (!string.IsNullOrWhiteSpace(request.Name.IsNotEqual))
-            {
-                filters.Add($"name != '{EscapeFilterValue(request.Name.IsNotEqual)}'");
-            }
-
-            if (!string.IsNullOrWhiteSpace(request.Name.Contains))
-            {
-                filters.Add($"name CONTAINS '{EscapeFilterValue(request.Name.Contains)}'");
-            }
-
-            if (!string.IsNullOrWhiteSpace(request.Name.StartsWith))
-            {
-                filters.Add($"name STARTS WITH '{EscapeFilterValue(request.Name.StartsWith)}'");
-            }
-
-            if (request.Name.InArray is { Count: > 0 })
-            {
-                var nonEmptyValues = request.Name.InArray.Where(v => !string.IsNullOrWhiteSpace(v)).ToList();
-                if (nonEmptyValues.Count > 0)
-                {
-                    filters.Add($"name IN [{string.Join(", ", nonEmptyValues.Select(v => $"'{EscapeFilterValue(v)}'"))}]");
-                }
-            }
-
-            if (request.Name.NotInArray is { Count: > 0 })
-            {
-                var nonEmptyValues = request.Name.NotInArray.Where(v => !string.IsNullOrWhiteSpace(v)).ToList();
-                if (nonEmptyValues.Count > 0)
-                {
-                    filters.Add($"name NOT IN [{string.Join(", ", nonEmptyValues.Select(v => $"'{EscapeFilterValue(v)}'"))}]");
-                }
-            }
-
-            if (request.Name.IsNull is not null)
-            {
-                filters.Add(request.Name.IsNull.Value ? "name IS NULL" : "name IS NOT NULL");
-            }
+            ApplyNameFilters(request, filters);
         }
         if (request.Email is not null)
         {
-            if (!string.IsNullOrWhiteSpace(request.Email.IsEqual))
-            {
-                filters.Add($"email = '{EscapeFilterValue(request.Email.IsEqual)}'");
-            }
-
-            if (!string.IsNullOrWhiteSpace(request.Email.IsNotEqual))
-            {
-                filters.Add($"email != '{EscapeFilterValue(request.Email.IsNotEqual)}'");
-            }
-
-            if (!string.IsNullOrWhiteSpace(request.Email.Contains))
-            {
-                filters.Add($"email CONTAINS '{EscapeFilterValue(request.Email.Contains)}'");
-            }
-
-            if (!string.IsNullOrWhiteSpace(request.Email.StartsWith))
-            {
-                filters.Add($"email STARTS WITH '{EscapeFilterValue(request.Email.StartsWith)}'");
-            }
-
-            if (request.Email.InArray is { Count: > 0 })
-            {
-                var nonEmptyValues = request.Email.InArray.Where(v => !string.IsNullOrWhiteSpace(v)).ToList();
-                if (nonEmptyValues.Count > 0)
-                {
-                    filters.Add($"email IN [{string.Join(", ", nonEmptyValues.Select(v => $"'{EscapeFilterValue(v)}'"))}]");
-                }
-            }
-
-            if (request.Email.NotInArray is { Count: > 0 })
-            {
-                var nonEmptyValues = request.Email.NotInArray.Where(v => !string.IsNullOrWhiteSpace(v)).ToList();
-                if (nonEmptyValues.Count > 0)
-                {
-                    filters.Add($"email NOT IN [{string.Join(", ", nonEmptyValues.Select(v => $"'{EscapeFilterValue(v)}'"))}]");
-                }
-            }
-
-            if (request.Email.IsNull is not null)
-            {
-                filters.Add(request.Email.IsNull.Value ? "email IS NULL" : "email IS NOT NULL");
-            }
+            ApplyEmailFilters(request, filters);
         }
 
         var sortList = new List<string>();
@@ -148,6 +67,101 @@ internal partial class UserSearch(ILogger<UserSearch> logger, MeilisearchClient 
         };
     }
 
+    private static void ApplyEmailFilters(PagedUserRequest request, List<string> filters)
+    {
+        ArgumentNullException.ThrowIfNull(request.Email);
+
+        if (!string.IsNullOrWhiteSpace(request.Email!.IsEqual))
+        {
+            filters.Add($"email = '{EscapeFilterValue(request.Email.IsEqual)}'");
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.Email.IsNotEqual))
+        {
+            filters.Add($"email != '{EscapeFilterValue(request.Email.IsNotEqual)}'");
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.Email.Contains))
+        {
+            filters.Add($"email CONTAINS '{EscapeFilterValue(request.Email.Contains)}'");
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.Email.StartsWith))
+        {
+            filters.Add($"email STARTS WITH '{EscapeFilterValue(request.Email.StartsWith)}'");
+        }
+
+        if (request.Email.InArray is { Count: > 0 })
+        {
+            var nonEmptyValues = request.Email.InArray.Where(v => !string.IsNullOrWhiteSpace(v)).ToList();
+            if (nonEmptyValues.Count > 0)
+            {
+                filters.Add($"email IN [{string.Join(", ", nonEmptyValues.Select(v => $"'{EscapeFilterValue(v)}'"))}]");
+            }
+        }
+
+        if (request.Email.NotInArray is { Count: > 0 })
+        {
+            var nonEmptyValues = request.Email.NotInArray.Where(v => !string.IsNullOrWhiteSpace(v)).ToList();
+            if (nonEmptyValues.Count > 0)
+            {
+                filters.Add($"email NOT IN [{string.Join(", ", nonEmptyValues.Select(v => $"'{EscapeFilterValue(v)}'"))}]");
+            }
+        }
+
+        if (request.Email.IsNull is not null)
+        {
+            filters.Add(request.Email.IsNull.Value ? "email IS NULL" : "email IS NOT NULL");
+        }
+    }
+
+    private static void ApplyNameFilters(PagedUserRequest request, List<string> filters)
+    {
+        ArgumentNullException.ThrowIfNull(request.Name);
+
+        if (!string.IsNullOrWhiteSpace(request.Name.IsEqual))
+        {
+            filters.Add($"name = '{EscapeFilterValue(request.Name.IsEqual)}'");
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.Name.IsNotEqual))
+        {
+            filters.Add($"name != '{EscapeFilterValue(request.Name.IsNotEqual)}'");
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.Name.Contains))
+        {
+            filters.Add($"name CONTAINS '{EscapeFilterValue(request.Name.Contains)}'");
+        }
+
+        if (!string.IsNullOrWhiteSpace(request.Name.StartsWith))
+        {
+            filters.Add($"name STARTS WITH '{EscapeFilterValue(request.Name.StartsWith)}'");
+        }
+
+        if (request.Name.InArray is { Count: > 0 })
+        {
+            var nonEmptyValues = request.Name.InArray.Where(v => !string.IsNullOrWhiteSpace(v)).ToList();
+            if (nonEmptyValues.Count > 0)
+            {
+                filters.Add($"name IN [{string.Join(", ", nonEmptyValues.Select(v => $"'{EscapeFilterValue(v)}'"))}]");
+            }
+        }
+
+        if (request.Name.NotInArray is { Count: > 0 })
+        {
+            var nonEmptyValues = request.Name.NotInArray.Where(v => !string.IsNullOrWhiteSpace(v)).ToList();
+            if (nonEmptyValues.Count > 0)
+            {
+                filters.Add($"name NOT IN [{string.Join(", ", nonEmptyValues.Select(v => $"'{EscapeFilterValue(v)}'"))}]");
+            }
+        }
+
+        if (request.Name.IsNull is not null)
+        {
+            filters.Add(request.Name.IsNull.Value ? "name IS NULL" : "name IS NOT NULL");
+        }
+    }
 
 
     private static string EscapeFilterValue(string value)

@@ -3,6 +3,7 @@ using Application.Common.Errors;
 using Application.Common.Interfaces;
 using Application.Resources;
 using Domain.Common;
+using Domain.Common.Interfaces;
 using FluentResults;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;

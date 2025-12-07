@@ -1,4 +1,4 @@
-using Domain.Entities;
+using Infrastructure.Messaging.Dto;
 using Microsoft.EntityFrameworkCore;
 
 namespace Infrastructure.Data;

@@ -1,6 +1,7 @@
 using Application.Common.Dto;
 using Application.Common.Search;
 using Application.Common.Search.Dto;
+using Application.Common.Search.Dto.User;
 using Application.Users.Queries;
 using NSubstitute;
 

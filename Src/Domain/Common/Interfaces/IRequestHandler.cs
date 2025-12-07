@@ -1,6 +1,6 @@
 using FluentResults;
 
-namespace Domain.Common;
+namespace Domain.Common.Interfaces;
 
 public interface IRequestHandler<in TRequest, TResponse> where TRequest : IRequest<TResponse>
 {

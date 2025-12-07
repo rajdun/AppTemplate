@@ -1,7 +1,8 @@
 using System.Data.Common;
 using Application.Common;
-using Domain.Entities;
-using Domain.Entities.Users;
+using Domain.Aggregates.Identity;
+using Infrastructure.Identity;
+using Infrastructure.Messaging.Dto;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -50,7 +51,7 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser, A
 
         base.OnModelCreating(builder);
 
-        builder.Entity<ApplicationUser>(b => { b.Property(u => u.Id).HasDefaultValueSql("uuidv7()"); });
+        builder.Entity<User>(b => { b.Property(u => u.Id).HasDefaultValueSql("uuidv7()"); });
 
         builder.Entity<OutboxMessage>(b =>
         {

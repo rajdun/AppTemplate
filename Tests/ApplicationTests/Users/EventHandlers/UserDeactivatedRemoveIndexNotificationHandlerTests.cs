@@ -1,7 +1,8 @@
 using Application.Common.Search;
 using Application.Common.Search.Dto;
+using Application.Common.Search.Dto.User;
 using Application.Users.NotificationHandlers;
-using Domain.DomainNotifications.User;
+using Domain.Aggregates.Identity.DomainNotifications;
 using NSubstitute;
 
 namespace ApplicationTests.Users.EventHandlers;

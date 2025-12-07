@@ -3,6 +3,7 @@ using Api.Modules.Users.Requests;
 using Application.Common.Dto;
 using Application.Common.MediatorPattern;
 using Application.Common.Search.Dto;
+using Application.Common.Search.Dto.User;
 using Application.Users.Commands;
 using Application.Users.Dto;
 using Application.Users.Queries;

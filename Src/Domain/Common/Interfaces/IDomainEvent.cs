@@ -1,6 +1,6 @@
 using System.Reflection;
 
-namespace Domain.Common;
+namespace Domain.Common.Interfaces;
 
 #pragma warning disable CA1040
 public interface IDomainEvent : IRequest

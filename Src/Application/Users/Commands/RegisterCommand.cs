@@ -1,8 +1,9 @@
 using Application.Common.Interfaces;
 using Application.Resources;
 using Application.Users.Dto;
+using Domain.Aggregates.Identity;
 using Domain.Common;
-using Domain.Entities.Users;
+using Domain.Common.Interfaces;
 using FluentResults;
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
@@ -34,7 +35,7 @@ public class RegisterCommandValidator : AbstractValidator<RegisterCommand>
 }
 
 public class RegisterCommandHandler(
-    UserManager<ApplicationUser> userManager,
+    UserManager<User> userManager,
     IJwtTokenGenerator jwtTokenGenerator,
     ICacheService cacheService,
     IUser user)
@@ -50,7 +51,7 @@ public class RegisterCommandHandler(
             return Result.Fail<TokenResult>(UserTranslations.UsernameAlreadyExists);
         }
 
-        var newUser = ApplicationUser.Create(request.Username, request.Email, user.Language.ToString());
+        var newUser = new User(request.Username, request.Email, user.Language.ToString());
 
         var createResult = await userManager.CreateAsync(newUser, request.Password).ConfigureAwait(false);
         if (!createResult.Succeeded)

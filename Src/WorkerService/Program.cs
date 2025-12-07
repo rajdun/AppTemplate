@@ -3,6 +3,7 @@ using Application.Common.Messaging;
 using Domain;
 using Hangfire;
 using Infrastructure;
+using Infrastructure.Messaging;
 using WorkerService;
 
 

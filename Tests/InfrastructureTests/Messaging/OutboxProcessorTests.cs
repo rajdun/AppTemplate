@@ -1,12 +1,12 @@
 using Application.Common;
 using Application.Common.Interfaces;
-using Application.Common.Messaging;
-using Domain.Entities;
 using Hangfire;
+using Infrastructure.Data;
+using Infrastructure.Messaging;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 
-namespace ApplicationTests.Common.Messaging;
+namespace InfrastructureTests.Messaging;
 
 public class OutboxProcessorTests
 {
@@ -26,7 +26,7 @@ public class OutboxProcessorTests
     public void OutboxProcessor_ShouldBeCreatedWithDependencies()
     {
         // Arrange
-        var dbContext = Substitute.For<IApplicationDbContext>();
+        var dbContext = Substitute.For<ApplicationDbContext>();
 
         // Act
         var processor = new OutboxProcessor(_logger, dbContext, _backgroundJobClient, _dateTimeProvider);

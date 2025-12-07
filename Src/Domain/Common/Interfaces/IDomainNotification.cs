@@ -2,7 +2,7 @@ using System.Reflection;
 using System.Text.Json;
 using Microsoft.Extensions.Logging;
 
-namespace Domain.Common;
+namespace Domain.Common.Interfaces;
 
 #pragma warning disable CA1040
 public interface IDomainNotification : IRequest

@@ -1,4 +1,4 @@
-namespace Domain.Common;
+namespace Domain.Common.Interfaces;
 
 // ReSharper disable once UnusedTypeParameter
 #pragma warning disable CA1040

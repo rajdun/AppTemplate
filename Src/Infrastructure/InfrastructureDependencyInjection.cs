@@ -4,10 +4,11 @@ using Application.Common;
 using Application.Common.Interfaces;
 using Application.Common.Mailing;
 using Application.Common.Messaging;
-using Domain.Entities.Users;
+using Domain.Aggregates.Identity;
 using Hangfire;
 using Hangfire.Redis.StackExchange;
 using Infrastructure.Data;
+using Infrastructure.Identity;
 using Infrastructure.Implementation;
 using Infrastructure.Implementation.Dto;
 using Infrastructure.Mailing;
@@ -42,6 +43,8 @@ public static class InfrastructureDependencyInjection
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
         ArgumentNullException.ThrowIfNull(configuration);
+
+        services.AddScoped<IOutboxProcessor, OutboxProcessor>();
 
         services.AddDatabase(configuration);
         services.AddIdentity(configuration);
@@ -155,7 +158,7 @@ public static class InfrastructureDependencyInjection
 
     private static IServiceCollection AddIdentity(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddIdentity<ApplicationUser, ApplicationRole>()
+        services.AddIdentity<User, ApplicationRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>();
         services.AddAuthorization();
         services.AddAuthentication(options =>

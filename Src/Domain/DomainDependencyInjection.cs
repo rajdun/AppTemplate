@@ -1,5 +1,7 @@
 using Domain.Common;
+using Domain.Common.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
+using DomainNotificationDeserializer = Domain.Common.Interfaces.DomainNotificationDeserializer;
 
 namespace Domain;
 

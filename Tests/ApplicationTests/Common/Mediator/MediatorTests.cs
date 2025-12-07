@@ -3,6 +3,7 @@ using Application.Common.Interfaces;
 using Application.Common.MediatorPattern;
 using Application.Resources;
 using Domain.Common;
+using Domain.Common.Interfaces;
 using FluentResults;
 using FluentValidation;
 using FluentValidation.Results;

@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Domain.Entities;
+namespace Infrastructure.Messaging.Dto;
 
 [Table("OutboxMessages", Schema = "Messaging")]
 public class OutboxMessage
