@@ -1,10 +1,14 @@
 using System.Data.Common;
+using Domain.Aggregates.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Application.Common;
 
 public interface IApplicationDbContext
 {
+    public DbSet<UserProfile> Profiles { get; set; }
+
     public DbConnection GetConnection();
     public Task<IDbContextTransaction> BeginTransactionAsync();
     public Task CommitTransactionAsync();

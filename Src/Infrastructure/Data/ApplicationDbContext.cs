@@ -12,7 +12,7 @@ namespace Infrastructure.Data;
 public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, Guid>,
     IApplicationDbContext
 {
-    protected ApplicationDbContext()
+    public ApplicationDbContext()
     {
     }
 
@@ -51,7 +51,12 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser, A
 
         base.OnModelCreating(builder);
 
-        builder.Entity<User>(b => { b.Property(u => u.Id).HasDefaultValueSql("uuidv7()"); });
+        builder.Entity<ApplicationUser>(b =>
+        {
+            b.Property(u => u.Id).HasDefaultValueSql("uuidv7()");
+            b.HasOne(x => x.DomainUserProfile)
+                .WithOne();
+        });
 
         builder.Entity<OutboxMessage>(b =>
         {

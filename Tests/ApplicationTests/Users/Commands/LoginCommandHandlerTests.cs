@@ -10,15 +10,15 @@ namespace ApplicationTests.Users.Commands;
 
 public class LoginCommandHandlerTests
 {
-    private readonly UserManager<User> _userManager;
+    private readonly UserManager<UserProfile> _userManager;
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
     private readonly ICacheService _cacheService;
     private readonly LoginCommandHandler _handler;
 
     public LoginCommandHandlerTests()
     {
-        var userStore = Substitute.For<IUserStore<User>>();
-        _userManager = Substitute.For<UserManager<User>>(
+        var userStore = Substitute.For<IUserStore<UserProfile>>();
+        _userManager = Substitute.For<UserManager<UserProfile>>(
             userStore, null, null, null, null, null, null, null, null);
         _jwtTokenGenerator = Substitute.For<IJwtTokenGenerator>();
         _cacheService = Substitute.For<ICacheService>();
@@ -30,7 +30,7 @@ public class LoginCommandHandlerTests
     {
         // Arrange
         var command = new LoginCommand("nonexistent", "password");
-        _userManager.FindByNameAsync(command.Username).Returns((User?)null);
+        _userManager.FindByNameAsync(command.Username).Returns((UserProfile?)null);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -44,7 +44,7 @@ public class LoginCommandHandlerTests
     public async Task Handle_WhenPasswordIncorrect_ShouldReturnFailure()
     {
         // Arrange
-        var user = new User("testuser", "test@test.com", "en");
+        var user = new UserProfile("testuser", "test@test.com", "en");
         var command = new LoginCommand("testuser", "wrongpassword");
 
         _userManager.FindByNameAsync(command.Username).Returns(user);
@@ -62,7 +62,7 @@ public class LoginCommandHandlerTests
     public async Task Handle_WhenUserDeactivated_ShouldReturnFailure()
     {
         // Arrange
-        var user = new User("testuser", "test@test.com", "en");
+        var user = new UserProfile("testuser", "test@test.com", "en");
         user.DeactivatedAt = DateTimeOffset.UtcNow;
         var command = new LoginCommand("testuser", "password");
 
@@ -81,7 +81,7 @@ public class LoginCommandHandlerTests
     public async Task Handle_WhenCredentialsValid_ShouldReturnTokens()
     {
         // Arrange
-        var user = new User("testuser", "test@test.com", "en");
+        var user = new UserProfile("testuser", "test@test.com", "en");
         var command = new LoginCommand("testuser", "password");
         var expectedToken = "jwt-token-123";
         var expectedRefreshToken = "refresh-token-456";

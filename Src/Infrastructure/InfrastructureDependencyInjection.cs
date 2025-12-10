@@ -9,6 +9,7 @@ using Hangfire;
 using Hangfire.Redis.StackExchange;
 using Infrastructure.Data;
 using Infrastructure.Identity;
+using Infrastructure.Identity.Interfaces;
 using Infrastructure.Implementation;
 using Infrastructure.Implementation.Dto;
 using Infrastructure.Mailing;
@@ -158,7 +159,7 @@ public static class InfrastructureDependencyInjection
 
     private static IServiceCollection AddIdentity(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddIdentity<User, ApplicationRole>()
+        services.AddIdentity<ApplicationUser, ApplicationRole>()
             .AddEntityFrameworkStores<ApplicationDbContext>();
         services.AddAuthorization();
         services.AddAuthentication(options =>

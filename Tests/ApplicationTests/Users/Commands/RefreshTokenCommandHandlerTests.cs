@@ -12,7 +12,7 @@ public class RefreshTokenCommandHandlerTests
 {
     private readonly ICacheService _cacheService;
     private readonly IJwtTokenGenerator _jwtTokenGenerator;
-    private readonly UserManager<User> _userManager;
+    private readonly UserManager<UserProfile> _userManager;
     private readonly IUser _currentUser;
     private readonly RefreshTokenCommandHandler _handler;
 
@@ -20,8 +20,8 @@ public class RefreshTokenCommandHandlerTests
     {
         _cacheService = Substitute.For<ICacheService>();
         _jwtTokenGenerator = Substitute.For<IJwtTokenGenerator>();
-        var userStore = Substitute.For<IUserStore<User>>();
-        _userManager = Substitute.For<UserManager<User>>(
+        var userStore = Substitute.For<IUserStore<UserProfile>>();
+        _userManager = Substitute.For<UserManager<UserProfile>>(
             userStore, null, null, null, null, null, null, null, null);
         _currentUser = Substitute.For<IUser>();
         _handler = new RefreshTokenCommandHandler(
@@ -78,7 +78,7 @@ public class RefreshTokenCommandHandlerTests
         _cacheService.GetAsync<string>(
             CacheKeys.GetRefreshTokenCacheKey(userId.ToString()),
             Arg.Any<CancellationToken>()).Returns(token);
-        _userManager.FindByIdAsync(userId.ToString()).Returns((User?)null);
+        _userManager.FindByIdAsync(userId.ToString()).Returns((UserProfile?)null);
 
         // Act
         var result = await _handler.Handle(command, CancellationToken.None);
@@ -94,7 +94,7 @@ public class RefreshTokenCommandHandlerTests
         // Arrange
         var userId = Guid.NewGuid();
         var token = "valid-token";
-        var user = new User("testuser", "test@test.com", "en");
+        var user = new UserProfile("testuser", "test@test.com", "en");
         user.DeactivatedAt = DateTimeOffset.UtcNow;
         var command = new RefreshTokenCommand(token);
 
@@ -120,7 +120,7 @@ public class RefreshTokenCommandHandlerTests
         var oldToken = "old-refresh-token";
         var newJwtToken = "new-jwt-token";
         var newRefreshToken = "new-refresh-token";
-        var user = new User("testuser", "test@test.com", "en");
+        var user = new UserProfile("testuser", "test@test.com", "en");
         var command = new RefreshTokenCommand(oldToken);
 
         _currentUser.UserId.Returns(userId);

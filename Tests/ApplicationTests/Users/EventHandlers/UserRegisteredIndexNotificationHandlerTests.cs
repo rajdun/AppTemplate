@@ -13,15 +13,15 @@ namespace ApplicationTests.Users.EventHandlers;
 public class UserRegisteredIndexNotificationHandlerTests
 {
     private readonly ISearch<UserSearchDocumentDto> _search;
-    private readonly UserManager<User> _userManager;
+    private readonly UserManager<UserProfile> _userManager;
     private readonly UserRegisteredIndexNotificationHandler _handler;
 
     public UserRegisteredIndexNotificationHandlerTests()
     {
         var logger = Substitute.For<ILogger<UserRegisteredIndexNotificationHandler>>();
         _search = Substitute.For<ISearch<UserSearchDocumentDto>>();
-        var userStore = Substitute.For<IUserStore<User>>();
-        _userManager = Substitute.For<UserManager<User>>(
+        var userStore = Substitute.For<IUserStore<UserProfile>>();
+        _userManager = Substitute.For<UserManager<UserProfile>>(
             userStore, null, null, null, null, null, null, null, null);
         _handler = new UserRegisteredIndexNotificationHandler(logger, _search, _userManager);
     }
@@ -31,7 +31,7 @@ public class UserRegisteredIndexNotificationHandlerTests
     {
         // Arrange
         var domainEvent = new UserRegistered("testuser", "test@test.com", "en");
-        _userManager.FindByNameAsync(domainEvent.Name).Returns((User?)null);
+        _userManager.FindByNameAsync(domainEvent.Name).Returns((UserProfile?)null);
 
         // Act & Assert
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
@@ -42,7 +42,7 @@ public class UserRegisteredIndexNotificationHandlerTests
     public async Task Handle_WhenIndexingFails_ShouldThrowException()
     {
         // Arrange
-        var user = new User("testuser", "test@test.com", "en");
+        var user = new UserProfile("testuser", "test@test.com", "en");
         var domainEvent = new UserRegistered("testuser", "test@test.com", "en");
 
         _userManager.FindByNameAsync(domainEvent.Name).Returns(user);
@@ -58,7 +58,7 @@ public class UserRegisteredIndexNotificationHandlerTests
     public async Task Handle_WhenIndexingSuccessful_ShouldReturnSuccess()
     {
         // Arrange
-        var user = new User("testuser", "test@test.com", "en");
+        var user = new UserProfile("testuser", "test@test.com", "en");
         var domainEvent = new UserRegistered("testuser", "test@test.com", "en");
 
         _userManager.FindByNameAsync(domainEvent.Name).Returns(user);

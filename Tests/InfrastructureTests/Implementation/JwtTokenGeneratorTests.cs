@@ -46,7 +46,7 @@ public class JwtTokenGeneratorTests
     public async Task GenerateToken_ShouldContainCorrectUserClaims()
     {
         // Arrange
-        var user = new User("testuser", "testEmail@test.test", "en");
+        var user = new UserProfile("testuser", "testEmail@test.test", "en");
 
         // Act
         var tokenString = await _sut.GenerateToken(user);
@@ -65,7 +65,7 @@ public class JwtTokenGeneratorTests
     public async Task GenerateToken_ShouldHaveCorrectIssuerAudienceAndExpiry()
     {
         // Arrange
-        var user = new User("testuser", "testEmail@test.test", "en");
+        var user = new UserProfile("testuser", "testEmail@test.test", "en");
         var expectedExpiry = _now.AddMinutes(_jwtSettings.ExpiryMinutes);
 
         // Act
@@ -84,7 +84,7 @@ public class JwtTokenGeneratorTests
     public async Task GenerateToken_ShouldBeValidAndSignedWithCorrectKey()
     {
         // Arrange
-        var user = new User("testuser", "testEmail@test.test", "en");
+        var user = new UserProfile("testuser", "testEmail@test.test", "en");
         var tokenString = await _sut.GenerateToken(user);
 
         var validationParameters = new TokenValidationParameters
@@ -151,7 +151,7 @@ public class JwtTokenGeneratorTests
     public async Task GenerateToken_ShouldSaveJtiInCache()
     {
         // Arrange
-        var user = new User("testuser", "testEmail@test.test", "en");
+        var user = new UserProfile("testuser", "testEmail@test.test", "en");
 
         // Act
         await _sut.GenerateToken(user);
