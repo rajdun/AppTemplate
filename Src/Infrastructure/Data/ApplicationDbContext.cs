@@ -55,7 +55,19 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser, A
         {
             b.Property(u => u.Id).HasDefaultValueSql("uuidv7()");
             b.HasOne(x => x.DomainUserProfile)
-                .WithOne();
+                .WithOne()
+                .HasForeignKey<UserProfile>(up => up.Id)
+                .IsRequired();
+        });
+
+        builder.Entity<UserProfile>(b =>
+        {
+            b.ToTable("UserProfiles");
+            b.Property(u => u.Id).HasDefaultValueSql("uuidv7()");
+            b.Property(u => u.FirstName).HasMaxLength(100).IsRequired();
+            b.Property(u => u.LastName).HasMaxLength(100).IsRequired();
+            b.Property(u => u.Email).HasMaxLength(256).IsRequired();
+            b.HasIndex(u => u.Email).IsUnique();
         });
 
         builder.Entity<OutboxMessage>(b =>

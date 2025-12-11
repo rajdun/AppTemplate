@@ -4,7 +4,7 @@ namespace Domain.Common.Models;
 
 public abstract class Entity<TId> : IEquatable<Entity<TId>>, IEqualityComparer<TId>
 {
-    public TId Id { get; private set; }
+    public TId Id { get; protected init; }
 
     // Protected constructor for ORM
     protected Entity()
@@ -40,11 +40,12 @@ public abstract class Entity<TId> : IEquatable<Entity<TId>>, IEqualityComparer<T
         return x.Equals(y);
     }
 
+    public override bool Equals(object? obj) => obj is Entity<TId> entity && Id!.Equals(entity.Id);
+
     public int GetHashCode([DisallowNull] TId obj)
     {
         return Id!.GetHashCode();
     }
 
-    public override bool Equals(object? obj) => obj is Entity<TId> entity && Id!.Equals(entity.Id);
     public override int GetHashCode() => Id!.GetHashCode();
 }
