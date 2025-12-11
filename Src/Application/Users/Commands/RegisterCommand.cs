@@ -1,70 +1,71 @@
-using Application.Common.Interfaces;
-using Application.Resources;
+﻿using Application.Common.Interfaces;
 using Application.Users.Dto;
-using Domain.Common;
-using Domain.Entities.Users;
+using Application.Users.ExtensionMethods;
+using Application.Users.Interfaces;
+using Domain.Common.Interfaces;
 using FluentResults;
 using FluentValidation;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Localization;
 
 namespace Application.Users.Commands;
 
-public record RegisterCommand(string Username, string? Email, string Password, string RepeatPassword)
-    : IRequest<TokenResult>;
+public record RegisterCommand(string Username, string Email, string Password, string RepeatPassword) : IRequest<TokenResult>;
 
 public class RegisterCommandValidator : AbstractValidator<RegisterCommand>
 {
     public RegisterCommandValidator()
     {
         RuleFor(x => x.Username)
-            .NotEmpty();
+            .NotEmpty()
+            .MinimumLength(2)
+            .MaximumLength(100);
 
         RuleFor(x => x.Email)
-            .EmailAddress()
-            .When(x => !string.IsNullOrEmpty(x.Email));
+            .NotEmpty()
+            .EmailAddress();
 
         RuleFor(x => x.Password)
             .NotEmpty()
             .MinimumLength(8);
 
         RuleFor(x => x.RepeatPassword)
-            .Equal(x => x.Password);
+            .NotEmpty()
+            .Equal(x => x.Password)
+            .WithMessage("Passwords do not match");
     }
 }
 
-public class RegisterCommandHandler(
-    UserManager<ApplicationUser> userManager,
+internal class RegisterCommandHandler(
+    IIdentityService identityService,
     IJwtTokenGenerator jwtTokenGenerator,
-    ICacheService cacheService,
-    IUser user)
+    ICacheService cacheService)
     : IRequestHandler<RegisterCommand, TokenResult>
 {
-    public async Task<Result<TokenResult>> Handle(RegisterCommand request, CancellationToken cancellationToken = new())
+    public async Task<Result<TokenResult>> Handle(RegisterCommand request, CancellationToken cancellationToken = default)
     {
-        ArgumentNullException.ThrowIfNull(request);
+        // Split username into first and last name (or use username as first name)
+        var nameParts = request.Username.Split(' ', 2);
+        var firstName = nameParts[0];
+        var lastName = nameParts.Length > 1 ? nameParts[1] : string.Empty;
 
-        var existingUser = await userManager.FindByNameAsync(request.Username).ConfigureAwait(false);
-        if (existingUser != null)
+        var createResult = await identityService.CreateUserAsync(
+            request.Email,
+            request.Password,
+            firstName,
+            lastName).ConfigureAwait(false);
+
+        if (createResult.IsFailed)
         {
-            return Result.Fail<TokenResult>(UserTranslations.UsernameAlreadyExists);
+            return Result.Fail<TokenResult>(createResult.Errors);
         }
 
-        var newUser = ApplicationUser.Create(request.Username, request.Email, user.Language.ToString());
+        var userId = createResult.Value;
 
-        var createResult = await userManager.CreateAsync(newUser, request.Password).ConfigureAwait(false);
-        if (!createResult.Succeeded)
-        {
-            var errors = createResult.Errors.Select(e => e.Description).ToList();
-            return Result.Fail<TokenResult>(errors);
-        }
-
-        var token = await jwtTokenGenerator.GenerateToken(newUser).ConfigureAwait(false);
+        var token = jwtTokenGenerator.GenerateToken(userId, firstName, lastName);
         var refreshToken = jwtTokenGenerator.GenerateRefreshToken();
 
-        var refreshTokenKey = CacheKeys.GetRefreshTokenCacheKey(newUser.Id.ToString());
-        await cacheService.SetAsync(refreshTokenKey, refreshToken, TimeSpan.FromDays(7), cancellationToken).ConfigureAwait(false);
+        await cacheService.SaveRefreshTokenAsync(userId, refreshToken, TimeSpan.FromHours(8), cancellationToken).ConfigureAwait(false);
 
         return Result.Ok(new TokenResult(token, refreshToken));
     }
 }
+

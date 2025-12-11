@@ -1,55 +1,58 @@
-using Application.Common.Interfaces;
-using Application.Resources;
+﻿using Application.Common.Interfaces;
 using Application.Users.Dto;
-using Domain.Common;
-using Domain.Entities.Users;
+using Application.Users.ExtensionMethods;
+using Application.Users.Interfaces;
+using Domain.Common.Interfaces;
 using FluentResults;
 using FluentValidation;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Localization;
 
 namespace Application.Users.Commands;
 
-public record LoginCommand(string Username, string Password) : IRequest<TokenResult>;
+public record LoginCommand(string Email, string Password) : IRequest<TokenResult>;
 
 public class LoginCommandValidator : AbstractValidator<LoginCommand>
 {
     public LoginCommandValidator()
     {
-        RuleFor(x => x.Username)
-            .NotEmpty();
+        RuleFor(x => x.Email)
+            .NotEmpty()
+            .EmailAddress();
 
         RuleFor(x => x.Password)
             .NotEmpty();
     }
 }
 
-internal sealed class LoginCommandHandler(
-    UserManager<ApplicationUser> userManager,
+internal class LoginCommandHandler(
+    IIdentityService identityService,
     IJwtTokenGenerator jwtTokenGenerator,
     ICacheService cacheService)
     : IRequestHandler<LoginCommand, TokenResult>
 {
-    public async Task<Result<TokenResult>> Handle(LoginCommand request, CancellationToken cancellationToken = new())
+    public async Task<Result<TokenResult>> Handle(LoginCommand request, CancellationToken cancellationToken = default)
     {
-        var user = await userManager.FindByNameAsync(request.Username).ConfigureAwait(false);
+        var validationResult = await identityService.ValidateCredentialsAsync(request.Email, request.Password)
+            .ConfigureAwait(false);
 
-        if (user == null || !await userManager.CheckPasswordAsync(user, request.Password).ConfigureAwait(false))
+        if (validationResult.IsFailed)
         {
-            return Result.Fail<TokenResult>(UserTranslations.InvalidPasswordOrUsername);
+            return Result.Fail<TokenResult>(validationResult.Errors);
         }
 
-        if (user.DeactivatedAt is not null)
+        var userId = validationResult.Value;
+
+        var userProfileResult = await identityService.GetUserProfileAsync(userId).ConfigureAwait(false);
+        if (userProfileResult.IsFailed)
         {
-            return Result.Fail(UserTranslations.UserNotActive);
+            return Result.Fail<TokenResult>(userProfileResult.Errors);
         }
 
-        var token = await jwtTokenGenerator.GenerateToken(user).ConfigureAwait(false);
+        var userProfile = userProfileResult.Value;
+
+        var token = jwtTokenGenerator.GenerateToken(userId, userProfile.FirstName, userProfile.LastName);
         var refreshToken = jwtTokenGenerator.GenerateRefreshToken();
 
-        var refreshTokenKey = CacheKeys.GetRefreshTokenCacheKey(user.Id.ToString());
-
-        await cacheService.SetAsync(refreshTokenKey, refreshToken, TimeSpan.FromDays(7), cancellationToken).ConfigureAwait(false);
+        await cacheService.SaveRefreshTokenAsync(userId, refreshToken, TimeSpan.FromHours(8), cancellationToken).ConfigureAwait(false);
 
         return Result.Ok(new TokenResult(token, refreshToken));
     }

@@ -1,4 +1,5 @@
 using Domain.Common;
+using Domain.Common.Interfaces;
 using FluentResults;
 
 namespace Application.Common.MediatorPattern;

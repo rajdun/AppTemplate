@@ -1,7 +1,9 @@
 using Application.Common.Dto;
 using Application.Common.Search;
 using Application.Common.Search.Dto;
+using Application.Common.Search.Dto.User;
 using Domain.Common;
+using Domain.Common.Interfaces;
 using FluentResults;
 using FluentValidation;
 

@@ -1,8 +1,9 @@
 using Application.Common.ExtensionMethods;
 using Application.Common.Mailing;
 using Application.Common.Mailing.Templates;
+using Domain.Aggregates.Identity.DomainNotifications;
 using Domain.Common;
-using Domain.DomainNotifications.User;
+using Domain.Common.Interfaces;
 using FluentResults;
 using Microsoft.Extensions.Logging;
 

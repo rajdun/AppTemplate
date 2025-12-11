@@ -1,11 +1,8 @@
-using Application.Resources;
-using Application.Users.Dto;
-using Domain.Common;
-using Domain.Entities.Users;
+﻿using Application.Users.Dto;
+using Application.Users.Interfaces;
+using Domain.Common.Interfaces;
 using FluentResults;
 using FluentValidation;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Logging;
 
 namespace Application.Users.Commands;
 
@@ -15,48 +12,32 @@ public class DeactivateUserCommandValidator : AbstractValidator<DeactivateUserCo
 {
     public DeactivateUserCommandValidator()
     {
-        RuleFor(x => x.UserId).NotEmpty();
+        RuleFor(x => x.UserId)
+            .NotEmpty();
     }
 }
 
-internal partial class DeactivateUserCommandHandler(UserManager<ApplicationUser> userManager, ILogger<DeactivateUserCommandHandler> logger)
+internal class DeactivateUserCommandHandler(IIdentityService identityService)
     : IRequestHandler<DeactivateUserCommand, DeactivateUserResult>
 {
-    [LoggerMessage(Level = LogLevel.Error, Message = "[DeactivateUser] User with ID {UserId} not found for deactivation")]
-    private static partial void LogUserNotFound(ILogger logger, Guid userId);
-
-    [LoggerMessage(Level = LogLevel.Warning, Message = "[DeactivateUser] User with ID {UserId} is already deactivated")]
-    private static partial void LogUserAlreadyDeactivated(ILogger logger, Guid userId);
-
-    [LoggerMessage(Level = LogLevel.Error, Message = "[DeactivateUser] Failed to deactivate user with ID {UserId}. Errors: {Errors}")]
-    private static partial void LogDeactivationFailed(ILogger logger, Guid userId, string errors);
-
-    public async Task<Result<DeactivateUserResult>> Handle(DeactivateUserCommand request, CancellationToken cancellationToken = new CancellationToken())
+    public async Task<Result<DeactivateUserResult>> Handle(DeactivateUserCommand request, CancellationToken cancellationToken = default)
     {
-        var user = await userManager.FindByIdAsync(request.UserId.ToString()).ConfigureAwait(false);
-
-        if (user == null)
+        var userProfileResult = await identityService.GetUserProfileAsync(request.UserId).ConfigureAwait(false);
+        if (userProfileResult.IsFailed)
         {
-            LogUserNotFound(logger, request.UserId);
-            return Result.Fail(UserTranslations.UserNotFound);
+            return Result.Fail<DeactivateUserResult>(userProfileResult.Errors);
         }
 
-        if (user.DeactivatedAt is not null)
+        var userProfile = userProfileResult.Value;
+        var fullName = $"{userProfile.FirstName} {userProfile.LastName}".Trim();
+
+        var deactivateResult = await identityService.DeactivateUserAsync(request.UserId).ConfigureAwait(false);
+        if (deactivateResult.IsFailed)
         {
-            LogUserAlreadyDeactivated(logger, request.UserId);
-            return Result.Fail(UserTranslations.UserNotActive);
+            return Result.Fail<DeactivateUserResult>(deactivateResult.Errors);
         }
 
-        user.DeactivatedAt = DateTimeOffset.UtcNow;
-
-        var result = await userManager.UpdateAsync(user).ConfigureAwait(false);
-
-        if (!result.Succeeded)
-        {
-            LogDeactivationFailed(logger, request.UserId, string.Join(", ", result.Errors.Select(e => e.Description)));
-            return Result.Fail(result.Errors.Select(x => x.Description));
-        }
-
-        return Result.Ok(new DeactivateUserResult(user.Id, user.UserName, user.Email));
+        return Result.Ok(new DeactivateUserResult(request.UserId, fullName, userProfile.Email));
     }
 }
+

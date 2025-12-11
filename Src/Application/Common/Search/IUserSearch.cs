@@ -1,5 +1,6 @@
 using Application.Common.Dto;
 using Application.Common.Search.Dto;
+using Application.Common.Search.Dto.User;
 
 namespace Application.Common.Search;
 

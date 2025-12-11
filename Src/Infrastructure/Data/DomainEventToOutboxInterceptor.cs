@@ -1,6 +1,7 @@
 using System.Text.Json;
 using Application.Common.Interfaces;
-using Domain.Entities;
+using Domain.Common.Models;
+using Infrastructure.Messaging.Dto;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
@@ -33,7 +34,7 @@ public class DomainEventToOutboxInterceptor(IDateTimeProvider dateTimeProvider)
         }
 
         var entitiesWithDomainEvents = context.ChangeTracker
-            .Entries<IEntity>()
+            .Entries<AggregateRoot<Guid>>()
             .Where(e => e.Entity.DomainNotifications.Count > 0)
             .Select(e => e.Entity)
             .ToList();

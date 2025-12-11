@@ -1,7 +1,9 @@
 using Application.Common.Search;
 using Application.Common.Search.Dto;
+using Application.Common.Search.Dto.User;
+using Domain.Aggregates.Identity.DomainNotifications;
 using Domain.Common;
-using Domain.DomainNotifications.User;
+using Domain.Common.Interfaces;
 using FluentResults;
 using Microsoft.Extensions.Logging;
 

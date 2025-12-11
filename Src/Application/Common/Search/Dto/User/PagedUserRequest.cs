@@ -1,6 +1,6 @@
 using Application.Common.Dto;
 
-namespace Application.Common.Search.Dto;
+namespace Application.Common.Search.Dto.User;
 
 public class PagedUserRequest : PagedRequest
 {

@@ -1,5 +1,5 @@
 using System.Data.Common;
-using Domain.Entities;
+using Domain.Aggregates.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
@@ -7,7 +7,7 @@ namespace Application.Common;
 
 public interface IApplicationDbContext
 {
-    public DbSet<OutboxMessage> OutboxMessages { get; set; }
+    public DbSet<UserProfile> Profiles { get; set; }
 
     public DbConnection GetConnection();
     public Task<IDbContextTransaction> BeginTransactionAsync();

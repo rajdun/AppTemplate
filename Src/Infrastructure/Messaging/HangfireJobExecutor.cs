@@ -1,6 +1,7 @@
 using Application.Common.MediatorPattern;
 using Application.Common.Messaging;
 using Domain.Common;
+using Domain.Common.Interfaces;
 using FluentResults;
 using Microsoft.Extensions.Logging;
 

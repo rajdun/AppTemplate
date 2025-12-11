@@ -1,19 +1,15 @@
-using Application.Common.Interfaces;
-using Application.Common.MediatorPattern;
-using Application.Resources;
+﻿using Application.Common.Interfaces;
 using Application.Users.Dto;
-using Domain.Common;
-using Domain.Entities.Users;
+using Application.Users.ExtensionMethods;
+using Application.Users.Interfaces;
+using Domain.Common.Interfaces;
 using FluentResults;
 using FluentValidation;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Localization;
 
 namespace Application.Users.Commands;
 
 public record RefreshTokenCommand(string RefreshToken) : IRequest<TokenResult>;
 
-[Authorize(AuthorizePolicy.None)]
 public class RefreshTokenCommandValidator : AbstractValidator<RefreshTokenCommand>
 {
     public RefreshTokenCommandValidator()
@@ -23,40 +19,26 @@ public class RefreshTokenCommandValidator : AbstractValidator<RefreshTokenComman
     }
 }
 
-internal class RefreshTokenCommandHandler(
-    ICacheService cacheService,
-    IJwtTokenGenerator jwtTokenGenerator,
-    UserManager<ApplicationUser> userManager,
-    IUser currentUser)
+internal class RefreshTokenCommandHandler(IUser currentUser, IJwtTokenGenerator jwtTokenGenerator, ICacheService cacheService, IIdentityService identityService)
     : IRequestHandler<RefreshTokenCommand, TokenResult>
 {
-    public async Task<Result<TokenResult>> Handle(RefreshTokenCommand request,
-        CancellationToken cancellationToken = new())
+    public async Task<Result<TokenResult>> Handle(RefreshTokenCommand request, CancellationToken cancellationToken = default)
     {
-        var refreshToken = CacheKeys.GetRefreshTokenCacheKey(currentUser.UserId.ToString());
+        var cachedTokenResult = await cacheService.GetRefreshTokenAsync(request.RefreshToken, cancellationToken).ConfigureAwait(false);
 
-        var cachedToken = await cacheService.GetAsync<string>(refreshToken, cancellationToken).ConfigureAwait(false);
-        if (cachedToken == null || cachedToken != request.RefreshToken)
+        if (cachedTokenResult == null || currentUser.UserId != cachedTokenResult.Value)
         {
-            return Result.Fail(UserTranslations.InvalidRefreshToken);
+            return Result.Fail<TokenResult>("Invalid refresh token");
         }
 
-        var user = await userManager.FindByIdAsync(currentUser.UserId.ToString()).ConfigureAwait(false);
-        if (user == null)
-        {
-            return Result.Fail(UserTranslations.InvalidRefreshToken);
-        }
+        var userProfile = await identityService.GetUserProfileAsync(currentUser.UserId).ConfigureAwait(false);
 
-        if (user.DeactivatedAt is not null)
-        {
-            return Result.Fail(UserTranslations.UserNotActive);
-        }
-
-        var newJwtToken = await jwtTokenGenerator.GenerateToken(user).ConfigureAwait(false);
+        var token = jwtTokenGenerator.GenerateToken(currentUser.UserId, userProfile.Value.FirstName, userProfile.Value.LastName);
         var newRefreshToken = jwtTokenGenerator.GenerateRefreshToken();
 
-        await cacheService.SetAsync(refreshToken, newRefreshToken, TimeSpan.FromDays(7), cancellationToken).ConfigureAwait(false);
+        await cacheService.SaveRefreshTokenAsync(currentUser.UserId, newRefreshToken, TimeSpan.FromHours(8), cancellationToken).ConfigureAwait(false);
 
-        return Result.Ok(new TokenResult(newJwtToken, newRefreshToken));
+        return Result.Ok(new TokenResult(token, newRefreshToken));
     }
 }
+

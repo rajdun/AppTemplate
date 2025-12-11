@@ -1,7 +1,8 @@
 using System.Data.Common;
 using Application.Common;
-using Domain.Entities;
-using Domain.Entities.Users;
+using Domain.Aggregates.Identity;
+using Infrastructure.Identity;
+using Infrastructure.Messaging.Dto;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -11,7 +12,7 @@ namespace Infrastructure.Data;
 public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, Guid>,
     IApplicationDbContext
 {
-    protected ApplicationDbContext()
+    public ApplicationDbContext()
     {
     }
 
@@ -50,7 +51,24 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser, A
 
         base.OnModelCreating(builder);
 
-        builder.Entity<ApplicationUser>(b => { b.Property(u => u.Id).HasDefaultValueSql("uuidv7()"); });
+        builder.Entity<ApplicationUser>(b =>
+        {
+            b.Property(u => u.Id).HasDefaultValueSql("uuidv7()");
+            b.HasOne(x => x.DomainUserProfile)
+                .WithOne()
+                .HasForeignKey<UserProfile>(up => up.Id)
+                .IsRequired();
+        });
+
+        builder.Entity<UserProfile>(b =>
+        {
+            b.ToTable("UserProfiles");
+            b.Property(u => u.Id).HasDefaultValueSql("uuidv7()");
+            b.Property(u => u.FirstName).HasMaxLength(100).IsRequired();
+            b.Property(u => u.LastName).HasMaxLength(100).IsRequired();
+            b.Property(u => u.Email).HasMaxLength(256).IsRequired();
+            b.HasIndex(u => u.Email).IsUnique();
+        });
 
         builder.Entity<OutboxMessage>(b =>
         {

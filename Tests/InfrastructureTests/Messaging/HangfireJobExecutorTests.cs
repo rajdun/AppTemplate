@@ -1,5 +1,6 @@
 using Application.Common.Messaging;
 using Domain.Common;
+using Domain.Common.Interfaces;
 using FluentResults;
 using Infrastructure.Messaging;
 using Microsoft.Extensions.Logging;

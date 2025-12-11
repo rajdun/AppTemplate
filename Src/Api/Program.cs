@@ -1,6 +1,7 @@
 using System.Reflection;
 using Api;
 using Api.Common;
+using Api.Resources;
 using Application;
 using Carter;
 using Domain;
