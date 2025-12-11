@@ -36,7 +36,7 @@ public class UserSearchTests
 
         // Assert
         Assert.Single(filters);
-        Assert.Contains("name = 'Jan Kowalski'", filters[0]);
+        Assert.Contains("name = 'Jan Kowalski'", filters[0], StringComparison.InvariantCulture);
     }
 
     [Fact]
@@ -54,7 +54,7 @@ public class UserSearchTests
 
         // Assert
         Assert.Single(filters);
-        Assert.Contains("name != 'Admin'", filters[0]);
+        Assert.Contains("name != 'Admin'", filters[0], StringComparison.InvariantCulture);
     }
 
     [Fact]
@@ -72,7 +72,7 @@ public class UserSearchTests
 
         // Assert
         Assert.Single(filters);
-        Assert.Contains("name CONTAINS 'Kowal'", filters[0]);
+        Assert.Contains("name CONTAINS 'Kowal'", filters[0], StringComparison.InvariantCulture);
     }
 
     [Fact]
@@ -90,7 +90,7 @@ public class UserSearchTests
 
         // Assert
         Assert.Single(filters);
-        Assert.Contains("name STARTS WITH 'Jan'", filters[0]);
+        Assert.Contains("name STARTS WITH 'Jan'", filters[0], StringComparison.InvariantCulture);
     }
 
     [Fact]
@@ -108,7 +108,7 @@ public class UserSearchTests
 
         // Assert
         Assert.Single(filters);
-        Assert.Contains("name IN ['Jan Kowalski', 'Piotr Nowak']", filters[0]);
+        Assert.Contains("name IN ['Jan Kowalski', 'Piotr Nowak']", filters[0], StringComparison.InvariantCulture);
     }
 
     [Fact]
@@ -126,7 +126,7 @@ public class UserSearchTests
 
         // Assert
         Assert.Single(filters);
-        Assert.Contains("name NOT IN ['Admin', 'System']", filters[0]);
+        Assert.Contains("name NOT IN ['Admin', 'System']", filters[0], StringComparison.InvariantCulture);
     }
 
     [Fact]
@@ -197,7 +197,7 @@ public class UserSearchTests
 
         // Assert
         Assert.Single(filters);
-        Assert.Contains("name IN ['Jan', 'Piotr']", filters[0]);
+        Assert.Contains("name IN ['Jan', 'Piotr']", filters[0], StringComparison.InvariantCulture);
     }
 
     [Fact]
@@ -215,7 +215,7 @@ public class UserSearchTests
 
         // Assert
         Assert.Single(filters);
-        Assert.Contains("email = 'test@example.com'", filters[0]);
+        Assert.Contains("email = 'test@example.com'", filters[0], StringComparison.InvariantCulture);
     }
 
     [Fact]
@@ -233,7 +233,7 @@ public class UserSearchTests
 
         // Assert
         Assert.Single(filters);
-        Assert.Contains("email CONTAINS '@example.com'", filters[0]);
+        Assert.Contains("email CONTAINS '@example.com'", filters[0], StringComparison.InvariantCulture);
     }
 
     [Fact]
@@ -251,7 +251,7 @@ public class UserSearchTests
 
         // Assert
         Assert.Single(filters);
-        Assert.Contains("email STARTS WITH 'admin'", filters[0]);
+        Assert.Contains("email STARTS WITH 'admin'", filters[0], StringComparison.InvariantCulture);
     }
 
     [Fact]
@@ -269,7 +269,7 @@ public class UserSearchTests
 
         // Assert
         Assert.Single(filters);
-        Assert.Contains("email IN ['test1@example.com', 'test2@example.com']", filters[0]);
+        Assert.Contains("email IN ['test1@example.com', 'test2@example.com']", filters[0], StringComparison.InvariantCulture);
     }
 
     [Fact]
@@ -330,8 +330,8 @@ public class UserSearchTests
 
         // Assert
         Assert.Equal(2, filters.Count);
-        Assert.Contains(filters, f => f.Contains("name != 'Admin'"));
-        Assert.Contains(filters, f => f.Contains("name CONTAINS 'Jan'"));
+        Assert.Contains(filters, f => f.Contains("name != 'Admin'", StringComparison.InvariantCulture));
+        Assert.Contains(filters, f => f.Contains("name CONTAINS 'Jan'", StringComparison.InvariantCulture));
     }
 
     [Fact]
@@ -353,8 +353,8 @@ public class UserSearchTests
 
         // Assert
         Assert.Equal(2, filters.Count);
-        Assert.Contains(filters, f => f.Contains("email CONTAINS '@example.com'"));
-        Assert.Contains(filters, f => f.Contains("email STARTS WITH 'admin'"));
+        Assert.Contains(filters, f => f.Contains("email CONTAINS '@example.com'", StringComparison.InvariantCulture));
+        Assert.Contains(filters, f => f.Contains("email STARTS WITH 'admin'", StringComparison.InvariantCulture));
     }
 
     // Helper methods to invoke private static methods using reflection
@@ -379,4 +379,3 @@ public class UserSearchTests
         return (string)method?.Invoke(null, new object[] { value })!;
     }
 }
-
