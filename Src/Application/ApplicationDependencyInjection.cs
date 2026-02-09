@@ -14,7 +14,15 @@ public static class ApplicationDependencyInjection
     {
         services.AddMediator(typeof(ApplicationDependencyInjection).Assembly);
         services.AddValidatorsFromAssembly(typeof(ApplicationDependencyInjection).Assembly);
+        services.AddDomainEventHandlers();
 
+        return services;
+    }
+
+    private static IServiceCollection AddDomainEventHandlers(this IServiceCollection services)
+    {
+        services.AddScoped<Identity.EventHandlers.UserRegisteredDomainEvents>();
+        services.AddScoped<Identity.EventHandlers.UserDeactivatedDomainEvents>();
 
         return services;
     }

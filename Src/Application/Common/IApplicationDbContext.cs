@@ -9,6 +9,7 @@ public interface IApplicationDbContext
 {
     public DbSet<UserProfile> Profiles { get; set; }
 
+    public DbSet<T> GetSet<T>() where T : class;
     public DbConnection GetConnection();
     public Task<IDbContextTransaction> BeginTransactionAsync();
     public Task CommitTransactionAsync();

@@ -1,4 +1,4 @@
-using Domain.Aggregates.Identity.DomainNotifications;
+using Domain.Aggregates.Identity.DomainEvents;
 using Domain.Common.Models;
 
 namespace Domain.Aggregates.Identity;
@@ -11,7 +11,9 @@ public class UserProfile : AggregateRoot<Guid>
     public DateTimeOffset? ArchivedAt { get; private set; }
 
     // Private constructor for EF Core
-    private UserProfile() { }
+    private UserProfile()
+    {
+    }
 
     private UserProfile(Guid id, string firstName, string lastName, string email)
     {
@@ -24,7 +26,7 @@ public class UserProfile : AggregateRoot<Guid>
     public static UserProfile Create(Guid id, string firstName, string lastName, string email, string language = "pl")
     {
         var profile = new UserProfile(id, firstName, lastName, email);
-        profile.AddDomainNotification(new UserRegistered(id, $"{firstName} {lastName}", email, language));
+        profile.AddDomainEvent(new UserRegistered(id, $"{firstName} {lastName}", email, language));
         return profile;
     }
 
@@ -41,7 +43,7 @@ public class UserProfile : AggregateRoot<Guid>
         }
 
         ArchivedAt = archivedAt;
-        AddDomainNotification(new UserDeactivated(Id));
+        AddDomainEvent(new UserDeactivated(Id));
     }
 
     public void Update(string firstName, string lastName)

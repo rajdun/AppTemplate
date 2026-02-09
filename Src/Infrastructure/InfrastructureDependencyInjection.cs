@@ -195,13 +195,15 @@ public static class InfrastructureDependencyInjection
     {
         var connectionString = configuration.GetConnectionString("DefaultConnection");
 
+        services.AddSingleton<DomainEventDispatcherInterceptor>();
         services.AddSingleton<DomainEventToOutboxInterceptor>();
 
         services.AddDbContext<ApplicationDbContext>((sp, options) =>
         {
-            var interceptor = sp.GetRequiredService<DomainEventToOutboxInterceptor>();
+            var eventDispatcher = sp.GetRequiredService<DomainEventDispatcherInterceptor>();
+            var outboxInterceptor = sp.GetRequiredService<DomainEventToOutboxInterceptor>();
             options.UseNpgsql(connectionString)
-                .AddInterceptors(interceptor);
+                .AddInterceptors(eventDispatcher, outboxInterceptor); // Event dispatcher runs first
         });
 
         services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<ApplicationDbContext>());

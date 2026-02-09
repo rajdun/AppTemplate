@@ -13,6 +13,8 @@ public abstract class AggregateRoot<TId> : Entity<TId>
     private readonly List<IDomainNotification> _domainNotifications = new();
     public IReadOnlyCollection<IDomainNotification> DomainNotifications => _domainNotifications.AsReadOnly();
 
-    protected void AddDomainNotification(IDomainNotification domainNotification) => _domainNotifications.Add(domainNotification);
+    public void AddDomainNotification(IDomainNotification domainNotification) =>
+        _domainNotifications.Add(domainNotification);
+
     public void ClearDomainNotifications() => _domainNotifications.Clear();
 }

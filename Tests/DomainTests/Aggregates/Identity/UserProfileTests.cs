@@ -1,5 +1,5 @@
 ﻿using Domain.Aggregates.Identity;
-using Domain.Aggregates.Identity.DomainNotifications;
+using Domain.Aggregates.Identity.DomainEvents;
 
 namespace DomainTests.Aggregates.Identity;
 
@@ -27,7 +27,7 @@ public class UserProfileTests
     }
 
     [Fact]
-    public void Create_ShouldAddUserRegisteredDomainNotification()
+    public void Create_ShouldAddUserRegisteredDomainEvent()
     {
         // Arrange
         var id = Guid.NewGuid();
@@ -39,12 +39,12 @@ public class UserProfileTests
         var profile = UserProfile.Create(id, firstName, lastName, email);
 
         // Assert
-        Assert.Single(profile.DomainNotifications);
-        var notification = profile.DomainNotifications.First() as UserRegistered;
-        Assert.NotNull(notification);
-        Assert.Equal(id, notification.Id);
-        Assert.Equal($"{firstName} {lastName}", notification.Name);
-        Assert.Equal(email, notification.Email);
+        Assert.Single(profile.DomainEvents);
+        var domainEvent = profile.DomainEvents.First() as UserRegistered;
+        Assert.NotNull(domainEvent);
+        Assert.Equal(id, domainEvent.Id);
+        Assert.Equal($"{firstName} {lastName}", domainEvent.Name);
+        Assert.Equal(email, domainEvent.Email);
     }
 
     [Fact]
@@ -75,12 +75,12 @@ public class UserProfileTests
     }
 
     [Fact]
-    public void Deactivate_WhenNotArchived_ShouldSetArchivedAtAndAddNotification()
+    public void Deactivate_WhenNotArchived_ShouldSetArchivedAtAndAddEvent()
     {
         // Arrange
         var profile = UserProfile.Create(Guid.NewGuid(), "Jan", "Kowalski", "jan@example.com");
         var archivedAt = DateTimeOffset.UtcNow;
-        profile.ClearDomainNotifications(); // Clear initial notification
+        profile.ClearDomainEvents(); // Clear initial event
 
         // Act
         profile.Deactivate(archivedAt);
@@ -88,23 +88,23 @@ public class UserProfileTests
         // Assert
         Assert.NotNull(profile.ArchivedAt);
         Assert.Equal(archivedAt, profile.ArchivedAt);
-        Assert.Single(profile.DomainNotifications);
-        Assert.IsType<UserDeactivated>(profile.DomainNotifications.First());
+        Assert.Single(profile.DomainEvents);
+        Assert.IsType<UserDeactivated>(profile.DomainEvents.First());
     }
 
     [Fact]
-    public void Deactivate_WhenAlreadyArchived_ShouldNotAddNotificationAgain()
+    public void Deactivate_WhenAlreadyArchived_ShouldNotAddEventAgain()
     {
         // Arrange
         var profile = UserProfile.Create(Guid.NewGuid(), "Jan", "Kowalski", "jan@example.com");
         profile.Deactivate(DateTimeOffset.UtcNow);
-        profile.ClearDomainNotifications(); // Clear notifications
+        profile.ClearDomainEvents(); // Clear events
 
         // Act
         profile.Deactivate(DateTimeOffset.UtcNow.AddDays(1));
 
         // Assert
-        Assert.Empty(profile.DomainNotifications);
+        Assert.Empty(profile.DomainEvents);
     }
 
     [Fact]

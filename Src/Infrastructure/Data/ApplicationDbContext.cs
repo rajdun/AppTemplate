@@ -25,6 +25,11 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser, A
         return Database.GetDbConnection();
     }
 
+    public DbSet<T> GetSet<T>() where T : class
+    {
+        return Set<T>();
+    }
+
     public async Task<IDbContextTransaction> BeginTransactionAsync()
     {
         return await Database.BeginTransactionAsync().ConfigureAwait(false);
