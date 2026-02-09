@@ -4,7 +4,7 @@ namespace DomainTests.Common.Models;
 
 public class EntityTests
 {
-    private class TestEntity : Entity<Guid>
+    private sealed class TestEntity : Entity<Guid>
     {
         public TestEntity(Guid id) : base(id) { }
 
@@ -48,7 +48,9 @@ public class EntityTests
         var entity = new TestEntity(Guid.NewGuid());
 
         // Act
+#pragma warning disable CA1508
         var result = entity.Equals(null);
+#pragma warning restore CA1508
 
         // Assert
         Assert.False(result);

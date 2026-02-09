@@ -129,7 +129,7 @@ public class MediatorTests
         var mediator = new Application.Common.MediatorPattern.Mediator(_serviceProvider);
 
         // Act
-        await Assert.ThrowsAsync<InvalidOperationException>(async () => await mediator.PublishAsync(request));
+        await Assert.ThrowsAsync<InvalidOperationException>(async () => await mediator.PublishAsync(request).ConfigureAwait(false));
     }
 
     [Fact]
@@ -188,11 +188,11 @@ public class MediatorTests
         await handler2.DidNotReceive().Handle(request, Arg.Any<CancellationToken>());
     }
 
-    public sealed class TestRequest : IRequest<string> { }
+    private sealed class TestRequest : IRequest<string> { }
 
     [Authorize(AuthorizePolicy.Admin)]
-    public sealed class AuthorizedRequest : IRequest<string> { }
+    private sealed class AuthorizedRequest : IRequest<string> { }
 
-    public sealed class TestNotification : IRequest { }
+    private sealed class TestNotification : IRequest { }
 }
 

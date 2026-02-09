@@ -5,7 +5,7 @@ namespace DomainTests.Common.Models;
 
 public class AggregateRootTests
 {
-    private class TestAggregateRoot : AggregateRoot<Guid>
+    private sealed class TestAggregateRoot : AggregateRoot<Guid>
     {
         public TestAggregateRoot(Guid id)
         {
@@ -23,13 +23,13 @@ public class AggregateRootTests
         }
     }
 
-    private class TestDomainEvent : IDomainEvent
+    private sealed class TestDomainEvent : IDomainEvent
     {
         public string Message { get; }
         public TestDomainEvent(string message) => Message = message;
     }
 
-    private class TestDomainNotification : IDomainNotification
+    private sealed class TestDomainNotification : IDomainNotification
     {
         public string Message { get; }
         public TestDomainNotification(string message) => Message = message;
