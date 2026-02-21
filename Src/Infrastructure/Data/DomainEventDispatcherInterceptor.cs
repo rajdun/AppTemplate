@@ -1,4 +1,4 @@
-using Application.Identity.EventHandlers;
+using Application.Common.MediatorPattern;
 using Domain.Common.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -56,35 +56,12 @@ public class DomainEventDispatcherInterceptor : SaveChangesInterceptor
         // Clear events before dispatching to prevent re-processing
         entitiesWithDomainEvents.ForEach(e => e.ClearDomainEvents());
 
-        using (var scope = _serviceProvider.CreateScope())
+        var mediator = _serviceProvider.GetRequiredService<IMediator>();
+
+        foreach (var domainEvent in domainEvents)
         {
-            // Dispatch events - handlers may add notifications to the aggregates
-            foreach (var domainEvent in domainEvents)
-            {
-                switch (domainEvent)
-                {
-                    case Domain.Aggregates.Identity.DomainEvents.UserRegistered userRegistered:
-                    {
-                        var handler = scope.ServiceProvider.GetService<UserRegisteredDomainEvents>();
-                        if (handler != null)
-                        {
-                            await handler.Handle(userRegistered, cancellationToken).ConfigureAwait(false);
-                        }
-
-                        break;
-                    }
-                    case Domain.Aggregates.Identity.DomainEvents.UserDeactivated userDeactivated:
-                    {
-                        var handler = scope.ServiceProvider.GetService<UserDeactivatedDomainEvents>();
-                        if (handler != null)
-                        {
-                            await handler.Handle(userDeactivated, cancellationToken).ConfigureAwait(false);
-                        }
-
-                        break;
-                    }
-                }
-            }
+            // Dynamic dispatch resolves IRequestHandler<ConcreteEventType> at runtime
+            await mediator.PublishAsync((dynamic)domainEvent, cancellationToken).ConfigureAwait(false);
         }
     }
 }

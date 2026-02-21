@@ -59,7 +59,7 @@ public class IdentityService : IIdentityService
             return Result.Fail<Guid>(UserTranslations.UsernameAlreadyExists);
         }
 
-        var userId = Guid.NewGuid();
+        var userId = Guid.CreateVersion7();
 
         // Create domain user profile
         var userProfile = UserProfile.Create(userId, firstName, lastName, email);
@@ -81,6 +81,8 @@ public class IdentityService : IIdentityService
             var errors = string.Join(", ", result.Errors.Select(e => e.Description));
             return Result.Fail<Guid>(errors);
         }
+
+        await _dbContext.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
 
         return Result.Ok(userId);
     }
@@ -159,6 +161,8 @@ public class IdentityService : IIdentityService
             var errors = string.Join(", ", result.Errors.Select(e => e.Description));
             return Result.Fail(errors);
         }
+
+        await _dbContext.SaveChangesAsync(CancellationToken.None).ConfigureAwait(false);
 
         return Result.Ok();
     }

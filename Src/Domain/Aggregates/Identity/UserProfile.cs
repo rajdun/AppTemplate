@@ -26,7 +26,7 @@ public class UserProfile : AggregateRoot<Guid>
     public static UserProfile Create(Guid id, string firstName, string lastName, string email, string language = "pl")
     {
         var profile = new UserProfile(id, firstName, lastName, email);
-        profile.AddDomainEvent(new UserRegistered(id, $"{firstName} {lastName}", email, language));
+    profile.AddDomainEvent(new UserRegistered(id, $"{firstName} {lastName}", email, language));
         return profile;
     }
 

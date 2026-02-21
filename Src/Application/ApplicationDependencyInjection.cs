@@ -1,7 +1,5 @@
 ﻿using System.Reflection;
 using Application.Common.MediatorPattern;
-using Application.Common.Messaging;
-using Domain.Common;
 using Domain.Common.Interfaces;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,17 +10,9 @@ public static class ApplicationDependencyInjection
 {
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
-        services.AddMediator(typeof(ApplicationDependencyInjection).Assembly);
-        services.AddValidatorsFromAssembly(typeof(ApplicationDependencyInjection).Assembly);
-        services.AddDomainEventHandlers();
-
-        return services;
-    }
-
-    private static IServiceCollection AddDomainEventHandlers(this IServiceCollection services)
-    {
-        services.AddScoped<Identity.EventHandlers.UserRegisteredDomainEvents>();
-        services.AddScoped<Identity.EventHandlers.UserDeactivatedDomainEvents>();
+        services
+            .AddMediator(typeof(ApplicationDependencyInjection).Assembly)
+            .AddValidatorsFromAssembly(typeof(ApplicationDependencyInjection).Assembly);
 
         return services;
     }

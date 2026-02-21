@@ -61,7 +61,7 @@ internal partial class UserSearch(ILogger<UserSearch> logger, MeilisearchClient 
         return new PagedResult<UserSearchDocumentDto>
         {
             Items = items,
-            TotalCount = total,
+            TotalCount = ((SearchResult<UserSearchDocumentDto>)result).EstimatedTotalHits,
             PageNumber = request.PageNumber,
             PageSize = request.PageSize
         };

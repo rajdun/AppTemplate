@@ -6,6 +6,8 @@ using Application.Common.Mailing;
 using Application.Common.Messaging;
 using Application.Users.Interfaces;
 using Domain.Aggregates.Identity;
+using Domain.Aggregates.Identity.DomainEvents;
+using Domain.Common.Interfaces;
 using Hangfire;
 using Hangfire.Redis.StackExchange;
 using Infrastructure.Data;
@@ -195,8 +197,8 @@ public static class InfrastructureDependencyInjection
     {
         var connectionString = configuration.GetConnectionString("DefaultConnection");
 
-        services.AddSingleton<DomainEventDispatcherInterceptor>();
-        services.AddSingleton<DomainEventToOutboxInterceptor>();
+        services.AddScoped<DomainEventDispatcherInterceptor>();
+        services.AddScoped<DomainEventToOutboxInterceptor>();
 
         services.AddDbContext<ApplicationDbContext>((sp, options) =>
         {

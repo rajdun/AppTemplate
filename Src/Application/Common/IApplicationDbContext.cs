@@ -1,5 +1,6 @@
 using System.Data.Common;
 using Domain.Aggregates.Identity;
+using Domain.Common.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
@@ -16,4 +17,6 @@ public interface IApplicationDbContext
     public Task RollbackTransactionAsync();
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     public IQueryable<T> Query<T>(FormattableString query);
+
+    public Task AddDomainNotification(IDomainNotification notification);
 }

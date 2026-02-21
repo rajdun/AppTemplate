@@ -42,7 +42,7 @@ public class UserProfileTests
         Assert.Single(profile.DomainEvents);
         var domainEvent = profile.DomainEvents.First() as UserRegistered;
         Assert.NotNull(domainEvent);
-        Assert.Equal(id, domainEvent.Id);
+        Assert.Equal(id, domainEvent.ProfileId);
         Assert.Equal($"{firstName} {lastName}", domainEvent.Name);
         Assert.Equal(email, domainEvent.Email);
     }

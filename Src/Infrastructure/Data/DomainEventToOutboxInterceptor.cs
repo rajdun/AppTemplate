@@ -50,16 +50,16 @@ public class DomainEventToOutboxInterceptor(IDateTimeProvider dateTimeProvider)
 
         entitiesWithDomainEvents.ForEach(e => e.ClearDomainNotifications());
 
-        var outboxMessages = domainEvents.Select(domainEvent =>
+        var outboxMessages = domainEvents.Select(domainNotification =>
             new OutboxMessage
             {
-                EventType = domainEvent.GetType().AssemblyQualifiedName!,
-                EventPayload = JsonSerializer.Serialize(domainEvent, domainEvent.GetType()),
+                EventType = domainNotification.GetType().AssemblyQualifiedName!,
+                EventPayload = JsonSerializer.Serialize(domainNotification, domainNotification.GetType()),
                 CreatedAt = dateTimeProvider.UtcNow,
                 ProcessedAt = null,
                 RetryCount = 0
             });
 
-        context.Set<OutboxMessage>().AddRange(outboxMessages);
+        context.Set<OutboxMessage>().AddRangeAsync(outboxMessages);
     }
 }

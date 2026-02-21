@@ -24,7 +24,7 @@ public partial class UserRegisteredSendEmailNotificationHandler(ILogger<UserRegi
             var emailLanguage = AppLanguageHelpers.FromString(request.Language);
 
             await emailService.SendTemplatedEmailAsync(request.Email,
-                new UserRegisteredEmailTemplate(request.Name, "Api", emailLanguage),
+                new UserRegisteredEmailTemplate(request.Name, "Api", emailLanguage), // TODO: add app name to config
                 cancellationToken).ConfigureAwait(false);
         }
 #pragma warning disable CA1031

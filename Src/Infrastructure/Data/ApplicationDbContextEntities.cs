@@ -1,4 +1,5 @@
 using Domain.Aggregates.Identity;
+using Domain.Common.Interfaces;
 using Infrastructure.Messaging.Dto;
 using Microsoft.EntityFrameworkCore;
 

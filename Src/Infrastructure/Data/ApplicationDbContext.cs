@@ -1,6 +1,8 @@
 using System.Data.Common;
+using System.Text.Json;
 using Application.Common;
 using Domain.Aggregates.Identity;
+using Domain.Common.Interfaces;
 using Infrastructure.Identity;
 using Infrastructure.Messaging.Dto;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -81,5 +83,21 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser, A
             b.Property(x => x.EventPayload).HasColumnType("jsonb");
             b.HasIndex(x => x.NextAttemptAt);
         });
+    }
+
+    public async Task AddDomainNotification(IDomainNotification notification)
+    {
+        ArgumentNullException.ThrowIfNull(notification);
+
+        var message = new OutboxMessage
+        {
+            EventType = notification.GetType().AssemblyQualifiedName!,
+            EventPayload = JsonSerializer.Serialize(notification, notification.GetType()),
+            CreatedAt = DateTime.UtcNow,
+            ProcessedAt = null,
+            RetryCount = 0
+        };
+
+        await OutboxMessages.AddAsync(message).ConfigureAwait(false);
     }
 }
