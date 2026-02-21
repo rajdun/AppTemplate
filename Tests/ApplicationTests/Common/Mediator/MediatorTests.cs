@@ -188,11 +188,11 @@ public class MediatorTests
         await handler2.DidNotReceive().Handle(request, Arg.Any<CancellationToken>());
     }
 
-    private sealed class TestRequest : IRequest<string> { }
+    public sealed class TestRequest : IRequest<string> { }
 
     [Authorize(AuthorizePolicy.Admin)]
-    private sealed class AuthorizedRequest : IRequest<string> { }
+    public sealed class AuthorizedRequest : IRequest<string> { }
 
-    private sealed class TestNotification : IRequest { }
+    public sealed class TestNotification : IRequest { }
 }
 
