@@ -36,6 +36,7 @@ using Serilog;
 using Serilog.Sinks.OpenTelemetry;
 using StackExchange.Redis;
 using Infrastructure.Search;
+using Infrastructure.Storage;
 
 namespace Infrastructure;
 
@@ -57,6 +58,7 @@ public static class InfrastructureDependencyInjection
         services.AddHangfire(configuration);
         services.AddMailing(configuration);
         services.AddMeilisearch(configuration);
+        services.AddStorage(configuration);
 
         return services;
     }
@@ -221,6 +223,15 @@ public static class InfrastructureDependencyInjection
             .AddDbContextCheck<ApplicationDbContext>();
 
         healthChecks.AddRedis(redisConnectionString, RedisConnectionStringName);
+
+        return services;
+    }
+
+    private static IServiceCollection AddStorage(this IServiceCollection services, IConfiguration configuration)
+    {
+        services.Configure<LocalFileStorageSettings>(configuration.GetSection(LocalFileStorageSettings.SectionName));
+        services.AddSingleton<IFileStorageProvider, LocalFileProvider>();
+        services.AddSingleton<IFileStorageProviderFactory, FileStorageFactory>();
 
         return services;
     }
