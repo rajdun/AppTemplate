@@ -1,7 +1,6 @@
 using System.Data.Common;
 using System.Text.Json;
 using Application.Common;
-using Domain.Aggregates.Identity;
 using Domain.Common.Interfaces;
 using Infrastructure.Identity;
 using Infrastructure.Messaging.Dto;
@@ -58,31 +57,27 @@ public partial class ApplicationDbContext : IdentityDbContext<ApplicationUser, A
 
         base.OnModelCreating(builder);
 
-        builder.Entity<ApplicationUser>(b =>
-        {
-            b.Property(u => u.Id).HasDefaultValueSql("uuidv7()");
-            b.HasOne(x => x.DomainUserProfile)
-                .WithOne()
-                .HasForeignKey<UserProfile>(up => up.Id)
-                .IsRequired();
-        });
+        builder.UseCollation("pl-PL-x-icu");
 
-        builder.Entity<UserProfile>(b =>
-        {
-            b.ToTable("UserProfiles");
-            b.Property(u => u.Id).HasDefaultValueSql("uuidv7()");
-            b.Property(u => u.FirstName).HasMaxLength(100).IsRequired();
-            b.Property(u => u.LastName).HasMaxLength(100).IsRequired();
-            b.Property(u => u.Email).HasMaxLength(256).IsRequired();
-            b.HasIndex(u => u.Email).IsUnique();
-        });
+        builder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
+    }
 
-        builder.Entity<OutboxMessage>(b =>
+    public async Task<long> GetApproxRowCountAsync<T>(CancellationToken cancellationToken = default) where T : class
+    {
+        var tableName = GetSet<T>().EntityType.GetTableName();
+
+        var approxCount = await Query<long>($"SELECT reltuples::bigint AS \"Value\" FROM pg_class WHERE relname = {tableName}")
+            .FirstOrDefaultAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        if (approxCount < 0)
         {
-            b.Property(x => x.Id).HasDefaultValueSql("uuidv7()");
-            b.Property(x => x.EventPayload).HasColumnType("jsonb");
-            b.HasIndex(x => x.NextAttemptAt);
-        });
+            approxCount = await GetSet<T>()
+                .LongCountAsync(cancellationToken)
+                .ConfigureAwait(false);
+        }
+
+        return approxCount;
     }
 
     public async Task AddDomainNotification(IDomainNotification notification)

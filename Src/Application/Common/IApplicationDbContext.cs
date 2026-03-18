@@ -17,6 +17,7 @@ public interface IApplicationDbContext
     public Task RollbackTransactionAsync();
     public Task<int> SaveChangesAsync(CancellationToken cancellationToken);
     public IQueryable<T> Query<T>(FormattableString query);
+    public Task<long> GetApproxRowCountAsync<T>(CancellationToken cancellationToken = default) where T : class;
 
     public Task AddDomainNotification(IDomainNotification notification);
 }

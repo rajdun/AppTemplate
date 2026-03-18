@@ -120,12 +120,13 @@ services:
 
   database:
     image: postgres:18.0-alpine3.22
-    ports:
-      - "5432:5432"
     environment:
       POSTGRES_DB: ${POSTGRES_DB:-dev_db}
       POSTGRES_USER: ${POSTGRES_USER:-dev_user}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dev_password}
+      POSTGRES_INITDB_ARGS: "--lc-collate=pl-PL-x-icu --lc-ctype=pl-PL-x-icu"
+    ports:
+      - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
     restart: unless-stopped
