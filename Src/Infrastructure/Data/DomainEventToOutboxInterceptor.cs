@@ -60,6 +60,6 @@ public class DomainEventToOutboxInterceptor(IDateTimeProvider dateTimeProvider)
                 RetryCount = 0
             });
 
-        context.Set<OutboxMessage>().AddRangeAsync(outboxMessages);
+        context.Set<OutboxMessage>().AddRange(outboxMessages);
     }
 }

@@ -1,4 +1,5 @@
 using Application.Common.MediatorPattern;
+using Domain.Common.Interfaces;
 using Domain.Common.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
@@ -6,14 +7,9 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Infrastructure.Data;
 
-public class DomainEventDispatcherInterceptor : SaveChangesInterceptor
+public class DomainEventDispatcherInterceptor(IServiceProvider serviceProvider) : SaveChangesInterceptor
 {
-    private readonly IServiceProvider _serviceProvider;
-
-    public DomainEventDispatcherInterceptor(IServiceProvider serviceProvider)
-    {
-        _serviceProvider = serviceProvider;
-    }
+    private const int MaxDispatchRounds = 10;
 
     public override InterceptionResult<int> SavingChanges(DbContextEventData eventData, InterceptionResult<int> result)
     {
@@ -38,6 +34,36 @@ public class DomainEventDispatcherInterceptor : SaveChangesInterceptor
             return;
         }
 
+        var mediator = serviceProvider.GetRequiredService<IMediator>();
+        var dispatchRound = 0;
+
+        while (dispatchRound < MaxDispatchRounds)
+        {
+            var domainEvents = GetAndClearDomainEvents(context);
+
+            if (domainEvents.Count == 0)
+            {
+                break;
+            }
+
+            foreach (var domainEvent in domainEvents)
+            {
+                await mediator.PublishAsync((dynamic)domainEvent, cancellationToken).ConfigureAwait(false);
+            }
+
+            dispatchRound++;
+        }
+
+        if (dispatchRound >= MaxDispatchRounds)
+        {
+            throw new InvalidOperationException(
+                $"Domain event dispatch exceeded {MaxDispatchRounds} rounds. " +
+                "This likely indicates an infinite loop where handlers keep raising new events.");
+        }
+    }
+
+    private static List<IDomainEvent> GetAndClearDomainEvents(DbContext context)
+    {
         var entitiesWithDomainEvents = context.ChangeTracker
             .Entries<AggregateRoot<Guid>>()
             .Where(e => e.Entity.DomainEvents.Count > 0)
@@ -46,22 +72,15 @@ public class DomainEventDispatcherInterceptor : SaveChangesInterceptor
 
         if (entitiesWithDomainEvents.Count == 0)
         {
-            return;
+            return [];
         }
 
         var domainEvents = entitiesWithDomainEvents
             .SelectMany(e => e.DomainEvents)
             .ToList();
 
-        // Clear events before dispatching to prevent re-processing
         entitiesWithDomainEvents.ForEach(e => e.ClearDomainEvents());
 
-        var mediator = _serviceProvider.GetRequiredService<IMediator>();
-
-        foreach (var domainEvent in domainEvents)
-        {
-            // Dynamic dispatch resolves IRequestHandler<ConcreteEventType> at runtime
-            await mediator.PublishAsync((dynamic)domainEvent, cancellationToken).ConfigureAwait(false);
-        }
+        return domainEvents;
     }
 }
