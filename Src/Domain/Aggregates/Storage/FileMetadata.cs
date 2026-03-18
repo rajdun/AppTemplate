@@ -4,14 +4,14 @@ namespace Domain.Aggregates.Storage;
 
 public class FileMetadata : AggregateRoot<Guid>
 {
-    public string OriginalFileName { get; private set; } = "";
-    public string ContentType { get; private set; } = "";
+    public string OriginalFileName { get; private set; }
+    public string ContentType { get; private set; }
     public long SizeInBytes { get; private set; }
     // SHA256 hash of the file content, used for integrity checks and deduplication
-    public string Checksum { get; private set; } = "";
+    public string Checksum { get; private set; }
 
-    public StorageProvider Provider { get; private set; } = StorageProvider.Local;
-    public string ProviderKey { get; private set; } = "";
+    public StorageProvider Provider { get; private set; }
+    public string ProviderKey { get; private set; }
 
     private FileMetadata(string originalFileName, string contentType, long sizeInBytes, string checksum, StorageProvider provider, string providerKey)
     {
