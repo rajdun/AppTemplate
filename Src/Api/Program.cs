@@ -1,4 +1,3 @@
-using System.Reflection;
 using Api;
 using Api.Common;
 using Api.Resources;
@@ -13,48 +12,76 @@ using Scalar.AspNetCore;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+var command = args.FirstOrDefault();
 
-var isRuntime = Assembly.GetEntryAssembly()?.GetName().Name != "GetDocument.Insider";
-
-builder.AddTelemetry();
+// Presentation and Domain are always registered (lightweight, no external dependencies)
 builder.Services.AddDomain();
-if (isRuntime)
+builder.Services.AddPresentation(builder.Configuration);
+
+if (command is "get-api-documentation")
 {
+    // Only auth scheme provider needed for OpenApiDocumentTransformer
+    builder.Services.AddAuthentication();
+    builder.WebHost.UseUrls("http://127.0.0.1:0");
+}
+else
+{
+    builder.AddTelemetry();
     builder.Services.AddInfrastructure(builder.Configuration);
     builder.Services.AddApplication();
 }
 
-builder.Services.AddPresentation(builder.Configuration);
-
 builder.Host.UseDefaultServiceProvider((context, options) =>
 {
-    options.ValidateOnBuild = !isRuntime;
-    options.ValidateScopes = !isRuntime;
+    var validate = command is null && context.HostingEnvironment.IsDevelopment();
+    options.ValidateOnBuild = validate;
+    options.ValidateScopes = validate;
 });
 
 var app = builder.Build();
 
-if (args.Contains("migrate"))
+// CLI commands
+if (command is "migrate")
 {
     Console.WriteLine(ApiResources.Applying_database_migrations___);
-    using (var scope = app.Services.CreateScope())
+    var scope = app.Services.CreateAsyncScope();
+    await using (scope.ConfigureAwait(false))
     {
         var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         await dbContext.Database.MigrateAsync().ConfigureAwait(false);
     }
-
     Console.WriteLine(ApiResources.Migrations_applied_successfully__Exiting_);
     return;
 }
 
+if (command is "get-api-documentation")
+{
+    app.MapOpenApi();
+    app.MapCarter();
+
+    await app.StartAsync().ConfigureAwait(false);
+
+    using var httpClient = new HttpClient();
+    var url = new Uri(new Uri(app.Urls.First()), "openapi/v1.json");
+    var json = await httpClient.GetStringAsync(url).ConfigureAwait(false);
+
+    var outputPath = args.ElementAtOrDefault(1) ?? "openapi.json";
+    await File.WriteAllTextAsync(outputPath, json).ConfigureAwait(false);
+    Console.WriteLine($"OpenAPI document written to: {Path.GetFullPath(outputPath)}");
+
+    await app.StopAsync().ConfigureAwait(false);
+    return;
+}
+
+// Runtime middleware pipeline
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.MapScalarApiReference();
 }
 
-app.UseCors(app.Configuration.GetValue<string>("Cors:PolicyName") ?? "DefaultCorsPolicy");
 app.UseExceptionHandler();
+app.UseCors(app.Configuration.GetValue<string>("Cors:PolicyName") ?? "DefaultCorsPolicy");
 
 var supportedCultures = new[] { "pl-PL", "en-US" };
 var localizationOptions = new RequestLocalizationOptions()
@@ -64,17 +91,14 @@ var localizationOptions = new RequestLocalizationOptions()
 
 app.UseRequestLocalization(localizationOptions);
 
-if (isRuntime)
-{
-    app.UseAuthentication();
-    app.UseAuthorization();
-    app.MapHealthChecks("/health");
+app.UseAuthentication();
+app.UseAuthorization();
+app.MapHealthChecks("/health");
 
-    app.UseHangfireDashboard("/hangfire", new DashboardOptions
-    {
-        Authorization = new[] { new HangfireAuthorizationFilter(app.Configuration) }
-    });
-}
+app.UseHangfireDashboard("/hangfire", new DashboardOptions
+{
+    Authorization = [new HangfireAuthorizationFilter(app.Configuration)]
+});
 
 app.MapCarter();
 
