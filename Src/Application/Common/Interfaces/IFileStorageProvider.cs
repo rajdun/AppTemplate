@@ -14,5 +14,5 @@ public interface IFileStorageProvider
 
 public interface IFileStorageProviderFactory
 {
-    IFileStorageProvider GetProvider(StorageProvider provider);
+    public IFileStorageProvider GetProvider(StorageProvider provider);
 }
