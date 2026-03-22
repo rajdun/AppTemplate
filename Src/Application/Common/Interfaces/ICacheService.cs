@@ -22,5 +22,5 @@ public static class CacheKeys
         return $"api:jti:{jti}";
     }
 
-    public static string GetLicenseCacheKey => "api:license";
+    public static string GetLicenceCacheKey => "api:Licence";
 }

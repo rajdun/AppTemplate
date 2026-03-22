@@ -1,13 +1,13 @@
 using Api.Common;
-using Api.Modules.License.Requests;
+using Api.Modules.Licence.Requests;
 using Application.Common.MediatorPattern;
-using Application.License;
+using Application.Licence.Commands;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Api.Modules.License;
+namespace Api.Modules.Licence;
 
 #pragma warning disable CA1515
-public sealed partial class LicenseModule
+public sealed partial class LicenceModule
 #pragma warning restore CA1515
 {
     private static async Task<IResult> RegisterTenant([FromServices] IMediator mediator,

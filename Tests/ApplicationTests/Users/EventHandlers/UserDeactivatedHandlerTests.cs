@@ -1,5 +1,5 @@
 using Application.Common;
-using Application.Identity.EventHandlers;
+using Application.Users.EventHandlers;
 using Domain.Common.Interfaces;
 using FluentResults;
 using NSubstitute;

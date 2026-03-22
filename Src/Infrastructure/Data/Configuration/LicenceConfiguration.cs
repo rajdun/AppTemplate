@@ -1,16 +1,16 @@
-using Domain.Aggregates.Licensing;
+using Domain.Aggregates.Licencing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace Infrastructure.Data.Configurations;
+namespace Infrastructure.Data.Configuration;
 
-public class LicenseConfiguration : IEntityTypeConfiguration<Domain.Aggregates.Licensing.License>
+public class LicenceConfiguration : IEntityTypeConfiguration<Domain.Aggregates.Licencing.Licence>
 {
-    public void Configure(EntityTypeBuilder<Domain.Aggregates.Licensing.License> builder)
+    public void Configure(EntityTypeBuilder<Domain.Aggregates.Licencing.Licence> builder)
     {
         ArgumentNullException.ThrowIfNull(builder);
 
-        builder.ToTable("Licenses");
+        builder.ToTable("Licences", "Licencing");
 
         builder.HasKey(l => l.Id);
 

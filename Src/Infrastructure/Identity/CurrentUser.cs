@@ -2,12 +2,11 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Application.Common.ExtensionMethods;
 using Application.Common.Interfaces;
-using Application.Common.Mailing;
 using Application.Common.ValueObjects;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
 
-namespace Infrastructure.Implementation;
+namespace Infrastructure.Identity;
 
 internal class CurrentUser : IUser
 {

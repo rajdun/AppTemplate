@@ -4,18 +4,19 @@ using Application.Common;
 using Application.Common.Interfaces;
 using Application.Common.Mailing;
 using Application.Common.Messaging;
-using Application.License.Services;
+using Application.Licence.Services;
 using Application.Users.Interfaces;
 using Domain.Aggregates.Identity;
 using Domain.Aggregates.Identity.DomainEvents;
 using Domain.Common.Interfaces;
 using Hangfire;
 using Hangfire.Redis.StackExchange;
+using Infrastructure.Cache;
 using Infrastructure.Data;
 using Infrastructure.Identity;
 using Infrastructure.Implementation;
 using Infrastructure.Implementation.Dto;
-using Infrastructure.License.Services;
+using Infrastructure.Licence.Services;
 using Infrastructure.Mailing;
 using Infrastructure.Mailing.Dto;
 using Infrastructure.Messaging;
@@ -51,7 +52,7 @@ public static class InfrastructureDependencyInjection
         ArgumentNullException.ThrowIfNull(configuration);
 
         services.AddScoped<IOutboxProcessor, OutboxProcessor>();
-        services.AddSingleton<ILicenseService, LicenseService>();
+        services.AddScoped<ILicenceService, LicenceService>();
 
         services.AddDatabase(configuration);
         services.AddIdentity(configuration);

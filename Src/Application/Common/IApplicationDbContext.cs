@@ -9,7 +9,7 @@ namespace Application.Common;
 public interface IApplicationDbContext
 {
     public DbSet<UserProfile> Profiles { get; set; }
-    public DbSet<Domain.Aggregates.Licensing.License> Licenses { get; set; }
+    public DbSet<Domain.Aggregates.Licencing.Licence> Licences { get; set; }
 
     public DbSet<T> GetSet<T>() where T : class;
     public DbConnection GetConnection();

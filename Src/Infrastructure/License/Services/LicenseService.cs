@@ -2,21 +2,21 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Cryptography;
 using Application.Common;
 using Application.Common.Interfaces;
-using Application.License.Services;
+using Application.Licence.Services;
 using Domain.Common.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Infrastructure.License.Services;
+namespace Infrastructure.Licence.Services;
 
-public class LicenseService(IConfiguration configuration, ICacheService cache, IApplicationDbContext dbContext) : ILicenseService
+public class LicenceService(IConfiguration configuration, ICacheService cache, IApplicationDbContext dbContext) : ILicenceService
 {
-    public async Task<LicenseData> DecodeTokenAsync(string token)
+    public async Task<LicenceData> DecodeTokenAsync(string token)
     {
         var settings = configuration
-            .GetSection(LicenseSettings.SectionName)
-            .Get<LicenseSettings>() ?? new LicenseSettings();
+            .GetSection(LicenceSettings.SectionName)
+            .Get<LicenceSettings>() ?? new LicenceSettings();
 
         var pemContent = await File.ReadAllTextAsync(settings.PublicKeyPath).ConfigureAwait(false);
 
@@ -52,24 +52,24 @@ public class LicenseService(IConfiguration configuration, ICacheService cache, I
             .Where(c => c.Type == "activeFeatures")
             .Select(c => c.Value);
 
-        return new LicenseData(tenantId, companyName, maxUsers, expiresAt.ToUniversalTime(), activeFeatures);
+        return new LicenceData(tenantId, companyName, maxUsers, expiresAt.ToUniversalTime(), activeFeatures);
     }
 
     public async Task<bool> IsValidAsync()
     {
-        var key = CacheKeys.GetLicenseCacheKey;
+        var key = CacheKeys.GetLicenceCacheKey;
 
-        var licenseData = await cache.GetAsync<LicenseData>(key).ConfigureAwait(false);
-        if (licenseData == null)
+        var LicenceData = await cache.GetAsync<LicenceData>(key).ConfigureAwait(false);
+        if (LicenceData == null)
         {
-            licenseData = await GetLicenseDataFromDbAsync(CancellationToken.None).ConfigureAwait(false);
-            if (licenseData == null)
+            LicenceData = await GetLicenceDataFromDbAsync(CancellationToken.None).ConfigureAwait(false);
+            if (LicenceData == null)
             {
                 return false;
             }
         }
 
-        if (licenseData.ExpiresAt < DateTime.UtcNow)
+        if (LicenceData.ExpiresAt < DateTime.UtcNow)
         {
             return false;
         }
@@ -77,15 +77,15 @@ public class LicenseService(IConfiguration configuration, ICacheService cache, I
         return true;
     }
 
-    private async Task<LicenseData?> GetLicenseDataFromDbAsync(CancellationToken cancellationToken)
+    private async Task<LicenceData?> GetLicenceDataFromDbAsync(CancellationToken cancellationToken)
     {
-        var license = await dbContext.Licenses.FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
+        var Licence = await dbContext.Licences.FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
 
-        if (license == null)
+        if (Licence == null)
         {
             return null;
         }
 
-        return new LicenseData(license.TenantId, license.CompanyName, license.MaxUsers, license.ExpiresAt.DateTime, license.ActiveFeatures);
+        return new LicenceData(Licence.TenantId, Licence.CompanyName, Licence.MaxUsers, Licence.ExpiresAt.DateTime, Licence.ActiveFeatures);
     }
 }

@@ -3,6 +3,7 @@ using System.Security.Claims;
 using Application.Common.ExtensionMethods;
 using Application.Common.Interfaces;
 using Application.Common.ValueObjects;
+using Infrastructure.Identity;
 using Infrastructure.Implementation;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;

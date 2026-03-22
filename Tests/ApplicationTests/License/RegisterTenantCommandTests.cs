@@ -1,37 +1,38 @@
 using Application.Common;
-using Application.License;
-using Application.License.Services;
+using Application.Licence.Commands;
+using Application.Licence.Services;
 using Domain.Common.Models;
 using ApplicationTests.Common;
+using Domain.Aggregates.Licencing;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
-using LicenseEntity = Domain.Aggregates.Licensing.License;
+using RegisterTenantCommandHandler = Application.Licence.Commands.RegisterTenantCommandHandler;
 
-namespace ApplicationTests.License;
+namespace ApplicationTests.Licence;
 
 public class RegisterTenantCommandHandlerTests
 {
-    private readonly ILicenseService _licenseService;
+    private readonly ILicenceService _licenceService;
     private readonly ILogger<RegisterTenantCommandHandler> _logger;
 
     public RegisterTenantCommandHandlerTests()
     {
-        _licenseService = Substitute.For<ILicenseService>();
+        _licenceService = Substitute.For<ILicenceService>();
         _logger = Substitute.For<ILogger<RegisterTenantCommandHandler>>();
     }
 
-    private static LicenseData ValidLicenseData(string tenantId = "tenant-1") =>
+    private static LicenceData ValidLicenceData(string tenantId = "tenant-1") =>
         new(tenantId, "Acme Corp", 100, DateTime.UtcNow.AddDays(30), ["FeatureA"]);
 
     [Fact]
-    public async Task Handle_WithValidToken_AndNewTenant_ShouldCreateLicenseAndReturnTenantId()
+    public async Task Handle_WithValidToken_AndNewTenant_ShouldCreateLicenceAndReturnTenantId()
     {
         // Arrange
         await using var context = FakeApplicationDbContext.Create();
-        _licenseService.DecodeTokenAsync("valid.token").Returns(ValidLicenseData("new-tenant"));
+        _licenceService.DecodeTokenAsync("valid.token").Returns(ValidLicenceData("new-tenant"));
 
-        var handler = new RegisterTenantCommandHandler(context, _licenseService, _logger);
+        var handler = new RegisterTenantCommandHandler(context, _licenceService, _logger);
 
         // Act
         var result = await handler.Handle(new RegisterTenantCommand("valid.token"), CancellationToken.None);
@@ -39,7 +40,7 @@ public class RegisterTenantCommandHandlerTests
         // Assert
         Assert.True(result.IsSuccess);
         Assert.Equal("new-tenant", result.Value.TenantId);
-        var stored = context.Licenses.Single();
+        var stored = context.Licences.Single();
         Assert.Equal("new-tenant", stored.TenantId);
     }
 
@@ -48,16 +49,16 @@ public class RegisterTenantCommandHandlerTests
     {
         // Arrange
         await using var context = FakeApplicationDbContext.Create();
-        _licenseService.DecodeTokenAsync(Arg.Any<string>()).ThrowsAsync(new InvalidOperationException("bad token"));
+        _licenceService.DecodeTokenAsync(Arg.Any<string>()).ThrowsAsync(new InvalidOperationException("bad token"));
 
-        var handler = new RegisterTenantCommandHandler(context, _licenseService, _logger);
+        var handler = new RegisterTenantCommandHandler(context, _licenceService, _logger);
 
         // Act
         var result = await handler.Handle(new RegisterTenantCommand("bad.token"), CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailed);
-        Assert.Empty(context.Licenses);
+        Assert.Empty(context.Licences);
     }
 
     [Fact]
@@ -65,28 +66,28 @@ public class RegisterTenantCommandHandlerTests
     {
         // Arrange
         await using var context = FakeApplicationDbContext.Create();
-        var existing = LicenseEntity.Create(
+        var existing = Domain.Aggregates.Licencing.Licence.Create(
             "existing-tenant", "t", "Corp", DateTime.UtcNow.AddDays(10), 10, []);
-        context.Licenses.Add(existing);
+        context.Licences.Add(existing);
         await context.SaveChangesAsync(CancellationToken.None);
 
-        _licenseService.DecodeTokenAsync("valid.token").Returns(ValidLicenseData("existing-tenant"));
+        _licenceService.DecodeTokenAsync("valid.token").Returns(ValidLicenceData("existing-tenant"));
 
-        var handler = new RegisterTenantCommandHandler(context, _licenseService, _logger);
+        var handler = new RegisterTenantCommandHandler(context, _licenceService, _logger);
 
         // Act
         var result = await handler.Handle(new RegisterTenantCommand("valid.token"), CancellationToken.None);
 
         // Assert
         Assert.True(result.IsFailed);
-        Assert.Single(context.Licenses); // no new entry added
+        Assert.Single(context.Licences); // no new entry added
     }
 
     [Fact]
     public async Task Handle_WithNullRequest_ShouldThrowArgumentNullException()
     {
         await using var context = FakeApplicationDbContext.Create();
-        var handler = new RegisterTenantCommandHandler(context, _licenseService, _logger);
+        var handler = new RegisterTenantCommandHandler(context, _licenceService, _logger);
 
         await Assert.ThrowsAsync<ArgumentNullException>(() => handler.Handle(null!, CancellationToken.None));
     }

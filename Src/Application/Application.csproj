@@ -38,9 +38,9 @@
             <Generator>PublicResXFileCodeGenerator</Generator>
             <LastGenOutput>UserTranslations.Designer.cs</LastGenOutput>
         </EmbeddedResource>
-        <EmbeddedResource Update="Resources\LicenseTranslations.resx">
+        <EmbeddedResource Update="Resources\LicenceTranslations.resx">
           <Generator>ResXFileCodeGenerator</Generator>
-          <LastGenOutput>LicenseTranslations.Designer.cs</LastGenOutput>
+          <LastGenOutput>LicenceTranslations.Designer.cs</LastGenOutput>
         </EmbeddedResource>
     </ItemGroup>
 
@@ -50,10 +50,10 @@
             <AutoGen>True</AutoGen>
             <DependentUpon>UserTranslations.resx</DependentUpon>
         </Compile>
-        <Compile Update="Resources\LicenseTranslations.Designer.cs">
+        <Compile Update="Resources\LicenceTranslations.Designer.cs">
           <DesignTime>True</DesignTime>
           <AutoGen>True</AutoGen>
-          <DependentUpon>LicenseTranslations.resx</DependentUpon>
+          <DependentUpon>LicenceTranslations.resx</DependentUpon>
         </Compile>
     </ItemGroup>
 

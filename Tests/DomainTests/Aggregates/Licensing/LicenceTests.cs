@@ -1,10 +1,10 @@
-using Domain.Aggregates.Licensing;
+using Domain.Aggregates.Licencing;
 
-namespace DomainTests.Aggregates.Licensing;
+namespace DomainTests.Aggregates.Licencing;
 
-public class LicenseTests
+public class LicenceTests
 {
-    private static License CreateValidLicense(
+    private static Licence CreateValidLicence(
         string tenantId = "tenant-1",
         string token = "raw.jwt.token",
         string companyName = "Acme Corp",
@@ -12,7 +12,7 @@ public class LicenseTests
         int maxUsers = 100,
         IEnumerable<string>? features = null)
     {
-        return License.Create(
+        return Licence.Create(
             tenantId,
             token,
             companyName,
@@ -26,54 +26,54 @@ public class LicenseTests
     [Fact]
     public void Create_ShouldSetTenantIdCorrectly()
     {
-        var license = CreateValidLicense(tenantId: "my-tenant");
+        var Licence = CreateValidLicence(tenantId: "my-tenant");
 
-        Assert.Equal("my-tenant", license.TenantId);
+        Assert.Equal("my-tenant", Licence.TenantId);
     }
 
     [Fact]
     public void Create_ShouldSetRawJwtTokenCorrectly()
     {
-        var license = CreateValidLicense(token: "header.payload.sig");
+        var Licence = CreateValidLicence(token: "header.payload.sig");
 
-        Assert.Equal("header.payload.sig", license.RawJwtToken);
+        Assert.Equal("header.payload.sig", Licence.RawJwtToken);
     }
 
     [Fact]
     public void Create_ShouldSetCompanyNameCorrectly()
     {
-        var license = CreateValidLicense(companyName: "My Company");
+        var Licence = CreateValidLicence(companyName: "My Company");
 
-        Assert.Equal("My Company", license.CompanyName);
+        Assert.Equal("My Company", Licence.CompanyName);
     }
 
     [Fact]
     public void Create_ShouldSetMaxUsersCorrectly()
     {
-        var license = CreateValidLicense(maxUsers: 50);
+        var Licence = CreateValidLicence(maxUsers: 50);
 
-        Assert.Equal(50, license.MaxUsers);
+        Assert.Equal(50, Licence.MaxUsers);
     }
 
     [Fact]
     public void Create_ShouldSetExpiresAtCorrectly()
     {
         var expiresAt = new DateTime(2030, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-        var license = CreateValidLicense(expiresAt: expiresAt);
+        var Licence = CreateValidLicence(expiresAt: expiresAt);
 
-        Assert.Equal(expiresAt, license.ExpiresAt);
+        Assert.Equal(expiresAt, Licence.ExpiresAt);
     }
 
     [Fact]
     public void Create_ShouldSetActiveFeaturesCorrectly()
     {
         var features = new[] { "FeatureX", "FeatureY", "FeatureZ" };
-        var license = CreateValidLicense(features: features);
+        var Licence = CreateValidLicence(features: features);
 
-        Assert.Equal(3, license.ActiveFeatures.Count);
-        Assert.Contains("FeatureX", license.ActiveFeatures);
-        Assert.Contains("FeatureY", license.ActiveFeatures);
-        Assert.Contains("FeatureZ", license.ActiveFeatures);
+        Assert.Equal(3, Licence.ActiveFeatures.Count);
+        Assert.Contains("FeatureX", Licence.ActiveFeatures);
+        Assert.Contains("FeatureY", Licence.ActiveFeatures);
+        Assert.Contains("FeatureZ", Licence.ActiveFeatures);
     }
 
     [Fact]
@@ -81,16 +81,16 @@ public class LicenseTests
     {
         // The parameterized constructor does not auto-generate an Id (EF Core handles it).
         // Assert the property is a Guid and the object is created without error.
-        var license = CreateValidLicense();
+        var Licence = CreateValidLicence();
 
-        Assert.IsType<Guid>(license.Id);
+        Assert.IsType<Guid>(Licence.Id);
     }
 
     [Fact]
     public void Create_CalledTwice_ShouldProduceSeparateInstances()
     {
-        var a = CreateValidLicense(tenantId: "tenant-a");
-        var b = CreateValidLicense(tenantId: "tenant-b");
+        var a = CreateValidLicence(tenantId: "tenant-a");
+        var b = CreateValidLicence(tenantId: "tenant-b");
 
         Assert.NotSame(a, b);
         Assert.NotEqual(a.TenantId, b.TenantId);
@@ -100,10 +100,10 @@ public class LicenseTests
     public void Create_ShouldSetLastSyncedAtToNow()
     {
         var before = DateTime.UtcNow.AddSeconds(-1);
-        var license = CreateValidLicense();
+        var Licence = CreateValidLicence();
         var after = DateTime.UtcNow.AddSeconds(1);
 
-        Assert.InRange(license.LastSyncedAt.UtcDateTime, before, after);
+        Assert.InRange(Licence.LastSyncedAt.UtcDateTime, before, after);
     }
 
     // ── IsValid ───────────────────────────────────────────────────────────
@@ -111,25 +111,25 @@ public class LicenseTests
     [Fact]
     public void IsValid_WhenNotExpired_ShouldReturnTrue()
     {
-        var license = CreateValidLicense(expiresAt: DateTime.UtcNow.AddDays(10));
+        var Licence = CreateValidLicence(expiresAt: DateTime.UtcNow.AddDays(10));
 
-        Assert.True(license.IsValid());
+        Assert.True(Licence.IsValid());
     }
 
     [Fact]
     public void IsValid_WhenExpired_ShouldReturnFalse()
     {
-        var license = CreateValidLicense(expiresAt: DateTime.UtcNow.AddDays(-1));
+        var Licence = CreateValidLicence(expiresAt: DateTime.UtcNow.AddDays(-1));
 
-        Assert.False(license.IsValid());
+        Assert.False(Licence.IsValid());
     }
 
     [Fact]
     public void IsValid_ExpiringInTheFuture_ShouldReturnTrue()
     {
-        var license = CreateValidLicense(expiresAt: DateTime.UtcNow.AddSeconds(10));
+        var Licence = CreateValidLicence(expiresAt: DateTime.UtcNow.AddSeconds(10));
 
-        Assert.True(license.IsValid());
+        Assert.True(Licence.IsValid());
     }
 
     // ── IsInGracePeriod ───────────────────────────────────────────────────
@@ -137,25 +137,25 @@ public class LicenseTests
     [Fact]
     public void IsInGracePeriod_WhenStillValid_ShouldReturnFalse()
     {
-        var license = CreateValidLicense(expiresAt: DateTime.UtcNow.AddDays(5));
+        var Licence = CreateValidLicence(expiresAt: DateTime.UtcNow.AddDays(5));
 
-        Assert.False(license.IsInGracePeriod());
+        Assert.False(Licence.IsInGracePeriod());
     }
 
     [Fact]
     public void IsInGracePeriod_WhenExpiredWithinGracePeriod_ShouldReturnTrue()
     {
-        var license = CreateValidLicense(expiresAt: DateTime.UtcNow.AddDays(-5));
+        var Licence = CreateValidLicence(expiresAt: DateTime.UtcNow.AddDays(-5));
 
-        Assert.True(license.IsInGracePeriod(gracePeriodDays: 14));
+        Assert.True(Licence.IsInGracePeriod(gracePeriodDays: 14));
     }
 
     [Fact]
     public void IsInGracePeriod_WhenExpiredBeyondGracePeriod_ShouldReturnFalse()
     {
-        var license = CreateValidLicense(expiresAt: DateTime.UtcNow.AddDays(-20));
+        var Licence = CreateValidLicence(expiresAt: DateTime.UtcNow.AddDays(-20));
 
-        Assert.False(license.IsInGracePeriod(gracePeriodDays: 14));
+        Assert.False(Licence.IsInGracePeriod(gracePeriodDays: 14));
     }
 
     // ── HasFeature ────────────────────────────────────────────────────────
@@ -163,25 +163,25 @@ public class LicenseTests
     [Fact]
     public void HasFeature_WhenFeatureExists_ShouldReturnTrue()
     {
-        var license = CreateValidLicense(features: ["Analytics", "Export"]);
+        var Licence = CreateValidLicence(features: ["Analytics", "Export"]);
 
-        Assert.True(license.HasFeature("Analytics"));
+        Assert.True(Licence.HasFeature("Analytics"));
     }
 
     [Fact]
     public void HasFeature_WhenFeatureDoesNotExist_ShouldReturnFalse()
     {
-        var license = CreateValidLicense(features: ["Analytics"]);
+        var Licence = CreateValidLicence(features: ["Analytics"]);
 
-        Assert.False(license.HasFeature("Import"));
+        Assert.False(Licence.HasFeature("Import"));
     }
 
     [Fact]
     public void HasFeature_IsCaseSensitive()
     {
-        var license = CreateValidLicense(features: ["Analytics"]);
+        var Licence = CreateValidLicence(features: ["Analytics"]);
 
-        Assert.False(license.HasFeature("analytics"));
+        Assert.False(Licence.HasFeature("analytics"));
     }
 
     // ── Renew ─────────────────────────────────────────────────────────────
@@ -189,52 +189,52 @@ public class LicenseTests
     [Fact]
     public void Renew_ShouldUpdateRawJwtToken()
     {
-        var license = CreateValidLicense(token: "old.token");
-        license.Renew("new.token", "Acme", DateTime.UtcNow.AddDays(365), 200, ["NewFeature"]);
+        var Licence = CreateValidLicence(token: "old.token");
+        Licence.Renew("new.token", "Acme", DateTime.UtcNow.AddDays(365), 200, ["NewFeature"]);
 
-        Assert.Equal("new.token", license.RawJwtToken);
+        Assert.Equal("new.token", Licence.RawJwtToken);
     }
 
     [Fact]
     public void Renew_ShouldUpdateCompanyName()
     {
-        var license = CreateValidLicense(companyName: "Old Corp");
-        license.Renew("token", "New Corp", DateTime.UtcNow.AddDays(365), 200, []);
+        var Licence = CreateValidLicence(companyName: "Old Corp");
+        Licence.Renew("token", "New Corp", DateTime.UtcNow.AddDays(365), 200, []);
 
-        Assert.Equal("New Corp", license.CompanyName);
+        Assert.Equal("New Corp", Licence.CompanyName);
     }
 
     [Fact]
     public void Renew_ShouldUpdateMaxUsers()
     {
-        var license = CreateValidLicense(maxUsers: 10);
-        license.Renew("token", "Corp", DateTime.UtcNow.AddDays(365), 500, []);
+        var Licence = CreateValidLicence(maxUsers: 10);
+        Licence.Renew("token", "Corp", DateTime.UtcNow.AddDays(365), 500, []);
 
-        Assert.Equal(500, license.MaxUsers);
+        Assert.Equal(500, Licence.MaxUsers);
     }
 
     [Fact]
     public void Renew_ShouldReplaceActiveFeatures()
     {
-        var license = CreateValidLicense(features: ["OldFeature"]);
-        license.Renew("token", "Corp", DateTime.UtcNow.AddDays(365), 100, ["NewFeatureA", "NewFeatureB"]);
+        var Licence = CreateValidLicence(features: ["OldFeature"]);
+        Licence.Renew("token", "Corp", DateTime.UtcNow.AddDays(365), 100, ["NewFeatureA", "NewFeatureB"]);
 
-        Assert.Equal(2, license.ActiveFeatures.Count);
-        Assert.Contains("NewFeatureA", license.ActiveFeatures);
-        Assert.Contains("NewFeatureB", license.ActiveFeatures);
-        Assert.DoesNotContain("OldFeature", license.ActiveFeatures);
+        Assert.Equal(2, Licence.ActiveFeatures.Count);
+        Assert.Contains("NewFeatureA", Licence.ActiveFeatures);
+        Assert.Contains("NewFeatureB", Licence.ActiveFeatures);
+        Assert.DoesNotContain("OldFeature", Licence.ActiveFeatures);
     }
 
     [Fact]
     public void Renew_ShouldUpdateLastSyncedAt()
     {
-        var license = CreateValidLicense();
+        var Licence = CreateValidLicence();
         var before = DateTime.UtcNow.AddSeconds(-1);
 
-        license.Renew("token", "Corp", DateTime.UtcNow.AddDays(365), 100, []);
+        Licence.Renew("token", "Corp", DateTime.UtcNow.AddDays(365), 100, []);
 
         var after = DateTime.UtcNow.AddSeconds(1);
-        Assert.InRange(license.LastSyncedAt.UtcDateTime, before, after);
+        Assert.InRange(Licence.LastSyncedAt.UtcDateTime, before, after);
     }
 
     // ── MarkAsSynced ──────────────────────────────────────────────────────
@@ -242,13 +242,13 @@ public class LicenseTests
     [Fact]
     public void MarkAsSynced_ShouldUpdateLastSyncedAtToNow()
     {
-        var license = CreateValidLicense();
+        var Licence = CreateValidLicence();
         var before = DateTime.UtcNow.AddSeconds(-1);
 
-        license.MarkAsSynced();
+        Licence.MarkAsSynced();
 
         var after = DateTime.UtcNow.AddSeconds(1);
-        Assert.InRange(license.LastSyncedAt.UtcDateTime, before, after);
+        Assert.InRange(Licence.LastSyncedAt.UtcDateTime, before, after);
     }
 
     // ── ActiveFeatures read-only ──────────────────────────────────────────
@@ -256,9 +256,9 @@ public class LicenseTests
     [Fact]
     public void ActiveFeatures_ShouldBeReadOnly()
     {
-        var license = CreateValidLicense();
+        var Licence = CreateValidLicence();
 
-        Assert.IsAssignableFrom<IReadOnlyCollection<string>>(license.ActiveFeatures);
+        Assert.IsAssignableFrom<IReadOnlyCollection<string>>(Licence.ActiveFeatures);
     }
 }
 

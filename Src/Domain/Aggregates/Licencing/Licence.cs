@@ -1,9 +1,9 @@
-using Domain.Aggregates.Licensing.DomainNotification;
+using Domain.Aggregates.Licencing.DomainNotification;
 using Domain.Common.Models;
 
-namespace Domain.Aggregates.Licensing;
+namespace Domain.Aggregates.Licencing;
 
-public class License : AggregateRoot<Guid>
+public class Licence : AggregateRoot<Guid>
 {
     public string TenantId { get; private set; } = null!;
     public string RawJwtToken { get; private set; } = null!;
@@ -16,23 +16,23 @@ public class License : AggregateRoot<Guid>
     private readonly List<string> _activeFeatures = new();
     public IReadOnlyCollection<string> ActiveFeatures => _activeFeatures.AsReadOnly();
 
-    private License()
+    private Licence()
     {
         Id = Guid.CreateVersion7();
         RawJwtToken = string.Empty;
     }
 
-    private License(string tenantId, string rawJwtToken, string companyName, DateTime expiresAt, int maxUsers,
+    private Licence(string tenantId, string rawJwtToken, string companyName, DateTime expiresAt, int maxUsers,
         IEnumerable<string> features)
     {
         TenantId = tenantId;
         ApplyNewToken(rawJwtToken, companyName, expiresAt, maxUsers, features);
     }
 
-    public static License Create(string tenantId, string rawJwtToken, string companyName, DateTime expiresAt, int maxUsers,
+    public static Licence Create(string tenantId, string rawJwtToken, string companyName, DateTime expiresAt, int maxUsers,
         IEnumerable<string> features)
     {
-        return new License(tenantId, rawJwtToken, companyName, expiresAt, maxUsers, features);
+        return new Licence(tenantId, rawJwtToken, companyName, expiresAt, maxUsers, features);
     }
 
     public void Renew(string newRawJwt, string companyName, DateTime newExpiresAt, int newMaxUsers,
@@ -58,7 +58,7 @@ public class License : AggregateRoot<Guid>
         _activeFeatures.Clear();
         _activeFeatures.AddRange(features);
 
-        AddDomainNotification(new LicenseRegenerated(TenantId, RawJwtToken));
+        AddDomainNotification(new LicenceRegenerated(TenantId, RawJwtToken));
     }
 
     public bool IsValid()

@@ -2,16 +2,16 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
 using Application.Common;
-using Infrastructure.License;
-using Infrastructure.License.Services;
+using Infrastructure.Licence;
+using Infrastructure.Licence.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Application.Common.Interfaces;
 using NSubstitute;
 
-namespace InfrastructureTests.License;
+namespace InfrastructureTests.Licence;
 
-public class LicenseServiceTests : IDisposable
+public class LicenceServiceTests : IDisposable
 {
     private readonly RSA _rsa;
     private readonly string _publicKeyPem;
@@ -20,7 +20,7 @@ public class LicenseServiceTests : IDisposable
     private const string TestIssuer = "TestIssuer";
     private const string TestAudience = "TestAudience";
 
-    public LicenseServiceTests()
+    public LicenceServiceTests()
     {
         _rsa = RSA.Create(2048);
         _publicKeyPem = _rsa.ExportSubjectPublicKeyInfoPem();
@@ -53,9 +53,9 @@ public class LicenseServiceTests : IDisposable
         new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>
             {
-                [$"{LicenseSettings.SectionName}:PublicKeyPath"] = _tempPublicKeyPath,
-                [$"{LicenseSettings.SectionName}:Issuer"] = TestIssuer,
-                [$"{LicenseSettings.SectionName}:Audience"] = TestAudience
+                [$"{LicenceSettings.SectionName}:PublicKeyPath"] = _tempPublicKeyPath,
+                [$"{LicenceSettings.SectionName}:Issuer"] = TestIssuer,
+                [$"{LicenceSettings.SectionName}:Audience"] = TestAudience
             })
             .Build();
 
@@ -101,7 +101,7 @@ public class LicenseServiceTests : IDisposable
     public async Task DecodeTokenAsync_WithValidToken_ShouldReturnCorrectTenantId()
     {
         var token = MintToken(tenantId: "my-tenant");
-        var service = new LicenseService(BuildConfiguration(), Substitute.For<ICacheService>(), Substitute.For<IApplicationDbContext>());
+        var service = new LicenceService(BuildConfiguration(), Substitute.For<ICacheService>(), Substitute.For<IApplicationDbContext>());
 
         var result = await service.DecodeTokenAsync(token);
 
@@ -112,7 +112,7 @@ public class LicenseServiceTests : IDisposable
     public async Task DecodeTokenAsync_WithValidToken_ShouldReturnCorrectCompanyName()
     {
         var token = MintToken(companyName: "Big Corp");
-        var service = new LicenseService(BuildConfiguration(), Substitute.For<ICacheService>(), Substitute.For<IApplicationDbContext>());
+        var service = new LicenceService(BuildConfiguration(), Substitute.For<ICacheService>(), Substitute.For<IApplicationDbContext>());
 
         var result = await service.DecodeTokenAsync(token);
 
@@ -123,7 +123,7 @@ public class LicenseServiceTests : IDisposable
     public async Task DecodeTokenAsync_WithValidToken_ShouldReturnCorrectMaxUsers()
     {
         var token = MintToken(maxUsers: 250);
-        var service = new LicenseService(BuildConfiguration(), Substitute.For<ICacheService>(), Substitute.For<IApplicationDbContext>());
+        var service = new LicenceService(BuildConfiguration(), Substitute.For<ICacheService>(), Substitute.For<IApplicationDbContext>());
 
         var result = await service.DecodeTokenAsync(token);
 
@@ -134,7 +134,7 @@ public class LicenseServiceTests : IDisposable
     public async Task DecodeTokenAsync_WithValidToken_ShouldReturnActiveFeatures()
     {
         var token = MintToken(features: ["Analytics", "Export", "Import"]);
-        var service = new LicenseService(BuildConfiguration(), Substitute.For<ICacheService>(), Substitute.For<IApplicationDbContext>());
+        var service = new LicenceService(BuildConfiguration(), Substitute.For<ICacheService>(), Substitute.For<IApplicationDbContext>());
 
         var result = await service.DecodeTokenAsync(token);
 
@@ -147,7 +147,7 @@ public class LicenseServiceTests : IDisposable
     public async Task DecodeTokenAsync_WithExpiredToken_ShouldThrowSecurityTokenException()
     {
         var token = MintToken(expired: true);
-        var service = new LicenseService(BuildConfiguration(), Substitute.For<ICacheService>(), Substitute.For<IApplicationDbContext>());
+        var service = new LicenceService(BuildConfiguration(), Substitute.For<ICacheService>(), Substitute.For<IApplicationDbContext>());
 
         await Assert.ThrowsAsync<SecurityTokenException>(() => service.DecodeTokenAsync(token));
     }
@@ -157,7 +157,7 @@ public class LicenseServiceTests : IDisposable
     {
         var token = MintToken();
         var tampered = token[..^5] + "XXXXX"; // corrupt the signature
-        var service = new LicenseService(BuildConfiguration(), Substitute.For<ICacheService>(), Substitute.For<IApplicationDbContext>());
+        var service = new LicenceService(BuildConfiguration(), Substitute.For<ICacheService>(), Substitute.For<IApplicationDbContext>());
 
         await Assert.ThrowsAsync<SecurityTokenException>(() => service.DecodeTokenAsync(tampered));
     }
@@ -177,7 +177,7 @@ public class LicenseServiceTests : IDisposable
             signingCredentials: creds);
 
         var tokenStr = new JwtSecurityTokenHandler().WriteToken(badToken);
-        var service = new LicenseService(BuildConfiguration(), Substitute.For<ICacheService>(), Substitute.For<IApplicationDbContext>());
+        var service = new LicenceService(BuildConfiguration(), Substitute.For<ICacheService>(), Substitute.For<IApplicationDbContext>());
 
         await Assert.ThrowsAsync<SecurityTokenException>(() => service.DecodeTokenAsync(tokenStr));
     }
@@ -196,7 +196,7 @@ public class LicenseServiceTests : IDisposable
             signingCredentials: creds);
 
         var tokenStr = new JwtSecurityTokenHandler().WriteToken(badToken);
-        var service = new LicenseService(BuildConfiguration(), Substitute.For<ICacheService>(), Substitute.For<IApplicationDbContext>());
+        var service = new LicenceService(BuildConfiguration(), Substitute.For<ICacheService>(), Substitute.For<IApplicationDbContext>());
 
         await Assert.ThrowsAsync<SecurityTokenException>(() => service.DecodeTokenAsync(tokenStr));
     }
@@ -206,7 +206,7 @@ public class LicenseServiceTests : IDisposable
     {
         var expectedExpiry = new DateTime(2030, 6, 15, 12, 0, 0, DateTimeKind.Utc);
         var token = MintToken(expiresAt: expectedExpiry);
-        var service = new LicenseService(BuildConfiguration(), Substitute.For<ICacheService>(), Substitute.For<IApplicationDbContext>());
+        var service = new LicenceService(BuildConfiguration(), Substitute.For<ICacheService>(), Substitute.For<IApplicationDbContext>());
 
         var result = await service.DecodeTokenAsync(token);
 

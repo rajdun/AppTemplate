@@ -1,5 +1,5 @@
 using Application.Common;
-using Application.License.Services;
+using Application.Licence.Services;
 using Application.Resources;
 using Domain.Common.Interfaces;
 using Domain.Common.Models;
@@ -8,7 +8,7 @@ using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace Application.License;
+namespace Application.Licence.Commands;
 
 public record RegisterTenantCommand(
     string Token) : IRequest<RegisterTenantResult>;
@@ -24,18 +24,18 @@ public class RegisterTenantCommandValidator : AbstractValidator<RegisterTenantCo
     }
 }
 
-public partial class RegisterTenantCommandHandler(IApplicationDbContext context, ILicenseService licenseService, ILogger<RegisterTenantCommandHandler> logger)
+public partial class RegisterTenantCommandHandler(IApplicationDbContext context, ILicenceService licenceService, ILogger<RegisterTenantCommandHandler> logger)
     : IRequestHandler<RegisterTenantCommand, RegisterTenantResult>
 {
     public async Task<Result<RegisterTenantResult>> Handle(RegisterTenantCommand request, CancellationToken cancellationToken = new CancellationToken())
     {
         ArgumentNullException.ThrowIfNull(request);
 
-        LicenseData licenseData;
+        LicenceData licenceData;
 
         try
         {
-            licenseData = await licenseService.DecodeTokenAsync(request.Token).ConfigureAwait(false);
+            licenceData = await licenceService.DecodeTokenAsync(request.Token).ConfigureAwait(false);
         }
 #pragma warning disable CA1031
 #pragma warning disable CS0168 // Variable is declared but never used
@@ -43,33 +43,33 @@ public partial class RegisterTenantCommandHandler(IApplicationDbContext context,
 #pragma warning restore CS0168 // Variable is declared but never used
 #pragma warning restore CA1031
         {
-            LogFailedToDecodeLicenseToken(logger);
-            return Result.Fail<RegisterTenantResult>(LicenseTranslations.InvalidToken);
+            LogFailedToDecodeLicenceToken(logger);
+            return Result.Fail<RegisterTenantResult>(LicenceTranslations.InvalidToken);
         }
 
-        if (await context.Licenses.AnyAsync(x => x.TenantId == licenseData.TenantId, cancellationToken)
+        if (await context.Licences.AnyAsync(x => x.TenantId == licenceData.TenantId, cancellationToken)
                 .ConfigureAwait(false))
         {
             LogTenantAlreadyTaken(logger);
-            return Result.Fail<RegisterTenantResult>(LicenseTranslations.TenantAlreadyTaken);
+            return Result.Fail<RegisterTenantResult>(LicenceTranslations.TenantAlreadyTaken);
         }
 
-        var license = Domain.Aggregates.Licensing.License.Create(
-            licenseData.TenantId,
+        var Licence = Domain.Aggregates.Licencing.Licence.Create(
+            licenceData.TenantId,
             request.Token,
-            licenseData.CompanyName,
-            licenseData.ExpiresAt,
-            licenseData.MaxUsers,
-            licenseData.ActiveFeatures);
+            licenceData.CompanyName,
+            licenceData.ExpiresAt,
+            licenceData.MaxUsers,
+            licenceData.ActiveFeatures);
 
-        context.Licenses.Add(license);
+        context.Licences.Add(Licence);
         await context.SaveChangesAsync(cancellationToken).ConfigureAwait(false);
 
-        return new RegisterTenantResult(licenseData.TenantId);
+        return new RegisterTenantResult(licenceData.TenantId);
     }
 
-    [LoggerMessage(LogLevel.Error, "Failed to decode license token")]
-    static partial void LogFailedToDecodeLicenseToken(ILogger<RegisterTenantCommandHandler> logger);
+    [LoggerMessage(LogLevel.Error, "Failed to decode Licence token")]
+    static partial void LogFailedToDecodeLicenceToken(ILogger<RegisterTenantCommandHandler> logger);
 
     [LoggerMessage(LogLevel.Warning, "Tenant already taken")]
     static partial void LogTenantAlreadyTaken(ILogger<RegisterTenantCommandHandler> logger);

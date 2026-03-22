@@ -18,6 +18,6 @@
         <value>Tenant not found</value>
     </data>
     <data name="InvalidToken" xml:space="preserve">
-        <value>Invalid license token</value>
+        <value>Invalid Licence token</value>
     </data>
 </root>

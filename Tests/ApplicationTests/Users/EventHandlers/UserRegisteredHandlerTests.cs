@@ -1,5 +1,5 @@
 using Application.Common;
-using Application.Identity.EventHandlers;
+using Application.Users.EventHandlers;
 using Domain.Aggregates.Identity.DomainEvents;
 using Domain.Aggregates.Identity.DomainNotifications;
 using Domain.Common.Interfaces;

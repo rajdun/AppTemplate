@@ -2,7 +2,7 @@ using System.Text.Json;
 using Application.Common.Interfaces;
 using StackExchange.Redis;
 
-namespace Infrastructure.Implementation;
+namespace Infrastructure.Cache;
 
 public class RedisCacheService : ICacheService
 {

@@ -1,20 +1,20 @@
-using Application.License;
+using Application.Licence.Commands;
 using Carter;
 
-namespace Api.Modules.License;
+namespace Api.Modules.Licence;
 
 #pragma warning disable CA1515
-public sealed partial class LicenseModule : ICarterModule
+public sealed partial class LicenceModule : ICarterModule
 #pragma warning restore CA1515
 {
     private const string JsonContentType = "application/json";
 
     public void AddRoutes(IEndpointRouteBuilder app)
     {
-        var group = app.MapGroup("api/license")
-            .WithTags("License");
+        var group = app.MapGroup("api/licence")
+            .WithTags("Licence");
 
-        group.MapPost("register", RegisterTenant)
+        group.MapPut("register", RegisterTenant)
             .WithName("RegisterTenant")
             .Produces<RegisterTenantResult>(StatusCodes.Status200OK, JsonContentType)
             .ProducesProblem(StatusCodes.Status400BadRequest)
@@ -25,14 +25,14 @@ public sealed partial class LicenseModule : ICarterModule
             .WithSummary(
                 "Rejestracja tenanta. Wymaga tokenu licencyjnego. Zwraca identyfikator tenanta.");
 
-        group.MapPut("apply-token", ApplyNewToken)
+        group.MapPatch("apply-token", ApplyNewToken)
             .WithName("ApplyNewToken")
             .RequireAuthorization()
             .Produces<ApplyNewTokenResult>(StatusCodes.Status200OK, JsonContentType)
             .ProducesProblem(StatusCodes.Status400BadRequest)
             .ProducesProblem(StatusCodes.Status401Unauthorized)
             .ProducesProblem(StatusCodes.Status404NotFound)
-            .WithDisplayName("Apply New License Token")
+            .WithDisplayName("Apply New Licence Token")
             .WithDescription(
                 "Aktualizuje licencję istniejącego tenanta na podstawie nowego tokenu licencyjnego. Dekoduje token, weryfikuje jego poprawność i odnawia dane licencji (data ważności, liczba użytkowników, aktywne funkcje). W przypadku nieistniejącego tenanta lub błędnych danych zwraca odpowiedni kod błędu.")
             .WithSummary(

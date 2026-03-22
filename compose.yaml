@@ -73,8 +73,8 @@ services:
       - MeilisearchSettings__Indexes__0__FilterableAttributes__0=name
       - MeilisearchSettings__Indexes__0__FilterableAttributes__1=email
 
-      # Licensing
-      - LicenseSettings__LicenseKeyPath=${LICENSE_KEY_PATH:-./keys/_public.pem}
+      # Licencing
+      - LicenceSettings__LicenceKeyPath=${LicencE_KEY_PATH:-./keys/_public.pem}
     restart: unless-stopped
     networks:
       - monitoring
@@ -120,8 +120,8 @@ services:
       - MeilisearchSettings__Indexes__0__FilterableAttributes__0=name
       - MeilisearchSettings__Indexes__0__FilterableAttributes__1=email
 
-      # Licensing
-      - LicenseSettings__LicenseKeyPath=${LICENSE_KEY_PATH:-./keys/_public.pem}
+      # Licencing
+      - LicenceSettings__LicenceKeyPath=${LicencE_KEY_PATH:-./keys/_public.pem}
     restart: unless-stopped
     networks:
       - monitoring

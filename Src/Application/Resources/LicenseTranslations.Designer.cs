@@ -9,32 +9,32 @@
 
 namespace Application.Resources {
     using System;
-    
-    
+
+
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
     [System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    internal class LicenseTranslations {
-        
+    internal class LicenceTranslations {
+
         private static System.Resources.ResourceManager resourceMan;
-        
+
         private static System.Globalization.CultureInfo resourceCulture;
-        
+
         [System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal LicenseTranslations() {
+        internal LicenceTranslations() {
         }
-        
+
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
         internal static System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.Equals(null, resourceMan)) {
-                    System.Resources.ResourceManager temp = new System.Resources.ResourceManager("Application.Resources.LicenseTranslations", typeof(LicenseTranslations).Assembly);
+                    System.Resources.ResourceManager temp = new System.Resources.ResourceManager("Application.Resources.LicenceTranslations", typeof(LicenceTranslations).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
             }
         }
-        
+
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
         internal static System.Globalization.CultureInfo Culture {
             get {
@@ -44,19 +44,19 @@ namespace Application.Resources {
                 resourceCulture = value;
             }
         }
-        
+
         internal static string TenantAlreadyTaken {
             get {
                 return ResourceManager.GetString("TenantAlreadyTaken", resourceCulture);
             }
         }
-        
+
         internal static string TenantNotFound {
             get {
                 return ResourceManager.GetString("TenantNotFound", resourceCulture);
             }
         }
-        
+
         internal static string InvalidToken {
             get {
                 return ResourceManager.GetString("InvalidToken", resourceCulture);

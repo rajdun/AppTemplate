@@ -2,6 +2,7 @@ using Infrastructure.Implementation;
 using NSubstitute;
 using StackExchange.Redis;
 using System.Text.Json;
+using Infrastructure.Cache;
 
 namespace InfrastructureTests.Implementation;
 

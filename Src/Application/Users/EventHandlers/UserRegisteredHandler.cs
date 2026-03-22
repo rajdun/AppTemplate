@@ -4,7 +4,7 @@ using FluentResults;
 using DomainEvent = Domain.Aggregates.Identity.DomainEvents.UserRegistered;
 using DomainNotification = Domain.Aggregates.Identity.DomainNotifications.UserRegistered;
 
-namespace Application.Identity.EventHandlers;
+namespace Application.Users.EventHandlers;
 
 public class UserRegisteredHandler : IRequestHandler<DomainEvent>
 {

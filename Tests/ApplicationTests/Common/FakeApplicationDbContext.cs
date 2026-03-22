@@ -1,8 +1,8 @@
 using System.Data.Common;
 using Application.Common;
 using Domain.Aggregates.Identity;
+using Domain.Aggregates.Licencing;
 using Domain.Common.Interfaces;
-using LicenseEntity = Domain.Aggregates.Licensing.License;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
@@ -15,7 +15,7 @@ namespace ApplicationTests.Common;
 internal sealed class FakeApplicationDbContext : DbContext, IApplicationDbContext
 {
     public DbSet<UserProfile> Profiles { get; set; } = null!;
-    public DbSet<LicenseEntity> Licenses { get; set; } = null!;
+    public DbSet<Domain.Aggregates.Licencing.Licence> Licences { get; set; } = null!;
 
     public FakeApplicationDbContext(DbContextOptions<FakeApplicationDbContext> options) : base(options)
     {
@@ -25,7 +25,7 @@ internal sealed class FakeApplicationDbContext : DbContext, IApplicationDbContex
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<LicenseEntity>(e =>
+        modelBuilder.Entity<Domain.Aggregates.Licencing.Licence>(e =>
         {
             e.HasKey(l => l.Id);
             e.Property(l => l.TenantId);

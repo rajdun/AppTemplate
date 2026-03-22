@@ -4,7 +4,7 @@ using FluentResults;
 using DomainEvent = Domain.Aggregates.Identity.DomainEvents.UserDeactivated;
 using DomainNotification = Domain.Aggregates.Identity.DomainNotifications.UserDeactivated;
 
-namespace Application.Identity.EventHandlers;
+namespace Application.Users.EventHandlers;
 
 public class UserDeactivatedHandler : IRequestHandler<DomainEvent>
 {
