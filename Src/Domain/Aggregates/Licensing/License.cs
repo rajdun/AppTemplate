@@ -1,3 +1,4 @@
+using Domain.Aggregates.Licensing.DomainNotification;
 using Domain.Common.Models;
 
 namespace Domain.Aggregates.Licensing;
@@ -56,6 +57,8 @@ public class License : AggregateRoot<Guid>
 
         _activeFeatures.Clear();
         _activeFeatures.AddRange(features);
+
+        AddDomainNotification(new LicenseRegenerated(TenantId, RawJwtToken));
     }
 
     public bool IsValid()

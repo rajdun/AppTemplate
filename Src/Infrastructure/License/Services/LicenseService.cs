@@ -1,13 +1,16 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Cryptography;
+using Application.Common;
+using Application.Common.Interfaces;
 using Application.License.Services;
 using Domain.Common.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Infrastructure.License.Services;
 
-public class LicenseService(IConfiguration configuration) : ILicenseService
+public class LicenseService(IConfiguration configuration, ICacheService cache, IApplicationDbContext dbContext) : ILicenseService
 {
     public async Task<LicenseData> DecodeTokenAsync(string token)
     {
@@ -50,5 +53,39 @@ public class LicenseService(IConfiguration configuration) : ILicenseService
             .Select(c => c.Value);
 
         return new LicenseData(tenantId, companyName, maxUsers, expiresAt.ToUniversalTime(), activeFeatures);
+    }
+
+    public async Task<bool> IsValidAsync()
+    {
+        var key = CacheKeys.GetLicenseCacheKey;
+
+        var licenseData = await cache.GetAsync<LicenseData>(key).ConfigureAwait(false);
+        if (licenseData == null)
+        {
+            licenseData = await GetLicenseDataFromDbAsync(CancellationToken.None).ConfigureAwait(false);
+            if (licenseData == null)
+            {
+                return false;
+            }
+        }
+
+        if (licenseData.ExpiresAt < DateTime.UtcNow)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    private async Task<LicenseData?> GetLicenseDataFromDbAsync(CancellationToken cancellationToken)
+    {
+        var license = await dbContext.Licenses.FirstOrDefaultAsync(cancellationToken).ConfigureAwait(false);
+
+        if (license == null)
+        {
+            return null;
+        }
+
+        return new LicenseData(license.TenantId, license.CompanyName, license.MaxUsers, license.ExpiresAt.DateTime, license.ActiveFeatures);
     }
 }

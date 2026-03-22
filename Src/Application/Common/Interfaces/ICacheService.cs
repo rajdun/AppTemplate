@@ -14,11 +14,13 @@ public static class CacheKeys
 {
     public static string GetRefreshTokenCacheKey(string userId)
     {
-        return $"refresh-token:{userId}";
+        return $"api:refresh-token:{userId}";
     }
 
     public static string GetJtiCacheKey(string jti)
     {
-        return $"jti:{jti}";
+        return $"api:jti:{jti}";
     }
+
+    public static string GetLicenseCacheKey => "api:license";
 }

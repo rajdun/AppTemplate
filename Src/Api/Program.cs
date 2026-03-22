@@ -93,6 +93,7 @@ app.UseRequestLocalization(localizationOptions);
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseMiddleware<LicenseMiddleware>();
 app.MapHealthChecks("/health");
 
 app.UseHangfireDashboard("/hangfire", new DashboardOptions

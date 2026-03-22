@@ -1,10 +1,12 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Security.Cryptography;
+using Application.Common;
 using Infrastructure.License;
 using Infrastructure.License.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Application.Common.Interfaces;
 using NSubstitute;
 
 namespace InfrastructureTests.License;
@@ -35,7 +37,11 @@ public class LicenseServiceTests : IDisposable
 
     protected virtual void Dispose(bool disposing)
     {
-        if (!disposing) return;
+        if (!disposing)
+        {
+            return;
+        }
+
         _rsa.Dispose();
         if (File.Exists(_tempPublicKeyPath))
         {
@@ -95,7 +101,7 @@ public class LicenseServiceTests : IDisposable
     public async Task DecodeTokenAsync_WithValidToken_ShouldReturnCorrectTenantId()
     {
         var token = MintToken(tenantId: "my-tenant");
-        var service = new LicenseService(BuildConfiguration());
+        var service = new LicenseService(BuildConfiguration(), Substitute.For<ICacheService>(), Substitute.For<IApplicationDbContext>());
 
         var result = await service.DecodeTokenAsync(token);
 
@@ -106,7 +112,7 @@ public class LicenseServiceTests : IDisposable
     public async Task DecodeTokenAsync_WithValidToken_ShouldReturnCorrectCompanyName()
     {
         var token = MintToken(companyName: "Big Corp");
-        var service = new LicenseService(BuildConfiguration());
+        var service = new LicenseService(BuildConfiguration(), Substitute.For<ICacheService>(), Substitute.For<IApplicationDbContext>());
 
         var result = await service.DecodeTokenAsync(token);
 
@@ -117,7 +123,7 @@ public class LicenseServiceTests : IDisposable
     public async Task DecodeTokenAsync_WithValidToken_ShouldReturnCorrectMaxUsers()
     {
         var token = MintToken(maxUsers: 250);
-        var service = new LicenseService(BuildConfiguration());
+        var service = new LicenseService(BuildConfiguration(), Substitute.For<ICacheService>(), Substitute.For<IApplicationDbContext>());
 
         var result = await service.DecodeTokenAsync(token);
 
@@ -128,7 +134,7 @@ public class LicenseServiceTests : IDisposable
     public async Task DecodeTokenAsync_WithValidToken_ShouldReturnActiveFeatures()
     {
         var token = MintToken(features: ["Analytics", "Export", "Import"]);
-        var service = new LicenseService(BuildConfiguration());
+        var service = new LicenseService(BuildConfiguration(), Substitute.For<ICacheService>(), Substitute.For<IApplicationDbContext>());
 
         var result = await service.DecodeTokenAsync(token);
 
@@ -141,7 +147,7 @@ public class LicenseServiceTests : IDisposable
     public async Task DecodeTokenAsync_WithExpiredToken_ShouldThrowSecurityTokenException()
     {
         var token = MintToken(expired: true);
-        var service = new LicenseService(BuildConfiguration());
+        var service = new LicenseService(BuildConfiguration(), Substitute.For<ICacheService>(), Substitute.For<IApplicationDbContext>());
 
         await Assert.ThrowsAsync<SecurityTokenException>(() => service.DecodeTokenAsync(token));
     }
@@ -151,7 +157,7 @@ public class LicenseServiceTests : IDisposable
     {
         var token = MintToken();
         var tampered = token[..^5] + "XXXXX"; // corrupt the signature
-        var service = new LicenseService(BuildConfiguration());
+        var service = new LicenseService(BuildConfiguration(), Substitute.For<ICacheService>(), Substitute.For<IApplicationDbContext>());
 
         await Assert.ThrowsAsync<SecurityTokenException>(() => service.DecodeTokenAsync(tampered));
     }
@@ -171,7 +177,7 @@ public class LicenseServiceTests : IDisposable
             signingCredentials: creds);
 
         var tokenStr = new JwtSecurityTokenHandler().WriteToken(badToken);
-        var service = new LicenseService(BuildConfiguration());
+        var service = new LicenseService(BuildConfiguration(), Substitute.For<ICacheService>(), Substitute.For<IApplicationDbContext>());
 
         await Assert.ThrowsAsync<SecurityTokenException>(() => service.DecodeTokenAsync(tokenStr));
     }
@@ -190,7 +196,7 @@ public class LicenseServiceTests : IDisposable
             signingCredentials: creds);
 
         var tokenStr = new JwtSecurityTokenHandler().WriteToken(badToken);
-        var service = new LicenseService(BuildConfiguration());
+        var service = new LicenseService(BuildConfiguration(), Substitute.For<ICacheService>(), Substitute.For<IApplicationDbContext>());
 
         await Assert.ThrowsAsync<SecurityTokenException>(() => service.DecodeTokenAsync(tokenStr));
     }
@@ -200,7 +206,7 @@ public class LicenseServiceTests : IDisposable
     {
         var expectedExpiry = new DateTime(2030, 6, 15, 12, 0, 0, DateTimeKind.Utc);
         var token = MintToken(expiresAt: expectedExpiry);
-        var service = new LicenseService(BuildConfiguration());
+        var service = new LicenseService(BuildConfiguration(), Substitute.For<ICacheService>(), Substitute.For<IApplicationDbContext>());
 
         var result = await service.DecodeTokenAsync(token);
 
