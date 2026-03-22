@@ -4,6 +4,7 @@ using Application.Common;
 using Application.Common.Interfaces;
 using Application.Common.Mailing;
 using Application.Common.Messaging;
+using Application.License.Services;
 using Application.Users.Interfaces;
 using Domain.Aggregates.Identity;
 using Domain.Aggregates.Identity.DomainEvents;
@@ -14,6 +15,7 @@ using Infrastructure.Data;
 using Infrastructure.Identity;
 using Infrastructure.Implementation;
 using Infrastructure.Implementation.Dto;
+using Infrastructure.License.Services;
 using Infrastructure.Mailing;
 using Infrastructure.Mailing.Dto;
 using Infrastructure.Messaging;
@@ -49,6 +51,7 @@ public static class InfrastructureDependencyInjection
         ArgumentNullException.ThrowIfNull(configuration);
 
         services.AddScoped<IOutboxProcessor, OutboxProcessor>();
+        services.AddSingleton<ILicenseService, LicenseService>();
 
         services.AddDatabase(configuration);
         services.AddIdentity(configuration);
